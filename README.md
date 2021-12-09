@@ -1,0 +1,2 @@
+# ee-core
+ee core
