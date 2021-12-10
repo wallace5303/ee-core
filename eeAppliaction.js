@@ -1,7 +1,7 @@
 const {app, BrowserWindow, BrowserView, Menu} = require('electron')
 const path = require('path')
-const eggLauncher = require('ee-core/lib/lanucher')
-const setup = require('./setup')
+const eggLauncher = require('./lib/lanucher')
+const BaseModule = require('./lib/baseModule')
 const electronConfig = require('./config')
 const storage = require('./lib/storage')
 const preferences = require('./preferences')
@@ -12,10 +12,9 @@ global.MAIN_WINDOW = null;
 global.APP_TRAY = null;
 global.CAN_QUIT = false;
 
-class EeAppliaction {
+class EeAppliaction extends BaseModule {
   constructor() {
-    // Initialize 
-    setup()
+    super();
 
     // argv
     let ENV = 'prod'

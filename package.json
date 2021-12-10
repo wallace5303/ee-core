@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "get-port": "^6.0.0"
+    "get-port": "^5.1.1"
   }
 }
