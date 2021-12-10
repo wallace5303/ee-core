@@ -5,10 +5,10 @@
  */
 
 /**
- * @member {Main} EeCore#Main
+ * @member {EeAppliaction} EeCore#EeAppliaction
  * @since 1.0.0
  */
- exports.Main = require('./lib/main');
+exports.EeAppliaction = require('./eeAppliaction');
 
 /**
  * @member {Api} EeCore#Api
@@ -20,25 +20,25 @@ exports.Api = require('./lib/api');
  * @member {AutoLaunch} EeCore#AutoLaunch
  * @since 1.0.0
  */
-exports.AutoLaunch = require('./lib/autoLaunch');
+exports.AutoLaunch = require('./lib/preferences/autoLaunch');
 
 /**
  * @member {AutoUpdater} EeCore#AutoUpdater
  * @since 1.0.0
  */
-exports.AutoUpdater = require('./lib/autoUpdater');
+exports.AutoUpdater = require('./lib/preferences/autoUpdater');
 
 /**
  * @member {Awaken} EeCore#Awaken
  * @since 1.0.0
  */
-exports.Awaken = require('./lib/awaken');
+exports.Awaken = require('./lib/preferences/awaken');
 
 /**
  * @member {ChromeExtension} EeCore#ChromeExtension
  * @since 1.0.0
  */
-exports.ChromeExtension = require('./lib/chromeExtension');
+exports.ChromeExtension = require('./lib/preferences/chromeExtension');
 
 /**
  * @member {CrashReport} EeCore#CrashReport
@@ -71,12 +71,12 @@ exports.IpcMain = require('./lib/ipcMain');
  /**
  * @member {Security} EeCore#Security
  */
-  exports.Security = require('./lib/security');
+  exports.Security = require('./lib/preferences/security');
 
   /**
  * @member {Shortcut} EeCore#Shortcut
  */
- exports.Shortcut = require('./lib/shortcut');
+ exports.Shortcut = require('./lib/preferences/shortcut');
 
  /**
  * @member {Storage} EeCore#Storage
@@ -86,4 +86,4 @@ exports.IpcMain = require('./lib/ipcMain');
   /**
  * @member {Tray} EeCore#Tray
  */
- exports.Tray = require('./lib/tray');
+ exports.Tray = require('./lib/preferences/tray');
