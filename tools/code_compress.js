@@ -107,7 +107,7 @@ class CodeCompress {
     for (let i = 0; i < process.argv.length; i++) {
       const tmpArgv = process.argv[i]
       if (tmpArgv.indexOf('--') !== -1) {
-        argvs.push(tmpArgv.substr(2))
+        argvs.push(tmpArgv.substring(2))
       }
     }
     return argvs;

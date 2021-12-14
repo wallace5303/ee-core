@@ -2,7 +2,7 @@ const {app, BrowserWindow, BrowserView, Menu} = require('electron')
 const path = require('path')
 const eggLauncher = require('./lib/lanucher')
 const BaseModule = require('./lib/baseModule')
-const electronConfig = require('./config')
+const electronConfig = require('ee-core/lib/config')
 const storage = require('./lib/storage')
 const preferences = require('./preferences')
 const helper = require('./lib/helper')
@@ -14,23 +14,46 @@ global.CAN_QUIT = false;
 
 class EeAppliaction extends BaseModule {
   constructor() {
-    super();
+    // let baseDir = app.getAppPath();
+    this.options = {
+      env: 'prod',
+      baseDir: process.cwd(),
+    }
 
     // argv
-    let ENV = 'prod'
     for (let i = 0; i < process.argv.length; i++) {
       const tmpArgv = process.argv[i]
       if (tmpArgv.indexOf('--env=') !== -1) {
-        ENV = tmpArgv.substr(6)
+        this.options.env = tmpArgv.substring(6)
       }
     }
-    const eggConfig = electronConfig.get('egg', ENV)
-    eggConfig.env = ENV
+
+    super(this.options);
+
+    const eggConfig = electronConfig.get('egg', env)
+    eggConfig.env = env
 
     // eLogger
-    const eLogger = require('ee-core/lib/eLogger').get()
+    const eLogger = require('./lib/eLogger').get()
 
     async function initialize () {
+
+      // 限制一个窗口
+      const gotTheLock = app.requestSingleInstanceLock()
+      if (!gotTheLock) {
+        helper.appQuit()
+      }
+      app.on('second-instance', (event) => {
+        if (MAIN_WINDOW) {
+          if (MAIN_WINDOW.isMinimized()) {
+            MAIN_WINDOW.restore()
+          }
+          MAIN_WINDOW.focus()
+        }
+      })
+      //去掉缓存
+      //app.commandLine.appendSwitch("--disable-http-cache");
+
       app.whenReady().then(() => {
         createWindow()
         app.on('activate', function () {

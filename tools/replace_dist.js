@@ -10,7 +10,7 @@ let distDir = '';
 for (let i = 0; i < process.argv.length; i++) {
   const tmpArgv = process.argv[i]
   if (tmpArgv.indexOf('--dist_dir=') !== -1) {
-    distDir = tmpArgv.substr(11)
+    distDir = tmpArgv.substring(11)
   }
 }
 
