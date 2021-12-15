@@ -8,7 +8,7 @@
  * @member {EeAppliaction} EeCore#EeAppliaction
  * @since 1.0.0
  */
-exports.EeAppliaction = require('./eeAppliaction');
+exports.EeAppliaction = require('./lib/eeAppliaction');
 
 /**
  * @member {Api} EeCore#Api
