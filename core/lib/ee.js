@@ -8,6 +8,8 @@ const co = require('co');
 const BaseContextClass = require('./utils/base_context_class');
 const utils = require('./utils');
 const Timing = require('./utils/timing');
+const EggConsoleLogger = require('egg-logger').EggConsoleLogger;
+const debug = require('debug')('ee-core');
 
 const ROUTER = Symbol('EeCore#router');
 const EE_LOADER = Symbol.for('ee#loader');
@@ -26,8 +28,16 @@ class EeCore extends KoaApplication {
     assert(fs.statSync(options.electronDir).isDirectory(), `Directory ${options.electronDir} is not a directory`);
 
     super();
+    // console.log(options);return;
+    this.mainWindow = null;
+
+    this.appTray = null;
+
+    this.winCanQuit = false;
 
     this.timing = new Timing();
+
+    this.console = new EggConsoleLogger();
 
     /**
      * @member {Object} EeCore#options
@@ -80,14 +90,15 @@ class EeCore extends KoaApplication {
      * @member {EeLoader} EeCore#loader
      * @since 1.0.0
      */
-    const Loader = this[EE_LOADER];
-    assert(Loader, 'Symbol.for(\'ee#loader\') is required');
-    this.loader = new Loader({
-      baseDir: options.baseDir,
-      electronDir: options.electronDir,
-      app: this,
-      env: options.env,
-    });
+    // const Loader = this[EE_LOADER];
+    // assert(Loader, 'Symbol.for(\'ee#loader\') is required');
+    // this.loader = new Loader({
+    //   baseDir: options.baseDir,
+    //   electronDir: options.electronDir,
+    //   logger: this.console,
+    //   app: this,
+    //   env: options.env,
+    // });
   }
 
   /**

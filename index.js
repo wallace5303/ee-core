@@ -5,36 +5,32 @@
  */
 
 /**
- * @member {EeAppliaction} EeCore#EeAppliaction
+ * @member {Appliaction} EeCore#Appliaction
  * @since 1.0.0
  */
-exports.EeAppliaction = require('./lib/eeAppliaction');
-
-/**
- * @member {ELogger} EeCore#ELogger
- * @since 1.10.0
- */
-exports.ELogger = require('./lib/eLogger');
-
-/**
- * @member {Helper} EeCore#Helper
- * @since 1.2.0
- */
-exports.Helper = require('./lib/helper');
-
-/**
- * @member {Storage} EeCore#Storage
- */
-exports.Storage = require('./lib/storage');
+const Appliaction = require('./lib/application');
 
 /**
  * @member {Controller} EeCore#Controller
- * @since 1.1.0
+ * @since 1.0.0
  */
-exports.Controller = require('./core/lib/utils/base_context_class');
+const Controller = require('./core/lib/utils/base_context_class');
 
 /**
  * @member {Service} EeCore#Service
- * @since 1.1.0
+ * @since 1.0.0
  */
-exports.Service = require('./core/lib/utils/base_context_class');
+const Service = require('./core/lib/utils/base_context_class');
+
+/**
+ * Catch exception
+ */
+process.on('uncaughtException', function(err) {
+  console.log(err);
+});
+
+module.exports = {
+  Appliaction,
+  Controller,
+  Service
+};

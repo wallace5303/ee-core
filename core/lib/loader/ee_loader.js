@@ -14,7 +14,6 @@ const Timing = require('ee-core/core/lib/utils/timing');
 
 const REQUIRE_COUNT = Symbol('EggLoader#requireCount');
 
-
 class EggLoader {
 
   /**
@@ -23,7 +22,6 @@ class EggLoader {
    * @param {String} options.baseDir - the directory of application
    * @param {EggCore} options.app - Application instance
    * @param {Logger} options.logger - logger
-   * @param {Object} [options.plugins] - custom plugins
    * @since 1.0.0
    */
   constructor(options) {
