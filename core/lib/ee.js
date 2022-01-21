@@ -90,15 +90,15 @@ class EeCore extends KoaApplication {
      * @member {EeLoader} EeCore#loader
      * @since 1.0.0
      */
-    // const Loader = this[EE_LOADER];
-    // assert(Loader, 'Symbol.for(\'ee#loader\') is required');
-    // this.loader = new Loader({
-    //   baseDir: options.baseDir,
-    //   electronDir: options.electronDir,
-    //   logger: this.console,
-    //   app: this,
-    //   env: options.env,
-    // });
+    const Loader = this[EE_LOADER];
+    assert(Loader, 'Symbol.for(\'ee#loader\') is required');
+    this.loader = new Loader({
+      baseDir: options.baseDir,
+      electronDir: options.electronDir,
+      logger: this.console,
+      app: this,
+      env: options.env,
+    });
   }
 
   /**

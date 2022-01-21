@@ -1,6 +1,6 @@
 'use strict';
 
-const debug = require('debug')('egg-core:config');
+const debug = require('debug')('ee-core:config');
 const path = require('path');
 const extend = require('extend2');
 const assert = require('assert');
@@ -21,6 +21,7 @@ module.exports = {
     this.configMeta = {};
 
     const target = {};
+console.log('----------------------- loadConfig');
 
     // Load Application config first
     const appConfig = this._preloadAppConfig();

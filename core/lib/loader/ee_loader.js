@@ -4,23 +4,22 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 const is = require('is-type-of');
-const debug = require('debug')('egg-core');
-const homedir = require('node-homedir');
-const FileLoader = require('ee-core/core/lib/loader/file_loader');
-const ContextLoader = require('ee-core/core/lib/loader/context_loader');
+const debug = require('debug')('ee-core');
+const FileLoader = require('./file_loader');
+const ContextLoader = require('./context_loader');
 const utility = require('utility');
-const utils = require('ee-core/core/lib/utils');
-const Timing = require('ee-core/core/lib/utils/timing');
+const utils = require('../utils');
+const Timing = require('../utils/timing');
 
-const REQUIRE_COUNT = Symbol('EggLoader#requireCount');
+const REQUIRE_COUNT = Symbol('EeLoader#requireCount');
 
-class EggLoader {
+class EeLoader {
 
   /**
    * @class
    * @param {Object} options - options
    * @param {String} options.baseDir - the directory of application
-   * @param {EggCore} options.app - Application instance
+   * @param {EeCore} options.app - Application instance
    * @param {Logger} options.logger - logger
    * @since 1.0.0
    */
@@ -31,12 +30,13 @@ class EggLoader {
     assert(this.options.logger, 'options.logger is required');
 
     this.app = this.options.app;
-    this.lifecycle = this.app.lifecycle;
     this.timing = this.app.timing || new Timing();
     this[REQUIRE_COUNT] = 0;
 
+    //console.log('dddddddddd ', this.app[Symbol.for('ee#eePath')]);return;
+    
     /**
-     * @member {Object} EggLoader#pkg
+     * @member {Object} EeLoader#pkg
      * @see {@link AppInfo#pkg}
      * @since 1.0.0
      */
@@ -45,33 +45,33 @@ class EggLoader {
     /**
      * All framework directories.
      *
-     * You can extend Application of egg, the entry point is options.app,
+     * You can extend Application of Ee, the entry point is options.app,
      *
      * loader will find all directories from the prototype of Application,
-     * you should define `Symbol.for('egg#eggPath')` property.
+     * you should define `Symbol.for('ee#eePath')` property.
      *
      * ```
      * // lib/example.js
-     * const egg = require('egg');
-     * class ExampleApplication extends egg.Application {
+     * const Ee = require('Ee');
+     * class ExampleApplication extends Ee.Application {
      *   constructor(options) {
      *     super(options);
      *   }
      *
-     *   get [Symbol.for('egg#eggPath')]() {
+     *   get [Symbol.for('ee#eePath')]() {
      *     return path.join(__dirname, '..');
      *   }
      * }
      * ```
-     * @member {Array} EggLoader#eggPaths
-     * @see EggLoader#getEggPaths
+     * @member {Array} EeLoader#EePaths
+     * @see EeLoader#getEePaths
      * @since 1.0.0
      */
-    this.eggPaths = this.getEggPaths();
-    debug('Loaded eggPaths %j', this.eggPaths);
+    this.EePaths = this.getEePaths();
+    debug('Loaded EePaths %j', this.EePaths);
 
     /**
-     * @member {String} EggLoader#serverEnv
+     * @member {String} EeLoader#serverEnv
      * @see AppInfo#env
      * @since 1.0.0
      */
@@ -79,13 +79,13 @@ class EggLoader {
     debug('Loaded serverEnv %j', this.serverEnv);
 
     /**
-     * @member {AppInfo} EggLoader#appInfo
+     * @member {AppInfo} EeLoader#appInfo
      * @since 1.0.0
      */
     this.appInfo = this.getAppInfo();
 
     /**
-     * @member {String} EggLoader#serverScope
+     * @member {String} EeLoader#serverScope
      * @see AppInfo#serverScope
      */
     this.serverScope = options.serverScope !== undefined
@@ -109,7 +109,7 @@ class EggLoader {
     }
 
     if (!serverEnv) {
-      serverEnv = process.env.EGG_SERVER_ENV;
+      serverEnv = process.env.EE_SERVER_ENV;
     }
 
     if (!serverEnv) {
@@ -133,7 +133,7 @@ class EggLoader {
    * @private
    */
   getServerScope() {
-    return process.env.EGG_SERVER_SCOPE || '';
+    return process.env.EE_SERVER_SCOPE || '';
   }
 
   /**
@@ -157,8 +157,7 @@ class EggLoader {
    * @since 3.4.0
    */
   getHomedir() {
-    // EGG_HOME for test
-    return process.env.EGG_HOME || homedir() || '/home/admin';
+    return process.env.HOME;
   }
 
   /**
@@ -193,7 +192,7 @@ class EggLoader {
        * The environment of the application, **it's not NODE_ENV**
        *
        * 1. from `$baseDir/config/env`
-       * 2. from EGG_SERVER_ENV
+       * 2. from Ee_SERVER_ENV
        * 3. from NODE_ENV
        *
        * env | description
@@ -204,7 +203,7 @@ class EggLoader {
        * unittest  | unit test
        *
        * @member {String} AppInfo#env
-       * @see https://eggjs.org/zh-cn/basics/env.html
+       * @see https://Eejs.org/zh-cn/basics/env.html
        */
       env,
 
@@ -238,40 +237,18 @@ class EggLoader {
   }
 
   /**
-   * Get {@link EggLoader#eggPaths}
+   * Get {@link EeLoader#EePaths}
    * @return {Array} framework directories
-   * @see {@link EggLoader#eggPaths}
+   * @see {@link EeLoader#EePaths}
    * @private
    * @since 1.0.0
    */
-  getEggPaths() {
+  getEePaths() {
     // avoid require recursively
-    const EggCore = require('../egg');
-    const eggPaths = [];
+    const EePaths = [];
+    EePaths.push(this.app[Symbol.for('ee#eePath')]);
 
-    let proto = this.app;
-
-    // Loop for the prototype chain
-    while (proto) {
-      proto = Object.getPrototypeOf(proto);
-      // stop the loop if
-      // - object extends Object
-      // - object extends EggCore
-      if (proto === Object.prototype || proto === EggCore.prototype) {
-        break;
-      }
-
-      assert(proto.hasOwnProperty(Symbol.for('egg#eggPath')), 'Symbol.for(\'egg#eggPath\') is required on Application');
-      const eggPath = proto[Symbol.for('egg#eggPath')];
-      assert(eggPath && typeof eggPath === 'string', 'Symbol.for(\'egg#eggPath\') should be string');
-      assert(fs.existsSync(eggPath), `${eggPath} not exists`);
-      const realpath = fs.realpathSync(eggPath);
-      if (!eggPaths.includes(realpath)) {
-        eggPaths.unshift(realpath);
-      }
-    }
-
-    return eggPaths;
+    return EePaths;
   }
 
   // Low Level API
@@ -320,7 +297,7 @@ class EggLoader {
   /**
    * Get all loadUnit
    *
-   * loadUnit is a directory that can be loaded by EggLoader, it has the same structure.
+   * loadUnit is a directory that can be loaded by EeLoader, it has the same structure.
    * loadUnit has a path and a type(app, framework, plugin).
    *
    * The order of the loadUnits:
@@ -348,10 +325,10 @@ class EggLoader {
       }
     }
 
-    // framework or egg path
-    for (const eggPath of this.eggPaths) {
+    // framework or Ee path
+    for (const EePath of this.EePaths) {
       dirs.push({
-        path: eggPath,
+        path: EePath,
         type: 'framework',
       });
     }
@@ -408,7 +385,7 @@ class EggLoader {
   }
 
   /**
-   * @member {FileLoader} EggLoader#FileLoader
+   * @member {FileLoader} EeLoader#FileLoader
    * @since 1.0.0
    */
   get FileLoader() {
@@ -416,7 +393,7 @@ class EggLoader {
   }
 
   /**
-   * @member {ContextLoader} EggLoader#ContextLoader
+   * @member {ContextLoader} EeLoader#ContextLoader
    * @since 1.0.0
    */
   get ContextLoader() {
@@ -441,7 +418,7 @@ class EggLoader {
       return undefined;
     }
 
-    if (process.env.EGG_TYPESCRIPT !== 'true' && fullPath.endsWith('.ts')) {
+    if (process.env.Ee_TYPESCRIPT !== 'true' && fullPath.endsWith('.ts')) {
       return undefined;
     }
 
@@ -450,24 +427,18 @@ class EggLoader {
 }
 
 /**
- * Mixin methods to EggLoader
+ * Mixin methods to EeLoader
  * // ES6 Multiple Inheritance
  * https://medium.com/@leocavalcante/es6-multiple-inheritance-73a3c66d2b6b
  */
 const loaders = [
-  require('ee-core/core/lib/loader/mixin/plugin'),
-  require('ee-core/core/lib/loader/mixin/config'),
-  require('ee-core/core/lib/loader/mixin/extend'),
-  require('ee-core/core/lib/loader/mixin/custom'),
-  require('ee-core/core/lib/loader/mixin/service'),
-  require('ee-core/core/lib/loader/mixin/middleware'),
-  require('ee-core/core/lib/loader/mixin/controller'),
-  require('ee-core/core/lib/loader/mixin/router'),
-  require('ee-core/core/lib/loader/mixin/custom_loader'),
+  require('./mixin/config'),
+  require('./mixin/service'),
+  require('./mixin/controller'),
 ];
 
 for (const loader of loaders) {
-  Object.assign(EggLoader.prototype, loader);
+  Object.assign(EeLoader.prototype, loader);
 }
 
-module.exports = EggLoader;
+module.exports = EeLoader;
