@@ -18,7 +18,7 @@ module.exports = {
     this.timing.start('Load Controller');
     opt = Object.assign({
       caseStyle: 'lower',
-      directory: path.join(this.options.baseDir, 'app/controller'),
+      directory: path.join(this.options.baseDir, 'controller'),
       initializer: (obj, opt) => {
         // return class if it exports a function
         // ```js

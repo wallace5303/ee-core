@@ -2,14 +2,14 @@
 
 const assert = require('assert');
 const fs = require('fs');
-const debug = require('debug')('egg-core:loader');
+const debug = require('debug')('ee-core:loader');
 const path = require('path');
 const globby = require('globby');
 const is = require('is-type-of');
-const deprecate = require('depd')('egg');
+const deprecate = require('depd')('ee');
 const utils = require('../utils');
-const FULLPATH = Symbol('EGG_LOADER_ITEM_FULLPATH');
-const EXPORTS = Symbol('EGG_LOADER_ITEM_EXPORTS');
+const FULLPATH = Symbol('EE_LOADER_ITEM_FULLPATH');
+const EXPORTS = Symbol('EE_LOADER_ITEM_EXPORTS');
 
 const defaults = {
   directory: null,
@@ -65,6 +65,7 @@ class FileLoader {
    */
   load() {
     const items = this.parse();
+    console.log('FileLoader load items:', items);
     const target = this.options.target;
     for (const item of items) {
       // item { properties: [ 'a', 'b', 'c'], exports }
@@ -124,7 +125,7 @@ class FileLoader {
     let files = this.options.match;
     
     if (!files) {
-      files = (process.env.EGG_TYPESCRIPT === 'true' && utils.extensions['.ts'])
+      files = (process.env.EE_TYPESCRIPT === 'true' && utils.extensions['.ts'])
         ? [ '**/*.(js|ts)', '!**/*.d.ts' ]
         : [ '**/*.js' ];
     } else {

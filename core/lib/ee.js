@@ -23,9 +23,9 @@ class EeCore extends KoaApplication {
    * @since 1.0.0
    */
   constructor(options = {}) {
-    assert(typeof options.electronDir === 'string', 'options.electronDir required, and must be a string');
-    assert(fs.existsSync(options.electronDir), `Directory ${options.electronDir} not exists`);
-    assert(fs.statSync(options.electronDir).isDirectory(), `Directory ${options.electronDir} is not a directory`);
+    assert(typeof options.baseDir === 'string', 'options.baseDir required, and must be a string');
+    assert(fs.existsSync(options.baseDir), `Directory ${options.baseDir} not exists`);
+    assert(fs.statSync(options.baseDir).isDirectory(), `Directory ${options.baseDir} is not a directory`);
 
     super();
     // console.log(options);return;
@@ -94,7 +94,7 @@ class EeCore extends KoaApplication {
     assert(Loader, 'Symbol.for(\'ee#loader\') is required');
     this.loader = new Loader({
       baseDir: options.baseDir,
-      electronDir: options.electronDir,
+      homeDir: options.homeDir,
       logger: this.console,
       app: this,
       env: options.env,
@@ -115,23 +115,23 @@ class EeCore extends KoaApplication {
   }
 
   /**
-   * The current directory of application
+   * The home directory of application
+   * @member {String}
+   * @see {@link AppInfo#baseDir}
+   * @since 1.0.0
+   */
+  get homeDir() {
+    return this.options.homeDir;
+  }
+
+  /**
+   * The electron current directory of application
    * @member {String}
    * @see {@link AppInfo#baseDir}
    * @since 1.0.0
    */
   get baseDir() {
     return this.options.baseDir;
-  }
-
-  /**
-   * The electron current directory of application
-   * @member {String}
-   * @see {@link AppInfo#electronDir}
-   * @since 1.0.0
-   */
-  get electronDir() {
-    return this.options.electronDir;
   }
 
   /**

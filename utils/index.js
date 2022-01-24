@@ -4,8 +4,6 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-exports = module.exports;
-
 exports.mkdir = function(dirpath, dirname) {
   // 判断是否是第一次调用
   if (typeof dirname === 'undefined') {
@@ -58,10 +56,7 @@ exports.getPackage = function() {
 /**
  * egg使用 - 获取数据存储路径
  */
- exports.getStorageDir = function() {
-  const pkgJson = this.getPackage();
-  const userHomeDir = os.userInfo().homedir;
-  const storageDir = path.join(userHomeDir, pkgJson.name, '/');
-
+exports.getStorageDir = function() {
+  const storageDir = path.join(process.env.EE_APP_USER_DATA);
   return storageDir;
 }

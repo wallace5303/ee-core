@@ -1,5 +1,5 @@
 const { app } = require('electron');
-const { LOGIN_SETTING_OPTIONS } = require('ee-core/lib/constant').AutoLaunch;
+const { LOGIN_SETTING_OPTIONS } = require('ee-core/lib/constant').autoLaunch;
 
 class AutoLaunch {
   enable () {

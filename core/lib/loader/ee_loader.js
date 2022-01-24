@@ -40,7 +40,7 @@ class EeLoader {
      * @see {@link AppInfo#pkg}
      * @since 1.0.0
      */
-    this.pkg = utility.readJSONSync(path.join(this.options.baseDir, 'package.json'));
+    this.pkg = utility.readJSONSync(path.join(this.options.homeDir, 'package.json'));
 
     /**
      * All framework directories.
@@ -377,7 +377,6 @@ class EeLoader {
       property,
       inject: this.app,
     }, opt);
-
     const timingKey = `Load "${String(property)}" to Context`;
     this.timing.start(timingKey);
     new ContextLoader(opt).load();

@@ -7,7 +7,7 @@ module.exports = {
 
   /**
    * Load app/service
-   * @function EggLoader#loadService
+   * @function EeLoader#loadService
    * @param {Object} opt - LoaderOptions
    * @since 1.0.0
    */
@@ -18,8 +18,9 @@ module.exports = {
       call: true,
       caseStyle: 'lower',
       fieldClass: 'serviceClasses',
-      directory: this.getLoadUnits().map(unit => path.join(unit.path, 'app/service')),
+      directory: this.getLoadUnits().map(unit => path.join(unit.path, 'service')), // this.getLoadUnits().map(unit => path.join(unit.path, 'app/service'))
     }, opt);
+
     const servicePaths = opt.directory;
     this.loadToContext(servicePaths, 'service', opt);
     this.timing.end('Load Service');

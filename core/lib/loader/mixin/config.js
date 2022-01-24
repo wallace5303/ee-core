@@ -21,10 +21,10 @@ module.exports = {
     this.configMeta = {};
 
     const target = {};
-console.log('----------------------- loadConfig');
 
     // Load Application config first
     const appConfig = this._preloadAppConfig();
+    //console.log('----------------------- appConfig:', appConfig);
 
     //   plugin config.default
     //     framework config.default
@@ -34,6 +34,7 @@ console.log('----------------------- loadConfig');
     //             app config.{env}
     for (const filename of this.getTypeFiles('config')) {
       for (const unit of this.getLoadUnits()) {
+        
         const isApp = unit.type === 'app';
         const config = this._loadConfig(unit.path, filename, isApp ? undefined : appConfig, unit.type);
 
@@ -41,12 +42,12 @@ console.log('----------------------- loadConfig');
           continue;
         }
 
-        debug('Loaded config %s/%s, %j', unit.path, filename, config);
+        debug('Loaded config %s, %s, %j', unit.path, filename, config);
         extend(true, target, config);
       }
     }
 
-    // load env from process.env.EGG_APP_CONFIG
+    // load env from process.env.EE_APP_CONFIG
     const envConfig = this._loadConfigFromEnv();
     debug('Loaded config from env, %j', envConfig);
     extend(true, target, envConfig);
@@ -99,14 +100,14 @@ console.log('----------------------- loadConfig');
   },
 
   _loadConfigFromEnv() {
-    const envConfigStr = process.env.EGG_APP_CONFIG;
+    const envConfigStr = process.env.EE_APP_CONFIG;
     if (!envConfigStr) return;
     try {
       const envConfig = JSON.parse(envConfigStr);
-      this._setConfigMeta(envConfig, '<process.env.EGG_APP_CONFIG>');
+      this._setConfigMeta(envConfig, '<process.env.EE_APP_CONFIG>');
       return envConfig;
     } catch (err) {
-      this.options.logger.warn('[egg-loader] process.env.EGG_APP_CONFIG is not invalid JSON: %s', envConfigStr);
+      this.options.logger.warn('[egg-loader] process.env.EE_APP_CONFIG is not invalid JSON: %s', envConfigStr);
     }
   },
 
