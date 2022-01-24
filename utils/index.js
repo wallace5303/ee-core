@@ -57,6 +57,6 @@ exports.getPackage = function() {
  * egg使用 - 获取数据存储路径
  */
 exports.getStorageDir = function() {
-  const storageDir = path.join(process.env.EE_APP_USER_DATA);
+  const storageDir = process.env.EE_APP_USER_DATA;
   return storageDir;
 }
