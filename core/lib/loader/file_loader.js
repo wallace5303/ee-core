@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const fs = require('fs');
-const debug = require('debug')('ee-core:loader');
+const debug = require('debug')('ee-core:fileLoader');
 const path = require('path');
 const globby = require('globby');
 const is = require('is-type-of');

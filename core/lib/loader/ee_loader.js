@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const assert = require('assert');
 const is = require('is-type-of');
-const debug = require('debug')('ee-core');
+const debug = require('debug')('ee-core:EeLoader');
 const FileLoader = require('./file_loader');
 const ContextLoader = require('./context_loader');
 const utility = require('utility');
@@ -83,6 +83,7 @@ class EeLoader {
      * @since 1.0.0
      */
     this.appInfo = this.getAppInfo();
+    console.log('appInfo:      ', this.appInfo);
 
     /**
      * @member {String} EeLoader#serverScope
@@ -157,7 +158,7 @@ class EeLoader {
    * @since 3.4.0
    */
   getHomedir() {
-    return process.env.HOME;
+    return this.options.homeDir;
   }
 
   /**
@@ -170,6 +171,7 @@ class EeLoader {
     const scope = this.serverScope;
     const home = this.getHomedir();
     const baseDir = this.options.baseDir;
+    const appUserDataDir = this.options.appUserData;
 
     /**
      * Meta information of the application
@@ -192,7 +194,7 @@ class EeLoader {
        * The environment of the application, **it's not NODE_ENV**
        *
        * 1. from `$baseDir/config/env`
-       * 2. from Ee_SERVER_ENV
+       * 2. from EE_SERVER_ENV
        * 3. from NODE_ENV
        *
        * env | description
@@ -232,7 +234,9 @@ class EeLoader {
        * keep root directory in baseDir when local and unittest
        * @member {String} AppInfo#root
        */
-      root: env === 'local' || env === 'unittest' ? baseDir : home,
+      root: env === 'local' || env === 'unittest' ? home : appUserDataDir,
+
+      appUserDataDir: appUserDataDir
     };
   }
 

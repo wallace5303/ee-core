@@ -9,7 +9,7 @@ const BaseContextClass = require('./utils/base_context_class');
 const utils = require('./utils');
 const Timing = require('./utils/timing');
 const EggConsoleLogger = require('egg-logger').EggConsoleLogger;
-const debug = require('debug')('ee-core');
+const debug = require('debug')('ee-core:EeCore');
 
 const ROUTER = Symbol('EeCore#router');
 const EE_LOADER = Symbol.for('ee#loader');
@@ -98,6 +98,7 @@ class EeCore extends KoaApplication {
       logger: this.console,
       app: this,
       env: options.env,
+      appUserData: options.appUserData
     });
   }
 

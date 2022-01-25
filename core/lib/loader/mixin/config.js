@@ -34,7 +34,6 @@ module.exports = {
     //             app config.{env}
     for (const filename of this.getTypeFiles('config')) {
       for (const unit of this.getLoadUnits()) {
-        
         const isApp = unit.type === 'app';
         const config = this._loadConfig(unit.path, filename, isApp ? undefined : appConfig, unit.type);
 
@@ -78,10 +77,14 @@ module.exports = {
     const isApp = type === 'app';
 
     let filepath = this.resolveModule(path.join(dirpath, 'config', filename));
+
+    //console.log("_loadConfig filepath:", filepath);
+
     // let config.js compatible
     if (filename === 'config.default' && !filepath) {
       filepath = this.resolveModule(path.join(dirpath, 'config/config'));
     }
+  
     const config = this.loadFile(filepath, this.appInfo, extraInject);
 
     if (!config) return null;
