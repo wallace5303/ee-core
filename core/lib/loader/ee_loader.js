@@ -32,8 +32,6 @@ class EeLoader {
     this.app = this.options.app;
     this.timing = this.app.timing || new Timing();
     this[REQUIRE_COUNT] = 0;
-
-    //console.log('dddddddddd ', this.app[Symbol.for('ee#eePath')]);return;
     
     /**
      * @member {Object} EeLoader#pkg
@@ -83,7 +81,6 @@ class EeLoader {
      * @since 1.0.0
      */
     this.appInfo = this.getAppInfo();
-    console.log('appInfo:      ', this.appInfo);
 
     /**
      * @member {String} EeLoader#serverScope

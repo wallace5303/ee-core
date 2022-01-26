@@ -23,6 +23,8 @@ class EeCore extends KoaApplication {
    * @since 1.0.0
    */
   constructor(options = {}) {
+    options.type = options.type || 'application';
+
     assert(typeof options.baseDir === 'string', 'options.baseDir required, and must be a string');
     assert(fs.existsSync(options.baseDir), `Directory ${options.baseDir} not exists`);
     assert(fs.statSync(options.baseDir).isDirectory(), `Directory ${options.baseDir} is not a directory`);
@@ -118,7 +120,7 @@ class EeCore extends KoaApplication {
   /**
    * The home directory of application
    * @member {String}
-   * @see {@link AppInfo#baseDir}
+   * @see {@link AppInfo#homeDir}
    * @since 1.0.0
    */
   get homeDir() {
@@ -133,6 +135,16 @@ class EeCore extends KoaApplication {
    */
   get baseDir() {
     return this.options.baseDir;
+  }
+
+  /**
+   * The ee-core directory of framework
+   * @member {String}
+   * @see {@link AppInfo#EeCoreDir}
+   * @since 1.0.0
+   */
+  get eeCoreDir() {
+    return this.options.framework;
   }
 
   /**

@@ -94,7 +94,7 @@ module.exports = appInfo => {
    * @property {Boolean} enablePerformanceTimer - using performance.now() timer instead of Date.now() for more more precise milliseconds, defaults to false. e.g.: logger will set 1.456ms instead of 1ms.
    */
   config.logger = {
-    dir: path.join(appInfo.root, 'logs', appInfo.env),
+    dir: path.join(appInfo.root, 'logs'),
     encoding: 'utf8',
     env: appInfo.env,
     level: 'INFO',
@@ -103,8 +103,8 @@ module.exports = appInfo => {
     outputJSON: false,
     buffer: true,
     appLogName: `ee.log`,
-    // coreLogName: 'ee-core.log',
-    // agentLogName: 'ee-agent.log',
+    coreLogName: 'ee-core.log',
+    agentLogName: 'ee-agent.log',
     errorLogName: `ee-error.log`,
     coreLogger: {},
     allowDebugAtProd: false,
