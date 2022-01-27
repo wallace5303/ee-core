@@ -23,6 +23,25 @@ const Controller = require('./core/lib/utils/base_context_class');
 const Service = require('./core/lib/utils/base_context_class');
 
 /**
+ * @member {Storage}
+ * @since 1.0.0
+ */
+const Storage = require('./lib/appStorage');
+
+/**
+ * @member {Utils}
+ * @since 1.0.0
+ */
+const Utils = require('./utils/index');
+
+/**
+ * @member {Socket}
+ * @since 1.0.0
+ */
+//const Socket = require('./lib/Socket');
+
+
+/**
  * Catch exception
  */
 process.on('uncaughtException', function(err) {
@@ -32,5 +51,8 @@ process.on('uncaughtException', function(err) {
 module.exports = {
   Appliaction,
   Controller,
-  Service
+  Service,
+  Storage,
+  //Socket,
+  Utils
 };
