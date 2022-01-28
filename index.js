@@ -40,14 +40,6 @@ const Utils = require('./utils/index');
  */
 //const Socket = require('./lib/Socket');
 
-
-/**
- * Catch exception
- */
-process.on('uncaughtException', function(err) {
-  console.log(err);
-});
-
 module.exports = {
   Appliaction,
   Controller,

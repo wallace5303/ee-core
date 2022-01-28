@@ -30,12 +30,6 @@ class EeCore extends KoaApplication {
     assert(fs.statSync(options.baseDir).isDirectory(), `Directory ${options.baseDir} is not a directory`);
 
     super();
-    // console.log(options);return;
-    this.mainWindow = null;
-
-    this.appTray = null;
-
-    this.winCanQuit = false;
 
     this.timing = new Timing();
 
