@@ -26,7 +26,7 @@ const Service = require('./core/lib/utils/base_context_class');
  * @member {Storage}
  * @since 1.0.0
  */
-const Storage = require('./lib/appStorage');
+const Storage = require('./lib/storage/index').Storage;
 
 /**
  * @member {Utils}
