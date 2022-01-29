@@ -215,7 +215,7 @@ class EeLoader {
        * The use directory, same as `process.env.HOME`
        * @member {String} AppInfo#HOME
        */
-      HOME: home,
+      home: home,
 
       /**
        * parsed from `package.json`

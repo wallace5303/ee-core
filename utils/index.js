@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const os = require('os');
+const LowdbStorage = require('../lib/storage/lowdbStorage');
 
 exports.mkdir = function(dirpath, dirname) {
   // 判断是否是第一次调用
@@ -54,11 +54,57 @@ exports.getPackage = function() {
 };
 
 /**
- * egg使用 - 获取数据存储路径
+ * 获取数据存储路径
  */
 exports.getStorageDir = function() {
   let env = process.env.EE_SERVER_ENV;
   const appDir = env === 'local' || env === 'unittest' ? process.env.EE_HOME : process.env.EE_APP_USER_DATA;
   const storageDir = path.join(appDir, 'data');
   return storageDir;
+}
+
+/**
+ * 获取ee配置
+ */
+exports.getEeConfig = function() {
+  const storage = this.getStorage();
+  const config = storage.getItem('config');
+
+  return config;
+}
+
+/**
+ * 获取egg配置
+ */
+ exports.getEggConfig = function() {
+  const storage = this.getStorage();
+  const config = storage.getItem('config');
+
+  return config.egg;
+}
+
+/**
+ * 获取ee storage
+ */
+exports.getStorage = function() {
+  const storage = new LowdbStorage('system');
+  return storage;
+}
+
+/**
+ * 获取 storage 目录
+ */
+exports.getStorageDir = function() {
+  const storage = this.getStorage();
+  const dirPath = storage.getStorageDir();
+
+  return dirPath;
+}
+
+/**
+ * 获取 日志 目录
+ */
+exports.getLogDir = function() {
+  let logPath = path.join(this.getStorageDir(), 'logs');
+  return logPath;
 }
