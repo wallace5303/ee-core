@@ -9,12 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dayjs": "^1.10.7",
-    "egg": "^2.33.1",
-    "egg-cluster": "^1.27.1",
-    "egg-log": "^1.0.5",
     "electron-is": "^3.0.0",
-    "electron-log": "^4.4.4",
     "electron-updater": "^4.6.1",
     "get-port": "^5.1.1",
     "is-type-of": "^1.2.1",
