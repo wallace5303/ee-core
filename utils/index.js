@@ -84,7 +84,7 @@ exports.getEggConfig = function() {
 
 
 /**
- * 获取 数据存储路径
+ * 获取 数据库存储路径
  */
 exports.getStorageDir = function() {
   const cdb = this.getCoreDB();
@@ -94,9 +94,18 @@ exports.getStorageDir = function() {
 }
 
 /**
+ * 获取 应用程序数据目录 (开发环境时，为项目根目录)
+ */
+exports.getAppUserDataDir = function() {
+  let env = process.env.EE_SERVER_ENV;
+  const dir = env === 'local' || env === 'unittest' ? process.env.EE_HOME : process.env.EE_APP_USER_DATA;
+  return dir;
+}
+
+/**
  * 获取 日志目录
  */
 exports.getLogDir = function() {
-  let logPath = path.join(this.getStorageDir(), 'logs');
+  let logPath = path.join(this.getAppUserDataDir(), 'logs');
   return logPath;
 }
