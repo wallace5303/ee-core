@@ -109,3 +109,10 @@ exports.getLogDir = function() {
   let logPath = path.join(this.getAppUserDataDir(), 'logs');
   return logPath;
 }
+
+/**
+ * 获取 socketio port
+ */
+exports.getIpcPort = function() {
+  return process.env.EE_IPC_PORT;
+}

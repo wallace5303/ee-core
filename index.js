@@ -38,13 +38,13 @@ const Utils = require('./utils/index');
  * @member {Socket}
  * @since 1.0.0
  */
-//const Socket = require('./lib/Socket');
+const Socket = require('./lib/socket/io');
 
 module.exports = {
   Appliaction,
   Controller,
   Service,
   Storage,
-  //Socket,
+  Socket,
   Utils
 };
