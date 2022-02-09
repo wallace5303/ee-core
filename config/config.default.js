@@ -49,7 +49,7 @@ module.exports = appInfo => {
      * @see {appInfo#HOME}
      * @since 1.0.0
      */
-    HOME: appInfo.HOME,
+    HOME: appInfo.home,
 
     /**
      * The directory of server running. You can find `application_config.json` under it that is dumpped from `app.config`.
@@ -73,7 +73,31 @@ module.exports = appInfo => {
         // ignore any key contains "secret" keyword
         /secret/i,
       ]),
-    }
+    },
+
+    /**
+     * application home directory
+     * @member {String} Config#homeDir
+     * @default
+     * @since 1.0.0
+     */
+    homeDir: appInfo.home,
+
+    /**
+     * application data & logs directory by env
+     * @member {String} Config#root
+     * @default
+     * @since 1.0.0
+     */
+    root: appInfo.root,
+
+    /**
+     * application data directory
+     * @member {String} Config#appUserDataDir
+     * @default
+     * @since 1.0.0
+     */
+    appUserDataDir: appInfo.appUserDataDir
   };
 
   /**
