@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const constant = require('../lib/constant');
 
 exports.mkdir = function(dirpath, dirname) {
   // 判断是否是第一次调用
@@ -81,8 +82,6 @@ exports.getEggConfig = function() {
   return config.egg;
 }
 
-
-
 /**
  * 获取 数据库存储路径
  */
@@ -97,8 +96,10 @@ exports.getStorageDir = function() {
  * 获取 应用程序数据目录 (开发环境时，为项目根目录)
  */
 exports.getAppUserDataDir = function() {
-  let env = process.env.EE_SERVER_ENV;
-  const dir = env === 'local' || env === 'unittest' ? process.env.EE_HOME : process.env.EE_APP_USER_DATA;
+  const cdb = this.getCoreDB();
+  const config = cdb.getItem('config');
+  const env = config.env;
+  const dir = env === 'local' || env === 'unittest' ? config.homeDir : config.appUserDataDir;
   return dir;
 }
 
@@ -106,7 +107,7 @@ exports.getAppUserDataDir = function() {
  * 获取 日志目录
  */
 exports.getLogDir = function() {
-  let logPath = path.join(this.getAppUserDataDir(), 'logs');
+  const logPath = path.join(this.getAppUserDataDir(), 'logs');
   return logPath;
 }
 
@@ -114,5 +115,14 @@ exports.getLogDir = function() {
  * 获取 socketio port
  */
 exports.getIpcPort = function() {
-  return process.env.EE_IPC_PORT;
+  const cdb = this.getCoreDB();
+  const port = cdb.getItem('ipc_port');
+  return port;
+}
+
+/**
+ * 获取 ipc channel
+ */
+exports.getIpcChannel = function() {
+  return constant.socketIo.channel;
 }
