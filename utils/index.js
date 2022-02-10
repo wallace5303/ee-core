@@ -54,8 +54,7 @@ exports.getPackage = function() {
 };
 
 /**
- * @class 获取 coredb
- * @since 1.0.0
+ * 获取 coredb
  */
 exports.getCoreDB = function() {
   const coreDB = require('../lib/storage/index').JsonDB.connection('system');
