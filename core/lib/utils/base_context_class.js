@@ -13,26 +13,27 @@ class BaseContextClass {
    * @since 1.0.0
    */
   constructor(ctx) {
-    /**
-     * @member {Context} BaseContextClass#ctx
-     * @since 1.0.0
-     */
-    this.ctx = ctx;
-    /**
-     * @member {Application} BaseContextClass#app
-     * @since 1.0.0
-     */
-    this.app = ctx.app;
-    /**
-     * @member {Config} BaseContextClass#config
-     * @since 1.0.0
-     */
-    this.config = ctx.app.config;
-    /**
-     * @member {Service} BaseContextClass#service
-     * @since 1.0.0
-     */
-    this.service = ctx.service;
+    console.log("sssssssss ctx:", ctx);
+    // /**
+    //  * @member {Context} BaseContextClass#ctx
+    //  * @since 1.0.0
+    //  */
+    // this.ctx = ctx;
+    // /**
+    //  * @member {Application} BaseContextClass#app
+    //  * @since 1.0.0
+    //  */
+    // this.app = ctx.app;
+    // /**
+    //  * @member {Config} BaseContextClass#config
+    //  * @since 1.0.0
+    //  */
+    // this.config = ctx.app.config;
+    // /**
+    //  * @member {Service} BaseContextClass#service
+    //  * @since 1.0.0
+    //  */
+    // this.service = ctx.service;
   }
 }
 

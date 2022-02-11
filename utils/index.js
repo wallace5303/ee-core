@@ -3,6 +3,9 @@
 const fs = require('fs');
 const path = require('path');
 const constant = require('../lib/constant');
+const convert = require('koa-convert');
+const is = require('is-type-of');
+const co = require('co');
 
 exports.mkdir = function(dirpath, dirname) {
   // 判断是否是第一次调用
@@ -124,4 +127,15 @@ exports.getIpcPort = function() {
  */
 exports.getIpcChannel = function() {
   return constant.socketIo.channel;
+}
+
+exports.callFn = async function (fn, args, ctx) {
+  args = args || [];
+  if (!is.function(fn)) return;
+  if (is.generatorFunction(fn)) fn = co.wrap(fn);
+  return ctx ? fn.call(ctx, ...args) : fn(...args);
+}
+
+exports.middleware = function (fn) {
+  return is.generatorFunction(fn) ? convert(fn) : fn;
 }
