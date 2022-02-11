@@ -80,9 +80,6 @@ function wrapClass(Controller) {
 
   function methodToMiddleware(Controller, key) {
     return function classControllerMiddleware(...args) {
-      console.log('bbbbbbbbbbbbbb Controller:',Controller);
-      console.log('bbbbbbbbbbbbbb key:',key);
-      console.log('bbbbbbbbbbbbbb args:',args);
       const controller = new Controller(this);
       // if (!this.app.config.controller || !this.app.config.controller.supportParams) {
       //   args = [ this ];

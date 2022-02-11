@@ -31,6 +31,9 @@ class EeCore extends KoaApplication {
 
     super();
 
+    // todo 
+    //this.context = null;
+
     this.timing = new Timing();
 
     this.console = new EggConsoleLogger();

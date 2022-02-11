@@ -362,7 +362,7 @@ class EeLoader {
     const timingKey = `Load "${String(property)}" to Application`;
     this.timing.start(timingKey);
     new FileLoader(opt).load();
-    //console.log('app controller:', this.app[property]);
+    console.log('app controller:', this.app[property]);
     this.timing.end(timingKey);
   }
 
