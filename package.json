@@ -9,10 +9,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "agentkeepalive": "^4.2.0",
+    "egg-errors": "^2.3.0",
     "egg-logger": "^2.7.1",
     "electron-is": "^3.0.0",
     "electron-updater": "^4.6.1",
     "get-port": "^5.1.1",
+    "humanize-ms": "^1.2.1",
     "is-type-of": "^1.2.1",
     "koa": "^2.13.4",
     "koa-convert": "^2.0.0",
@@ -20,7 +23,8 @@
     "lowdb": "^1.0.0",
     "socket.io": "^4.4.1",
     "socket.io-client": "^4.4.1",
-    "unzip-crx-3": "^0.2.0"
+    "unzip-crx-3": "^0.2.0",
+    "urllib": "^2.38.0"
   },
   "devDependencies": {
     "debug": "^4.3.3",

@@ -135,5 +135,45 @@ module.exports = appInfo => {
     enablePerformanceTimer: false,
   };
 
+  /**
+   * The option for httpclient
+   * @member Config#httpclient
+   * @property {Boolean} enableDNSCache - Enable DNS lookup from local cache or not, default is false.
+   * @property {Boolean} dnsCacheLookupInterval - minimum interval of DNS query on the same hostname (default 10s).
+   *
+   * @property {Number} request.timeout - httpclient request default timeout, default is 5000 ms.
+   *
+   * @property {Boolean} httpAgent.keepAlive - Enable http agent keepalive or not, default is true
+   * @property {Number} httpAgent.freeSocketTimeout - http agent socket keepalive max free time, default is 4000 ms.
+   * @property {Number} httpAgent.maxSockets - http agent max socket number of one host, default is `Number.MAX_SAFE_INTEGER` @ses https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER
+   * @property {Number} httpAgent.maxFreeSockets - http agent max free socket number of one host, default is 256.
+   *
+   * @property {Boolean} httpsAgent.keepAlive - Enable https agent keepalive or not, default is true
+   * @property {Number} httpsAgent.freeSocketTimeout - httpss agent socket keepalive max free time, default is 4000 ms.
+   * @property {Number} httpsAgent.maxSockets - https agent max socket number of one host, default is `Number.MAX_SAFE_INTEGER` @ses https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/MAX_SAFE_INTEGER
+   * @property {Number} httpsAgent.maxFreeSockets - https agent max free socket number of one host, default is 256.
+   */
+  config.httpclient = {
+    enableDNSCache: false,
+    dnsCacheLookupInterval: 10000,
+    dnsCacheMaxLength: 1000,
+
+    request: {
+      timeout: 5000,
+    },
+    httpAgent: {
+      keepAlive: true,
+      freeSocketTimeout: 4000,
+      maxSockets: Number.MAX_SAFE_INTEGER,
+      maxFreeSockets: 256,
+    },
+    httpsAgent: {
+      keepAlive: true,
+      freeSocketTimeout: 4000,
+      maxSockets: Number.MAX_SAFE_INTEGER,
+      maxFreeSockets: 256,
+    },
+  };
+
   return config;
 };
