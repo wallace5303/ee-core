@@ -79,14 +79,15 @@ function wrapClass(Controller) {
   return ret;
 
   function methodToMiddleware(Controller, key) {
-    console.log('eeeeeeeeeee Controller:',Controller);
-    console.log('eeeeeeeeeee key:',key);
-    console.log('eeeeeeeeeee this:',this);
     return function classControllerMiddleware(...args) {
+      console.log('bbbbbbbbbbbbbb Controller:',Controller);
+      console.log('bbbbbbbbbbbbbb key:',key);
+      console.log('bbbbbbbbbbbbbb args:',args);
       const controller = new Controller(this);
-      if (!this.app.config.controller || !this.app.config.controller.supportParams) {
-        args = [ this ];
-      }
+      // if (!this.app.config.controller || !this.app.config.controller.supportParams) {
+      //   args = [ this ];
+      // }
+      //args = [ this ];
       return utils.callFn(controller[key], args, controller);
     };
   }
@@ -112,9 +113,9 @@ function wrapObject(obj, path, prefix) {
 
   function functionToMiddleware(func) {
     const objectControllerMiddleware = async function(...args) {
-      if (!this.app.config.controller || !this.app.config.controller.supportParams) {
-        args = [ this ];
-      }
+      // if (!this.app.config.controller || !this.app.config.controller.supportParams) {
+      //   args = [ this ];
+      // }
       return await utils.callFn(func, args, this);
     };
     for (const key in func) {
