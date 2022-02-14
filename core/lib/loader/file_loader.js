@@ -170,7 +170,7 @@ class FileLoader {
           exports.prototype.pathName = pathName;
           exports.prototype.fullPath = fullpath;
         }
-
+        //console.log('lll---------------pathName:', pathName);
         items.push({ fullpath, properties, exports });
         debug('parse %s, properties %j, export %O', fullpath, properties, exports);
       }
