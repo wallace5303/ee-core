@@ -140,12 +140,14 @@ exports.middleware = function (fn) {
   return is.generatorFunction(fn) ? convert(fn) : fn;
 }
 
-// exports.call = async function (method, uri, params, timeout = 15000) {
-
+// /**
+//  * 调用 egg api
+//  */
+// exports.curlEgg = async function (method, uri, params, timeout = 15000) {
 //   try {
-//     const port = this.app.config.egg.port;
+//     const port = this.getEggConfig().port;
 //     const url = "http://127.0.0.1:" + port + uri;
-//     console.log('[ee:socket] [call]: info url:', url);
+//     console.log('[ee:utils] [curlEgg] url:', url);
 //     const response = await this.app.curl(url, {
 //       method: method,
 //       contentType: 'application/json',
@@ -157,7 +159,7 @@ exports.middleware = function (fn) {
 //     console.log('[ee:socket] [call]: info result:%j', result);
 
 //   } catch (err) {
-//     this.app.logger.error('[ee:socket] [call] throw error:', err);
+//     console.log('[ee:socket] [call] throw error:', err);
 //   }
 
 //   return result; 
