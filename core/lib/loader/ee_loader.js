@@ -41,26 +41,8 @@ class EeLoader {
     this.pkg = utility.readJSONSync(path.join(this.options.homeDir, 'package.json'));
 
     /**
-     * All framework directories.
+     * Framework directories
      *
-     * You can extend Application of Ee, the entry point is options.app,
-     *
-     * loader will find all directories from the prototype of Application,
-     * you should define `Symbol.for('ee#eePath')` property.
-     *
-     * ```
-     * // lib/example.js
-     * const Ee = require('Ee');
-     * class ExampleApplication extends Ee.Application {
-     *   constructor(options) {
-     *     super(options);
-     *   }
-     *
-     *   get [Symbol.for('ee#eePath')]() {
-     *     return path.join(__dirname, '..');
-     *   }
-     * }
-     * ```
      * @member {Array} EeLoader#EePaths
      * @see EeLoader#getEePaths
      * @since 1.0.0
@@ -362,7 +344,7 @@ class EeLoader {
     const timingKey = `Load "${String(property)}" to Application`;
     this.timing.start(timingKey);
     new FileLoader(opt).load();
-    console.log('app controller:', this.app[property]);
+    console.log('app property:', this.app[property]);
     this.timing.end(timingKey);
   }
 

@@ -48,7 +48,7 @@ module.exports = {
 
     // load env from process.env.EE_APP_CONFIG
     const envConfig = this._loadConfigFromEnv();
-    debug('Loaded config from env, %j', envConfig);
+    debug('Loaded config from private env, %j', envConfig);
     extend(true, target, envConfig);
 
     // You can manipulate the order of app.config.coreMiddleware and app.config.appMiddleware in app.js

@@ -172,7 +172,7 @@ class FileLoader {
         }
 
         items.push({ fullpath, properties, exports });
-        debug('parse %s, properties %j, export %j', fullpath, properties, exports);
+        debug('parse %s, properties %j, export %O', fullpath, properties, exports);
       }
     }
 
