@@ -139,28 +139,3 @@ exports.callFn = async function (fn, args, ctx) {
 exports.middleware = function (fn) {
   return is.generatorFunction(fn) ? convert(fn) : fn;
 }
-
-// /**
-//  * 调用 egg api
-//  */
-// exports.curlEgg = async function (method, uri, params, timeout = 15000) {
-//   try {
-//     const port = this.getEggConfig().port;
-//     const url = "http://127.0.0.1:" + port + uri;
-//     console.log('[ee:utils] [curlEgg] url:', url);
-//     const response = await this.app.curl(url, {
-//       method: method,
-//       contentType: 'application/json',
-//       data: params,
-//       dataType: 'json',
-//       timeout: timeout,
-//     });
-//     const result = response.data;
-//     console.log('[ee:socket] [call]: info result:%j', result);
-
-//   } catch (err) {
-//     console.log('[ee:socket] [call] throw error:', err);
-//   }
-
-//   return result; 
-// }
