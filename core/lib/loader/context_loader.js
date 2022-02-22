@@ -9,7 +9,6 @@ const EXPORTS = FileLoader.EXPORTS;
 class ClassLoader {
 
   constructor(options) {
-    console.log('ClassLoader options:', options);
     assert(options.ctx, 'options.ctx is required');
     const properties = options.properties;
     this._cache = new Map();
@@ -47,7 +46,6 @@ class ContextLoader extends FileLoader {
    * @param {String} options.fieldClass - determine the field name of inject object.
    */
   constructor(options) {
-    console.log('ContextLoader options:', options);
     assert(options.property, 'options.property is required');
     assert(options.inject, 'options.inject is required');
     const target = options.target = {};
@@ -60,7 +58,7 @@ class ContextLoader extends FileLoader {
     const property = options.property;
 
     // define ctx.service
-    Object.defineProperty(app.context, property, {
+    Object.defineProperty(app, property, {
       get() {
         // distinguish property cache,
         // cache's lifecycle is the same with this context instance

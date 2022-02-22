@@ -65,7 +65,7 @@ class FileLoader {
    */
   load() {
     const items = this.parse();
-    console.log('FileLoader load items:', items);
+    //console.log('FileLoader load items:', items);
     const target = this.options.target;
     for (const item of items) {
       // item { properties: [ 'a', 'b', 'c'], exports }
