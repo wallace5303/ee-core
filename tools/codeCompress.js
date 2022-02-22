@@ -7,33 +7,44 @@ const UglifyJS = require('uglify-js');
 
 class CodeCompress {
   constructor() {
-    this.dirs = [
+    const directory = [
       'app',
       'electron',
       'config'
     ];
-    this.basePath = path.normalize(__dirname + '/..');
-    this.backupCodeDir = path.join(this.basePath, 'run/backup_code');
+    this.dirs = [];
+
+    this.basePath = process.cwd();
+    this.backupCodeDir = path.join(this.basePath, 'run', 'backup_code');
+
+    // 检查存在的目录
+    for (let i = 0; i < directory.length; i++) {
+      let codeDirPath = path.join(this.basePath, directory[i]);
+      if (fs.existsSync(codeDirPath)) {
+        this.dirs.push(directory[i]);
+      }
+    }
+    console.log('dirs:', this.dirs);
   }
 
   /**
    * 备份 app、electron目录代码
    */
   backup () {
-    console.log('[electron] [code_compress] [backup] start');
+    console.log('[ee-core] [code_compress] [backup] start');
     this.rmBackup();
 
     for (let i = 0; i < this.dirs.length; i++) {
       // check code dir
       let codeDirPath = path.join(this.basePath, this.dirs[i]);
       if (!fs.existsSync(codeDirPath)) {
-        console.log('[electron] [code_compress] [backup] ERROR: %s is not exist', codeDirPath);
+        console.log('[ee-core] [code_compress] [backup] ERROR: %s is not exist', codeDirPath);
         return
       }
 
       // copy
       let targetDir = path.join(this.backupCodeDir, this.dirs[i]);
-      console.log('[electron] [code_compress] [backup] targetDir:', targetDir);
+      console.log('[ee-core] [code_compress] [backup] targetDir:', targetDir);
       if (!fs.existsSync(targetDir)) {
         this.mkdir(targetDir);
         this.chmodPath(targetDir, '777');
@@ -41,32 +52,32 @@ class CodeCompress {
 
       fsPro.copySync(codeDirPath, targetDir);
     }
-    console.log('[electron] [code_compress] [backup] success');
+    console.log('[ee-core] [code_compress] [backup] success');
   }
 
   /**
    * 还原代码
    */
   restore () {
-    console.log('[electron] [code_compress] [restore] start');
+    console.log('[ee-core] [code_compress] [restore] start');
     for (let i = 0; i < this.dirs.length; i++) {
       let codeDirPath = path.join(this.backupCodeDir, this.dirs[i]);
       let targetDir = path.join(this.basePath, this.dirs[i]);
       fsPro.copySync(codeDirPath, targetDir);
     }
-    console.log('[electron] [code_compress] [restore] success');
+    console.log('[ee-core] [code_compress] [restore] success');
   };
 
   /**
    * 压缩代码
    */
   compress () {
-    console.log('[electron] [code_compress] [compress] start');
+    console.log('[ee-core] [code_compress] [compress] start');
     for (let i = 0; i < this.dirs.length; i++) {
       let codeDirPath = path.join(this.basePath, this.dirs[i]);
       this.compressLoop(codeDirPath);
     }
-    console.log('[electron] [code_compress] [compress] success');
+    console.log('[ee-core] [code_compress] [compress] success');
   };
 
   compressLoop (dirPath) {
@@ -171,17 +182,21 @@ class CodeCompress {
   };
 }
 
-const cc = new CodeCompress();
-let argvs = cc.formatArgvs();
-console.log('[electron] [code_compress] argvs:', argvs);
-if (argvs.indexOf('compress') != -1) {
+const compress = () => {
+  const cc = new CodeCompress();
   cc.backup();
   cc.compress();
-} else if (argvs.indexOf('restore') != -1) {
+}
+
+const restore = () => {
+  const cc = new CodeCompress();
   cc.restore();
 }
 
-module.exports = CodeCompress;
+module.exports = {
+  compress,
+  restore
+};
 
 
 

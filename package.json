@@ -8,6 +8,9 @@
   },
   "author": "",
   "license": "ISC",
+  "bin": {
+    "ee-cli": "bin/tools.js"
+  },
   "dependencies": {
     "agentkeepalive": "^4.2.0",
     "egg-errors": "^2.3.0",
