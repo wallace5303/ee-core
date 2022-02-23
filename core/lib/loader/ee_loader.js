@@ -38,7 +38,7 @@ class EeLoader {
      * @see {@link AppInfo#pkg}
      * @since 1.0.0
      */
-    this.pkg = utility.readJSONSync(path.join(this.options.homeDir, 'package.json'));
+    this.pkg = this.getPkg();
 
     /**
      * Framework directories
@@ -127,7 +127,7 @@ class EeLoader {
       debug('Loaded appname(%s) from package.json', this.pkg.name);
       return this.pkg.name;
     }
-    const pkg = path.join(this.options.baseDir, 'package.json');
+
     throw new Error(`name is required from ${pkg}`);
   }
 
@@ -407,6 +407,18 @@ class EeLoader {
 
     return fullPath;
   }
+
+  getPkg() {
+    //let filePath = '';
+    // let variablePath = 'build'; // 打包前路径
+    // if (this.options.isPackaged) {
+    //   variablePath = '..'; // 打包后路径
+    // }
+    // filePath = path.join(app.getAppPath(), variablePath, "package.json");
+
+    const content = utility.readJSONSync(path.join(this.options.homeDir, 'package.json'));
+    return content;
+  }  
 }
 
 /**

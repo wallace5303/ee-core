@@ -50,7 +50,9 @@ exports.chmodPath = function(path, mode) {
  * 获取项目根目录package.json
  */
 exports.getPackage = function() {
-  const filePath = path.join(process.cwd(), 'package.json');
+  const cdb = this.getCoreDB();
+  const config = cdb.getItem('config');
+  const filePath = path.join(config.homeDir, 'package.json');
   const json = require(filePath);
   
   return json;

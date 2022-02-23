@@ -94,7 +94,8 @@ class EeCore extends KoaApplication {
       logger: this.console,
       app: this,
       env: options.env,
-      appUserData: options.appUserData
+      appUserData: options.appUserData,
+      isPackaged: options.isPackaged
     });
   }
 

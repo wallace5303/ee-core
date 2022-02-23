@@ -1,7 +1,7 @@
 {
   "name": "ee-core",
-  "version": "1.1.0",
-  "description": "electron-egg core",
+  "version": "1.1.2",
+  "description": "ee core",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
