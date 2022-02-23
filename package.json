@@ -1,6 +1,6 @@
 {
   "name": "ee-core",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "electron-egg core",
   "main": "index.js",
   "scripts": {
@@ -17,23 +17,24 @@
     "egg-logger": "^2.7.1",
     "electron-is": "^3.0.0",
     "electron-updater": "^4.6.1",
+    "fs-extra": "^10.0.0",
     "get-port": "^5.1.1",
     "globby": "^10.0.0",
     "humanize-ms": "^1.2.1",
     "is-type-of": "^1.2.1",
     "koa": "^2.13.4",
     "koa-convert": "^2.0.0",
+    "koa-static": "^5.0.0",
     "lodash": "^4.17.21",
     "lowdb": "^1.0.0",
     "socket.io": "^4.4.1",
     "socket.io-client": "^4.4.1",
+    "uglify-js": "^3.14.5",
     "unzip-crx-3": "^0.2.0",
     "urllib": "^2.38.0",
     "utility": "^1.17.0"
   },
   "devDependencies": {
-    "debug": "^4.3.3",
-    "fs-extra": "^10.0.0",
-    "uglify-js": "^3.14.5"
+    "debug": "^4.3.3"
   }
 }
