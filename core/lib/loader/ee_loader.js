@@ -147,11 +147,7 @@ class EeLoader {
    */
   getAppInfo() {
     const env = this.serverEnv;
-    const scope = this.serverScope;
-    const home = this.getHomedir();
-    const baseDir = this.options.baseDir;
-    const appUserDataDir = this.options.appUserData;
-
+    
     /**
      * Meta information of the application
      * @class AppInfo
@@ -167,7 +163,7 @@ class EeLoader {
        * The current directory, where the application code is.
        * @member {String} AppInfo#baseDir
        */
-      baseDir,
+      baseDir: this.options.baseDir,
 
       /**
        * The environment of the application, **it's not NODE_ENV**
@@ -186,24 +182,18 @@ class EeLoader {
        * @member {String} AppInfo#env
        * @see https://Eejs.org/zh-cn/basics/env.html
        */
-      env,
+      env: env,
 
       /**
        * @member {String} AppInfo#scope
        */
-      scope,
+      scope: this.serverScope,
 
       /**
        * The use directory, same as `process.env.HOME`
        * @member {String} AppInfo#HOME
        */
-      home: home,
-
-      /**
-       * parsed from `package.json`
-       * @member {Object} AppInfo#pkg
-       */
-      pkg: this.pkg,
+      home: this.getHomedir(),
 
       /**
        * The directory whether is baseDir or HOME depend on env.
@@ -213,9 +203,37 @@ class EeLoader {
        * keep root directory in baseDir when local and unittest
        * @member {String} AppInfo#root
        */
-      root: env === 'local' || env === 'unittest' ? home : appUserDataDir,
+      root: env === 'local' || env === 'unittest' ? this.getHomedir() : this.options.appUserData,
 
-      appUserDataDir: appUserDataDir
+      /**
+       * electron application data dir
+       * @member {String} AppInfo#appUserDataDir
+       */
+      appUserDataDir: this.options.appUserData,
+
+      /**
+       * system user home dir 
+       * @member {String} AppInfo#userHome
+       */
+      userHome: this.options.userHome,
+
+      /**
+       * application version
+       * @member {String} AppInfo#appVersion
+       */
+      appVersion: this.options.appVersion,
+
+      /**
+       * application package status
+       * @member {boolean} AppInfo#isPackaged
+       */      
+      isPackaged: this.options.isPackaged,
+
+      /**
+       * application exec file dir
+       * @member {String} AppInfo#execDir
+       */  
+      execDir: this.options.execDir
     };
   }
 
@@ -409,15 +427,9 @@ class EeLoader {
   }
 
   getPkg() {
-    //let filePath = '';
-    // let variablePath = 'build'; // 打包前路径
-    // if (this.options.isPackaged) {
-    //   variablePath = '..'; // 打包后路径
-    // }
-    // filePath = path.join(app.getAppPath(), variablePath, "package.json");
-
-    const content = utility.readJSONSync(path.join(this.options.homeDir, 'package.json'));
-    return content;
+    const filePath = path.join(this.options.homeDir, 'package.json');
+    const json = utility.readJSONSync(filePath);
+    return json;
   }  
 }
 

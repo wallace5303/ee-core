@@ -88,15 +88,11 @@ class EeCore extends KoaApplication {
      */
     const Loader = this[EE_LOADER];
     assert(Loader, 'Symbol.for(\'ee#loader\') is required');
-    this.loader = new Loader({
-      baseDir: options.baseDir,
-      homeDir: options.homeDir,
+    let loaderOptions = Object.assign({
       logger: this.console,
-      app: this,
-      env: options.env,
-      appUserData: options.appUserData,
-      isPackaged: options.isPackaged
-    });
+      app:this
+    }, options);
+    this.loader = new Loader(loaderOptions);
   }
 
   /**

@@ -6,6 +6,7 @@ const constant = require('../lib/constant');
 const convert = require('koa-convert');
 const is = require('is-type-of');
 const co = require('co');
+const utility = require('utility');
 
 exports.mkdir = function(dirpath, dirname) {
   // 判断是否是第一次调用
@@ -52,8 +53,7 @@ exports.chmodPath = function(path, mode) {
 exports.getPackage = function() {
   const cdb = this.getCoreDB();
   const config = cdb.getItem('config');
-  const filePath = path.join(config.homeDir, 'package.json');
-  const json = require(filePath);
+  const json = utility.readJSONSync(path.join(config.homeDir, 'package.json'));
   
   return json;
 };

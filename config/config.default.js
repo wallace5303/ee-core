@@ -28,14 +28,6 @@ module.exports = appInfo => {
     name: appInfo.name,
 
     /**
-     * package.json
-     * @member {Object} Config#pkg
-     * @see {appInfo#pkg}
-     * @since 1.0.0
-     */
-    pkg: appInfo.pkg,
-
-    /**
      * The current directory of the application
      * @member {String} Config#baseDir
      * @see {appInfo#baseDir}
@@ -97,7 +89,31 @@ module.exports = appInfo => {
      * @default
      * @since 1.0.0
      */
-    appUserDataDir: appInfo.appUserDataDir
+    appUserDataDir: appInfo.appUserDataDir,
+
+    /**
+     * system user home dir 
+     * @member {String} Config#userHome
+     */
+    userHome: appInfo.userHome,
+
+    /**
+      * application version
+      * @member {String} Config#appVersion
+      */
+    appVersion: appInfo.appVersion,
+
+    /**
+      * application package status
+      * @member {boolean} Config#isPackaged
+      */      
+    isPackaged: appInfo.isPackaged,
+
+    /**
+      * application exec file dir
+      * @member {String} Config#execDir
+      */  
+    execDir: appInfo.execDir
   };
 
   /**
