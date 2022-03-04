@@ -47,6 +47,11 @@ const fsPro = require('fs-extra');
     
     // 复制到ee资源目录
     const eeResourceDir = path.join(homeDir, 'public', 'dist');
+
+    // 清空历史资源
+    fs.rmdirSync(eeResourceDir, {recursive: true});
+    console.log('[ee-core] [replace_dist] 清空历史资源:', eeResourceDir);
+
     fsPro.copySync(sourceDir, eeResourceDir);
     console.log('[ee-core] [replace_dist] 复制资源到:', eeResourceDir);
 

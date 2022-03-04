@@ -118,16 +118,16 @@ exports.getLogDir = function() {
 /**
  * 获取 socketio port
  */
-exports.getIpcPort = function() {
+exports.getSocketPort = function() {
   const cdb = this.getCoreDB();
-  const port = cdb.getItem('ipc_port');
-  return port;
+  const port = cdb.getItem('config').socketServer.port;
+  return parseInt(port);
 }
 
 /**
- * 获取 ipc channel
+ * 获取 socket channel
  */
-exports.getIpcChannel = function() {
+exports.getSocketChannel = function() {
   return constant.socketIo.channel;
 }
 

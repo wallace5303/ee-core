@@ -191,19 +191,11 @@ module.exports = appInfo => {
     },
   };
 
-  /* egg服务 (待定) */
-  config.egg = {
-    enable: false, // 是否启用
-    title: 'ee', // 进程的title属性标识（默认你的应用名称-英文）
-    port: 7068,
-    hostname: '127.0.0.1',
-    workers: 1 // 工作进程数据
-  };
-
-  /* web渲染服务 */
-  config.webServer = {
-    port: 7068
-  };
+  /* 内置socket服务 */
+  config.socketServer = {
+    port: 7070, // 默认端口
+    isDynamic: false // 如果值为false，框架默认使用port端口（如果默认端口被使用，则随机获取一个）；如果为true，默认端口无效，框架随机生成
+  };  
 
   return config;
 };
