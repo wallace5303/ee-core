@@ -8,6 +8,9 @@ const is = require('is-type-of');
 const co = require('co');
 const utility = require('utility');
 
+/**
+ * 创建文件夹
+ */
 exports.mkdir = function(dirpath, dirname) {
   // 判断是否是第一次调用
   if (typeof dirname === 'undefined') {
@@ -30,6 +33,9 @@ exports.mkdir = function(dirpath, dirname) {
   }
 };
 
+/**
+ * 修改文件权限
+ */
 exports.chmodPath = function(path, mode) {
   let files = [];
   if (fs.existsSync(path)) {
@@ -131,6 +137,29 @@ exports.getSocketChannel = function() {
   return constant.socketIo.channel;
 }
 
+/**
+ * 获取 额外资源目录
+ */
+exports.getExtraResourcesDir = function() {
+  const cdb = this.getCoreDB();
+  const config = cdb.getItem('config');
+  const execDir = config.execDir;
+
+  // 资源路径不同
+  let dir = '';
+  if (config.isPackaged) {
+    // 打包后  execDir为 应用程序 exe\dmg\dep软件所在目录；打包前该值是项目根目录
+    dir = path.join(execDir, "resources", "extraResources");
+  } else {
+    // 打包前
+    dir = path.join(execDir, "build", "extraResources");
+  }
+  return dir;
+}
+
+/**
+ * 执行一个函数
+ */
 exports.callFn = async function (fn, args, ctx) {
   args = args || [];
   if (!is.function(fn)) return;
