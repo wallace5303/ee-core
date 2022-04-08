@@ -209,6 +209,8 @@ module.exports = appInfo => {
   /* 内置http服务 - 该功能依赖socketServer */
   config.httpServer = {
     enable: false, // 是否启用
+    protocol: 'http://',
+    host: '127.0.0.1',
     port: 7071, // 默认端口（如果端口被使用，则随机获取一个）
   };  
 

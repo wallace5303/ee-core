@@ -1,6 +1,6 @@
 {
   "name": "ee-core",
-  "version": "1.1.11",
+  "version": "1.2.0",
   "description": "ee core",
   "main": "index.js",
   "scripts": {
@@ -27,10 +27,14 @@
     "humanize-ms": "^1.2.1",
     "is-type-of": "^1.2.1",
     "koa": "^2.13.4",
+    "koa-bodyparser": "^4.3.0",
     "koa-convert": "^2.0.0",
+    "koa-cors": "0.0.16",
+    "koa-router": "^10.1.1",
     "koa-static": "^5.0.0",
     "lodash": "^4.17.21",
     "lowdb": "^1.0.0",
+    "path-to-regexp": "^6.2.0",
     "socket.io": "^4.4.1",
     "socket.io-client": "^4.4.1",
     "uglify-js": "^3.14.5",
