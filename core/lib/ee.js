@@ -206,12 +206,4 @@ class EeCore extends KoaApplication {
   }
 }
 
-// delegate all router method to application
-// utils.methods.concat([ 'all', 'resources', 'register', 'redirect' ]).forEach(method => {
-//   EeCore.prototype[method] = function(...args) {
-//     this.router[method](...args);
-//     return this;
-//   };
-// });
-
 module.exports = EeCore;
