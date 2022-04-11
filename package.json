@@ -29,7 +29,6 @@
     "koa": "^2.13.4",
     "koa-bodyparser": "^4.3.0",
     "koa-convert": "^2.0.0",
-    "koa-router": "^10.1.1",
     "koa-static": "^5.0.0",
     "koa2-cors": "^2.0.6",
     "lodash": "^4.17.21",

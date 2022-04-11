@@ -206,7 +206,7 @@ module.exports = appInfo => {
     }
   };
   
-  /* 内置http服务 - 该功能依赖socketServer */
+  /* 内置http服务 */
   config.httpServer = {
     enable: false, // 是否启用
     protocol: 'http://',
