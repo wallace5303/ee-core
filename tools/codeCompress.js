@@ -128,7 +128,9 @@ class CodeCompress {
    * 移除备份
    */
   rmBackup () {
-    fs.rmdirSync(this.backupCodeDir, {recursive: true});
+    if (fs.existsSync(this.backupCodeDir)) {
+      fs.rmSync(this.backupCodeDir, {recursive: true, force: true});
+    }
     return;
   }
 
