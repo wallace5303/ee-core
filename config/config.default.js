@@ -224,7 +224,11 @@ module.exports = appInfo => {
     port: 7072, // 默认端口（如果端口被使用，则随机获取一个）
   }; 
 
-  /* 应用程序顶部菜单 */
+  /**
+   * 应用程序顶部菜单
+   * boolean | string
+   * true, false, 'dev-show'(dev环境显示，prod环境隐藏)
+   */
   config.openAppMenu = true; 
 
   return config;
