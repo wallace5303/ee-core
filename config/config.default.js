@@ -232,7 +232,7 @@ module.exports = appInfo => {
   config.openAppMenu = true; 
 
   /**
-   * 关闭硬件加速
+   * 硬件加速
    */
   config.hardGpu = false; 
 
