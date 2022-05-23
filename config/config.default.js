@@ -234,7 +234,9 @@ module.exports = appInfo => {
   /**
    * 硬件加速
    */
-  config.hardGpu = false; 
+  config.hardGpu = {
+    enable: false
+  }; 
 
   /**
    * loading页（废弃）
