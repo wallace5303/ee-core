@@ -236,5 +236,10 @@ module.exports = appInfo => {
    */
   config.hardGpu = false; 
 
+  /**
+   * loading页（废弃）
+   */
+  config.loadingPage = false;  
+
   return config;
 };
