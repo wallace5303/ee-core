@@ -1,6 +1,6 @@
 {
   "name": "ee-core",
-  "version": "1.2.6",
+  "version": "1.2.7-beta.2",
   "description": "ee core",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "bin": {
-    "ee-cli": "bin/tools.js"
+    "ee-core": "./bin/tools.js"
   },
   "dependencies": {
     "agentkeepalive": "^4.2.0",

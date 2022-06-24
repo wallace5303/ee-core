@@ -20,12 +20,12 @@ const fsPro = require('fs-extra');
     // argv
     let distDir = '';
     for (let i = 0; i < process.argv.length; i++) {
-      const tmpArgv = process.argv[i]
+      let tmpArgv = process.argv[i]
       if (tmpArgv.indexOf('--dist_dir=') !== -1) {
         distDir = tmpArgv.substring(11)
       }
     }
-    
+ 
     const fileExist = (filePath) => {
       try {
         return fs.statSync(filePath).isFile();

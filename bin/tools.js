@@ -1,11 +1,11 @@
-'use strict';
+#!/usr/bin/env node
 
 const codeCompress = require('../tools/codeCompress');
 const replaceDist = require('../tools/replaceDist');
 
 // argv
 const args = process.argv;
-//console.log('[ee-core] args:', args);
+// console.log('[ee-core] args:', args);
 const cmd = args[2];
 console.log('[ee-core] cmd:', cmd);
 
