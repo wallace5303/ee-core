@@ -7,6 +7,7 @@ const convert = require('koa-convert');
 const is = require('is-type-of');
 const co = require('co');
 const utility = require('utility');
+const eis = require('electron-is');
 
 /**
  * 创建文件夹
@@ -149,7 +150,11 @@ exports.getExtraResourcesDir = function() {
   let dir = '';
   if (config.isPackaged) {
     // 打包后  execDir为 应用程序 exe\dmg\dep软件所在目录；打包前该值是项目根目录
+    // windows和MacOs不一样
     dir = path.join(execDir, "resources", "extraResources");
+    if (eis.macOS()) {
+      dir = path.join(execDir, "..", "Resources", "extraResources");
+    }
   } else {
     // 打包前
     dir = path.join(execDir, "build", "extraResources");
