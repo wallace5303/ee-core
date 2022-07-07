@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * ee-core使用
+ */
+
 const fs = require('fs');
 const path = require('path');
 
@@ -33,9 +37,9 @@ exports.compareVersion = function (v1, v2) {
 }
 
 /**
- * 创建文件夹 (ee-core使用)
+ * 创建文件夹
  */
- exports.mkdir = function(dirpath, dirname) {
+exports.mkdir = function(dirpath, dirname) {
   // 判断是否是第一次调用
   if (typeof dirname === 'undefined') {
     if (fs.existsSync(dirpath)) {
@@ -58,7 +62,7 @@ exports.compareVersion = function (v1, v2) {
 };
 
 /**
- * 修改文件权限 (ee-core使用)
+ * 修改文件权限
  */
 exports.chmodPath = function(path, mode) {
   let files = [];
@@ -75,3 +79,13 @@ exports.chmodPath = function(path, mode) {
     fs.chmodSync(path, mode);
   }
 };
+
+/**
+ * 获取数据存储路径
+ */
+exports.getStorageDir = function () {
+  let env = process.env.EE_SERVER_ENV;
+  const appDir = env === 'local' || env === 'unittest' ? process.env.EE_HOME : process.env.EE_APP_USER_DATA;
+  const storageDir = path.join(appDir, 'data');
+  return storageDir;
+}
