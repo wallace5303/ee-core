@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "agentkeepalive": "^4.2.0",
-    "better-sqlite3": "^7.5.3",
     "co": "^4.6.0",
     "debug": "^4.3.3",
     "depd": "^2.0.0",
