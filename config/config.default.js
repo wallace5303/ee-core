@@ -214,6 +214,9 @@ module.exports = appInfo => {
     port: 7071, // 默认端口（如果端口被使用，则随机获取一个）
     cors: {
       origin: "*"
+    },
+    body: {
+      multipart: true, // 文件类型
     }
   };  
 

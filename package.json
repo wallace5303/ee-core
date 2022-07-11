@@ -27,7 +27,7 @@
     "humanize-ms": "^1.2.1",
     "is-type-of": "^1.2.1",
     "koa": "^2.13.4",
-    "koa-bodyparser": "^4.3.0",
+    "koa-body": "^5.0.0",
     "koa-convert": "^2.0.0",
     "koa-static": "^5.0.0",
     "koa2-cors": "^2.0.6",
