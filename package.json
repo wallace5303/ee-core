@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "agentkeepalive": "^4.2.0",
+    "better-sqlite3": "^7.6.0",
     "co": "^4.6.0",
     "debug": "^4.3.3",
     "depd": "^2.0.0",
@@ -37,7 +38,6 @@
     "socket.io": "^4.4.1",
     "socket.io-client": "^4.4.1",
     "uglify-js": "^3.14.5",
-    "unzip-crx-3": "^0.2.0",
     "urllib": "^2.38.0",
     "utility": "^1.17.0"
   },
