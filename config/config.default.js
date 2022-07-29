@@ -247,6 +247,13 @@ module.exports = appInfo => {
   }; 
 
   /**
+   * TODO storage
+   */
+  config.storage = {
+    dir: path.join(appInfo.root, 'data'),
+  };
+
+  /**
    * loading页（废弃）
    */
   config.loadingPage = false;  

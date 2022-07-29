@@ -196,11 +196,7 @@ class EeLoader {
       home: this.getHomedir(),
 
       /**
-       * The directory whether is baseDir or HOME depend on env.
-       * it's good for test when you want to write some file to HOME,
-       * but don't want to write to the real directory,
-       * so use root to write file to baseDir instead of HOME when unittest.
-       * keep root directory in baseDir when local and unittest
+       * The directory whether is homeDir or appUserData depend on env.
        * @member {String} AppInfo#root
        */
       root: env === 'local' || env === 'unittest' ? this.getHomedir() : this.options.appUserData,
