@@ -2,6 +2,7 @@
 
 const codeCompress = require('../tools/codeCompress');
 const replaceDist = require('../tools/replaceDist');
+const encrypt = require('../tools/encrypt');
 
 // argv
 const args = process.argv;
@@ -19,4 +20,8 @@ if (cmd == 'compress') {
 
 if (cmd == 'restore') {
   codeCompress.restore();
+}
+
+if (cmd == 'encrypt') {
+  encrypt.run();
 }
