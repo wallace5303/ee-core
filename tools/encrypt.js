@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const fsPro = require('fs-extra');
 const UglifyJS = require('uglify-js');
+const bytenode = require('bytenode');
 
 class Encrypt {
   constructor() {
@@ -39,7 +40,7 @@ class Encrypt {
   }
 
   /**
-   * 备份 electron目录代码
+   * 备份 electron 目录代码
    */
   backup () {
     console.log('[ee-core] [encrypt] backup start');
@@ -58,7 +59,7 @@ class Encrypt {
       this.rmBackup(targetDir);
 
       // copy
-      console.log('[ee-core] [encrypt] backup targetDir:', targetDir);
+      console.log('[ee-core] [encrypt] backup target Dir:', targetDir);
       if (!fs.existsSync(targetDir)) {
         this.mkdir(targetDir);
         this.chmodPath(targetDir, '777');
@@ -70,17 +71,21 @@ class Encrypt {
   }
 
   /**
-   * 压缩代码
+   * 加密代码
    */
-  compress () {
-    console.log('[ee-core] [encrypt] compress start');
+  encrypt () {
+    console.log('[ee-core] [encrypt] start ciphering');
     for (let i = 0; i < this.dirs.length; i++) {
       let codeDirPath = path.join(this.encryptCodeDir, this.dirs[i]);
       this.compressLoop(codeDirPath);
     }
-    console.log('[ee-core] [encrypt] compress success');
+
+    console.log('[ee-core] [encrypt] end ciphering');
   };
 
+  /**
+   * 递归
+   */
   compressLoop (dirPath) {
     let files = [];
     if (fs.existsSync(dirPath)) {
@@ -91,14 +96,28 @@ class Encrypt {
           this.compressLoop(curPath);
         } else {
           if (path.extname(curPath) === '.js') {
-            this.miniFile(curPath);
+            this.generate(curPath);
           }
         }
       });
     }
   }
 
-  miniFile (file) {
+  /**
+   * 生成文件
+   */  
+  generate (curPath) {
+    if (this.type == 'bytecode') {
+      this.generateBytecodeFile(curPath);
+    } else {
+      this.generateBytecodeFile(curPath);
+    }
+  }
+
+  /**
+   * 生成压缩/混淆文件
+   */  
+  generateConfuseFile (file) {
     let code = fs.readFileSync(file, "utf8");
     const options = {
       mangle: {
@@ -108,6 +127,23 @@ class Encrypt {
     
     let result = UglifyJS.minify(code, options);
     fs.writeFileSync(file, result.code, "utf8"); 
+  }
+
+  /**
+   * 生成字节码文件
+   */
+  generateBytecodeFile (curPath) {
+    if (path.extname(curPath) !== '.js') {
+      return
+    }
+    //let jscFile = curPath.replace(/.js/g, '.jsc');
+    let jscFile = curPath + 'c';
+    bytenode.compileFile({
+      filename: curPath,
+      output: jscFile,
+    });
+    fs.rmSync(curPath, {force: true});
+    console.log('[ee-core] [encrypt] generate ', jscFile);
   }
 
   /**
@@ -174,7 +210,7 @@ class Encrypt {
 const run = () => {
   const e = new Encrypt();
   e.backup();
-  e.compress();
+  e.encrypt();
 }
 
 module.exports = {
