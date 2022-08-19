@@ -75,10 +75,11 @@ module.exports = {
   _loadConfig(dirpath, filename, extraInject, type) {
     const isPlugin = type === 'plugin';
     const isApp = type === 'app';
-
+    // console.log("_loadConfig dirpath:", dirpath);
+    // console.log("_loadConfig filename:", filename);
     let filepath = this.resolveModule(path.join(dirpath, 'config', filename));
 
-    //console.log("_loadConfig filepath:", filepath);
+    console.log("_loadConfig filepath:", filepath);
 
     // let config.js compatible
     if (filename === 'config.default' && !filepath) {

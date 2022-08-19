@@ -53,13 +53,25 @@ module.exports = {
 
 };
 
+function isBytecodeClass (property) {
+  let isBytecodeClass = false;
+  if (property == 'service' || property == 'controller') {
+    //exports = exports.toString();
+    isBytecodeClass = true;
+  }
+  
+  return isBytecodeClass;
+}
+
 // wrap the class, yield a object with middlewares
 function wrapClass(Controller) {
   let proto = Controller.prototype;
+  console.log('proto:', proto);
   const ret = {};
   // tracing the prototype chain
   while (proto !== Object.prototype) {
     const keys = Object.getOwnPropertyNames(proto);
+    console.log('keys:', keys);
     for (const key of keys) {
       // getOwnPropertyNames will return constructor
       // that should be ignored
@@ -76,6 +88,7 @@ function wrapClass(Controller) {
     }
     proto = Object.getPrototypeOf(proto);
   }
+  console.log('ret:', ret);
   return ret;
 
   function methodToMiddleware(Controller, key) {

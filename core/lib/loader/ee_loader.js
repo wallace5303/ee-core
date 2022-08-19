@@ -409,16 +409,26 @@ class EeLoader {
 
   resolveModule(filepath) {
     let fullPath;
+    console.log("resolveModule filepath:", filepath);
+    //fullPath = require.resolve(filepath);
+    //const extname = path.extname(filepath);
+    // if (['.default', '.prod'].indexOf(extname) != -1) {
+    //   return filepath;
+    // }
     try {
       fullPath = require.resolve(filepath);
     } catch (e) {
+      let jscFile = filepath + '.jsc';
+      if (fs.existsSync(jscFile)) {
+        return jscFile;
+      }
       return undefined;
     }
 
     if (process.env.Ee_TYPESCRIPT !== 'true' && fullPath.endsWith('.ts')) {
       return undefined;
     }
-
+    console.log("resolveModule fullPath:", fullPath);
     return fullPath;
   }
 
