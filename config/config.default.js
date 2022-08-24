@@ -230,6 +230,7 @@ module.exports = appInfo => {
     protocol: 'http://',
     host: '127.0.0.1',
     port: 7072, // 默认端口（如果端口被使用，则随机获取一个）
+    options: {}
   }; 
 
   /**
