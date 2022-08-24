@@ -3,31 +3,35 @@
 const path = require('path');
 const fs = require('fs');
 const fsPro = require('fs-extra');
+const is = require('is-type-of');
 const UglifyJS = require('uglify-js');
 const bytenode = require('bytenode');
 
 class Encrypt {
   constructor() {
+    this.basePath = process.cwd();
+    const directory = [
+      'electron',
+    ];
+    this.dirs = [];
+    this.type = '';
+    this.configPath = '';
+    this.config = null;
+    this.filesExt = ['.js', '.json', '.node'];
+    this.encryptCodeDir = path.join(this.basePath, 'public');
 
     // argv
-    this.type = '';
     for (let i = 0; i < process.argv.length; i++) {
       let tmpArgv = process.argv[i];
       if (tmpArgv.indexOf('--type=') !== -1) {
         this.type = tmpArgv.substring(7);
       }
+      if (tmpArgv.indexOf('--config=') !== -1) {
+        let configPathStr = tmpArgv.substring(9);
+        this.configPath = path.join(this.basePath, configPathStr);
+        this.config = fs.existsSync(this.configPath) ? require(this.configPath) : null;
+      }
     }
-
-    const directory = [
-      'electron',
-    ];
-    this.dirs = [];
-
-    this.basePath = process.cwd();
-    // if (this.type == 'uglify') {
-    //   this.encryptCodeDir = path.join(this.basePath, 'public');
-    // }
-    this.encryptCodeDir = path.join(this.basePath, 'public');
 
     // 检查存在的目录
     for (let i = 0; i < directory.length; i++) {
@@ -36,7 +40,18 @@ class Encrypt {
         this.dirs.push(directory[i]);
       }
     }
-    console.log('dirs:', this.dirs);
+    console.log('[ee-core] [encrypt] dirs:', this.dirs);
+  }
+
+  /**
+   * 检查
+   */
+  check () {
+    if (this.configPath.length > 0 && !is.object(this.config)) {
+      console.log('[ee-core] [encrypt] ERROR: config file is invalid');
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -49,7 +64,7 @@ class Encrypt {
       // check code dir
       let codeDirPath = path.join(this.basePath, this.dirs[i]);
       if (!fs.existsSync(codeDirPath)) {
-        console.log('[ee-core] [encrypt] backup ERROR: %s is not exist', codeDirPath);
+        console.log('[ee-core] [encrypt] ERROR: backup %s is not exist', codeDirPath);
         return
       }
 
@@ -67,7 +82,8 @@ class Encrypt {
 
       fsPro.copySync(codeDirPath, targetDir);
     }
-    console.log('[ee-core] [encrypt] backup success');
+    console.log('[ee-core] [encrypt] backup end');
+    return true;
   }
 
   /**
@@ -77,7 +93,7 @@ class Encrypt {
     console.log('[ee-core] [encrypt] start ciphering');
     for (let i = 0; i < this.dirs.length; i++) {
       let codeDirPath = path.join(this.encryptCodeDir, this.dirs[i]);
-      this.compressLoop(codeDirPath);
+      this.loop(codeDirPath);
     }
 
     console.log('[ee-core] [encrypt] end ciphering');
@@ -86,16 +102,17 @@ class Encrypt {
   /**
    * 递归
    */
-  compressLoop (dirPath) {
+  loop (dirPath) {
     let files = [];
     if (fs.existsSync(dirPath)) {
       files = fs.readdirSync(dirPath);
       files.forEach((file, index) => {
         let curPath = dirPath + '/' + file;        
         if (fs.statSync(curPath).isDirectory()) {
-          this.compressLoop(curPath);
+          this.loop(curPath);
         } else {
-          if (path.extname(curPath) === '.js') {
+          const extname = path.extname(curPath);
+          if (this.filesExt.indexOf(extname) !== -1) {
             this.generate(curPath);
           }
         }
@@ -110,7 +127,7 @@ class Encrypt {
     if (this.type == 'bytecode') {
       this.generateBytecodeFile(curPath);
     } else {
-      this.generateBytecodeFile(curPath);
+      this.generateConfuseFile(curPath);
     }
   }
 
@@ -118,13 +135,24 @@ class Encrypt {
    * 生成压缩/混淆文件
    */  
   generateConfuseFile (file) {
-    let code = fs.readFileSync(file, "utf8");
-    const options = {
+    let defaultOpt = {
       mangle: {
         toplevel: false,
       },
-    };
-    
+      compress: {
+        drop_console: true,
+        passes: 2
+      },
+      output: {
+        beautify: false
+      },
+    }
+    let options = defaultOpt;
+    if (is.object(this.config)) {
+      options = Object.assign(defaultOpt, this.config);
+    }
+
+    let code = fs.readFileSync(file, "utf8");
     let result = UglifyJS.minify(code, options);
     fs.writeFileSync(file, result.code, "utf8"); 
   }
@@ -209,7 +237,8 @@ class Encrypt {
 
 const run = () => {
   const e = new Encrypt();
-  e.backup();
+  if (!e.check()) return;
+  if (!e.backup()) return;
   e.encrypt();
 }
 
