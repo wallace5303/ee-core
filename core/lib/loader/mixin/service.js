@@ -22,7 +22,6 @@ module.exports = {
     }, opt);
 
     const servicePaths = opt.directory;
-    console.log('servicePaths:', servicePaths);
     this.loadToContext(servicePaths, 'service', opt);
     this.timing.end('Load Service');
   },
