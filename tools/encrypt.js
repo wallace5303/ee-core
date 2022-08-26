@@ -169,6 +169,7 @@ class Encrypt {
     bytenode.compileFile({
       filename: curPath,
       output: jscFile,
+      electron: true
     });
     fs.rmSync(curPath, {force: true});
   }
