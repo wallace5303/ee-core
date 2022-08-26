@@ -66,7 +66,6 @@ class FileLoader {
    */
   load() {
     const items = this.parse();
-    //console.log('FileLoader load items:', items);
     const target = this.options.target;
     for (const item of items) {
       // item { properties: [ 'a', 'b', 'c'], exports }
@@ -92,8 +91,7 @@ class FileLoader {
         return obj;
       }, target);
     }
-    console.log('FileLoader load items:', items);
-    console.log('FileLoader load target:', target);
+
     return target;
   }
 
@@ -151,7 +149,6 @@ class FileLoader {
 
     for (const directory of directories) {
       const filepaths = globby.sync(files, { cwd: directory });
-      // console.log('filepaths:', filepaths);
       for (const filepath of filepaths) {
         const fullpath = path.join(directory, filepath);
         if (!fs.statSync(fullpath).isFile()) continue;
@@ -161,23 +158,17 @@ class FileLoader {
         // app/service/foo/bar.js => service.foo.bar
         const pathName = directory.split(/[/\\]/).slice(-1) + '.' + properties.join('.');
         // get exports from the file
-        console.log('parse fullpath:', fullpath);
-        console.log('parse pathName:', pathName);
-        //console.log('parse options:', this.options);
         let exports = getExports(fullpath, this.options, pathName);
-        exports = exports.toString();
-        console.log(exports);
         // ignore exports when it's null or false returned by filter function
         if (exports == null || (filter && filter(exports) === false)) continue;
 
         // set properties of class
-        if (is.class(exports) || isBytecodeClass (this.options.property)) {
+        if (is.class(exports) || utils.isBytecodeClass(exports)) {
           exports.prototype.pathName = pathName;
           exports.prototype.fullPath = fullpath;
         }
-        //console.log('lll---------------pathName:', pathName);
+
         items.push({ fullpath, properties, exports });
-        console.log('parse items:', items);
         debug('parse %s, properties %j, export %O', fullpath, properties, exports);
       }
     }
@@ -204,21 +195,10 @@ function getProperties(filepath, { caseStyle }) {
   return defaultCamelize(filepath, caseStyle);
 }
 
-function isBytecodeClass (property) {
-  let isBytecodeClass = false;
-  if (property == 'service' || property == 'controller') {
-    //exports = exports.toString();
-    isBytecodeClass = true;
-  }
-  
-  return isBytecodeClass;
-}
-
 // Get exports from filepath
 // If exports is null/undefined, it will be ignored
-function getExports(fullpath, { initializer, call, inject, property }, pathName) {
+function getExports(fullpath, { initializer, call, inject }, pathName) {
   let exports = utils.loadFile(fullpath);
-  console.log('property:', property);
 
   // process exports as you like
   if (initializer) {
@@ -230,10 +210,9 @@ function getExports(fullpath, { initializer, call, inject, property }, pathName)
   // module.exports = class Service {};
   // or
   // module.exports = function*() {}
+  //new exports;
 
-  console.log('class:', is.class(exports));
-  console.log('exports:', exports);
-  if (is.class(exports) || is.generatorFunction(exports) || is.asyncFunction(exports) || isBytecodeClass(property)) {
+  if (is.class(exports) || is.generatorFunction(exports) || is.asyncFunction(exports) || utils.isBytecodeClass(exports)) {
     return exports;
   }
 

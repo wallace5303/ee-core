@@ -272,7 +272,7 @@ class EeLoader {
     if (inject.length === 0) inject = [ this.app ];
 
     let ret = this.requireFile(filepath);
-    if (is.function(ret) && !is.class(ret)) {
+    if (is.function(ret) && !is.class(ret) && !utils.isBytecodeClass(ret)) {
       ret = ret(...inject);
     }
     return ret;
@@ -358,7 +358,6 @@ class EeLoader {
     const timingKey = `Load "${String(property)}" to Application`;
     this.timing.start(timingKey);
     new FileLoader(opt).load();
-    //console.log('app property:', this.app[property]);
     this.timing.end(timingKey);
   }
 
@@ -409,12 +408,6 @@ class EeLoader {
 
   resolveModule(filepath) {
     let fullPath;
-    console.log("resolveModule filepath:", filepath);
-    //fullPath = require.resolve(filepath);
-    //const extname = path.extname(filepath);
-    // if (['.default', '.prod'].indexOf(extname) != -1) {
-    //   return filepath;
-    // }
     try {
       fullPath = require.resolve(filepath);
     } catch (e) {
@@ -428,7 +421,7 @@ class EeLoader {
     if (process.env.Ee_TYPESCRIPT !== 'true' && fullPath.endsWith('.ts')) {
       return undefined;
     }
-    console.log("resolveModule fullPath:", fullPath);
+
     return fullPath;
   }
 

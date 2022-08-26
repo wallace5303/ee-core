@@ -6,7 +6,6 @@ const utility = require('utility');
 const utils = require('../../utils');
 const FULLPATH = require('../file_loader').FULLPATH;
 
-
 module.exports = {
 
   /**
@@ -26,10 +25,11 @@ module.exports = {
         //   return class HomeController extends app.Controller {};
         // }
         // ```
-        if (is.function(obj) && !is.generatorFunction(obj) && !is.class(obj) && !is.asyncFunction(obj)) {
+        
+        if (is.function(obj) && !is.generatorFunction(obj) && !is.class(obj) && !is.asyncFunction(obj) && !utils.isBytecodeClass(obj)) {
           obj = obj(this.app);
         }
-        if (is.class(obj)) {
+        if (is.class(obj) || utils.isBytecodeClass(obj)) {
           obj.prototype.pathName = opt.pathName;
           obj.prototype.fullPath = opt.path;
           return wrapClass(obj);
@@ -53,25 +53,13 @@ module.exports = {
 
 };
 
-function isBytecodeClass (property) {
-  let isBytecodeClass = false;
-  if (property == 'service' || property == 'controller') {
-    //exports = exports.toString();
-    isBytecodeClass = true;
-  }
-  
-  return isBytecodeClass;
-}
-
 // wrap the class, yield a object with middlewares
 function wrapClass(Controller) {
   let proto = Controller.prototype;
-  console.log('proto:', proto);
   const ret = {};
   // tracing the prototype chain
   while (proto !== Object.prototype) {
     const keys = Object.getOwnPropertyNames(proto);
-    console.log('keys:', keys);
     for (const key of keys) {
       // getOwnPropertyNames will return constructor
       // that should be ignored
@@ -88,7 +76,7 @@ function wrapClass(Controller) {
     }
     proto = Object.getPrototypeOf(proto);
   }
-  console.log('ret:', ret);
+
   return ret;
 
   function methodToMiddleware(Controller, key) {

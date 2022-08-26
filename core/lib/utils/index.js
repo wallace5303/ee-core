@@ -95,6 +95,21 @@ module.exports = {
     const reg = /[/\\]/g;
     return filepath.replace(baseDir + path.sep, '').replace(reg, '/');
   },
+
+  /**
+   * 字节码类
+   */
+  isBytecodeClass (exports) {
+    let isClass = false;
+
+    // 标识
+    if (exports.toString().indexOf('[class') != -1) {
+      isClass = true;
+    }
+    // TODO 更严谨的判断，应该加上文件名和路径
+    
+    return isClass;
+  },
 };
 
 
