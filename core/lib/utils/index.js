@@ -21,21 +21,15 @@ module.exports = {
     try {
       // if not js module, just return content buffer
       const extname = path.extname(filepath);
-      // if (extname == '.jsc') {
-      //   filepath = filepath.replace(/.jsc/g, '');
-      // }
-      // console.log('_extensions: ', Module._extensions);
-      console.log('loadFile filepath: ', filepath);
       if (extname && !Module._extensions[extname]) {
         return fs.readFileSync(filepath);
       }
-      console.log('loadFile extname: dddd');
+
       // require js module
       const obj = require(filepath);
       if (!obj) return obj;
       // it's es module
       if (obj.__esModule) return 'default' in obj ? obj.default : obj;
-      console.log('loadFile extname: ffff');
       return obj;
     } catch (err) {
       err.message = `[egg-core] load file: ${filepath}, error: ${err.message}`;

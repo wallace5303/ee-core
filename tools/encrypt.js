@@ -171,7 +171,6 @@ class Encrypt {
       output: jscFile,
     });
     fs.rmSync(curPath, {force: true});
-    console.log('[ee-core] [encrypt] generate ', jscFile);
   }
 
   /**

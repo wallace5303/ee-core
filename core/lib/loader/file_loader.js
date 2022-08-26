@@ -1,6 +1,5 @@
 'use strict';
 
-require('bytenode');
 const assert = require('assert');
 const fs = require('fs');
 const debug = require('debug')('ee-core:fileLoader');
