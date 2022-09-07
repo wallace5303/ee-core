@@ -184,17 +184,6 @@ class Encrypt {
     }
     return;
   }
-  
-  /**
-   * 删除文件
-   */
-  deleteFiles (filePath) {
-    try {
-      fs.rmSync(filePath, {recursive: true, force: true});
-    } catch (e){
-      fs.rmdirSync(filePath, {recursive: true});
-    }
-  };
 
   /**
    * 检查文件是否存在
