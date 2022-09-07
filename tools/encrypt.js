@@ -171,7 +171,7 @@ class Encrypt {
       output: jscFile,
       electron: true
     });
-    fs.rmSync(curPath, {force: true});
+	  fsPro.removeSync(curPath);
   }
 
   /**
@@ -180,10 +180,21 @@ class Encrypt {
   rmBackup (dir) {
     if (fs.existsSync(dir)) {
       console.log('[ee-core] [encrypt] clean old directory:', dir);
-      fs.rmSync(dir, {recursive: true, force: true});
+      fsPro.removeSync(dir);
     }
     return;
   }
+  
+  /**
+   * 删除文件
+   */
+  deleteFiles (filePath) {
+    try {
+      fs.rmSync(filePath, {recursive: true, force: true});
+    } catch (e){
+      fs.rmdirSync(filePath, {recursive: true});
+    }
+  };
 
   /**
    * 检查文件是否存在
