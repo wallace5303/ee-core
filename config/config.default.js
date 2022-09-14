@@ -248,6 +248,17 @@ module.exports = appInfo => {
   }; 
 
   /**
+   * 加密配置
+   */
+  config.encrypt = {
+    type: 'bytecode', // bytecode | confusion
+    directory: [
+      'electron'
+    ],
+    fileExt: ['.js'],
+  };
+
+  /**
    * TODO storage
    */
   config.storage = {

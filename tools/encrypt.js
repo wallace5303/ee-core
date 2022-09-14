@@ -6,30 +6,26 @@ const fsPro = require('fs-extra');
 const is = require('is-type-of');
 const UglifyJS = require('uglify-js');
 const bytenode = require('bytenode');
+const utility = require('utility');
+const crypto = require('crypto');
 
 class Encrypt {
   constructor() {
     this.basePath = process.cwd();
-    const directory = [
-      'electron',
-    ];
     this.dirs = [];
-    this.type = '';
-    this.configPath = '';
-    this.config = null;
-    this.filesExt = ['.js', '.json', '.node'];
     this.encryptCodeDir = path.join(this.basePath, 'public');
+    this.config = this.loadConfig('encrypt');
+    this.filesExt = this.config.fileExt || ['.js'];
+    this.type = this.config.type || 'bytecode';
+    const directory = this.config.directory || ['electron'];
+    this.tmpFile = '';
+    this.mapFile = '';
 
     // argv
     for (let i = 0; i < process.argv.length; i++) {
       let tmpArgv = process.argv[i];
       if (tmpArgv.indexOf('--type=') !== -1) {
         this.type = tmpArgv.substring(7);
-      }
-      if (tmpArgv.indexOf('--config=') !== -1) {
-        let configPathStr = tmpArgv.substring(9);
-        this.configPath = path.join(this.basePath, configPathStr);
-        this.config = fs.existsSync(this.configPath) ? require(this.configPath) : null;
       }
     }
 
@@ -41,17 +37,6 @@ class Encrypt {
       }
     }
     console.log('[ee-core] [encrypt] dirs:', this.dirs);
-  }
-
-  /**
-   * 检查
-   */
-  check () {
-    if (this.configPath.length > 0 && !is.object(this.config)) {
-      console.log('[ee-core] [encrypt] ERROR: config file is invalid');
-      return false;
-    }
-    return true;
   }
 
   /**
@@ -83,6 +68,23 @@ class Encrypt {
       fsPro.copySync(codeDirPath, targetDir);
     }
     console.log('[ee-core] [encrypt] backup end');
+    return true;
+  }
+  
+  prepare () {
+    if (this.type == 'bytecode') {
+      let filename = this.config.mangle || this.config.mangle.file || null;
+      if (filename) {
+        this.tmpFile = path.join(this.encryptCodeDir, 'electron', 'tmp.json');
+        this.mapFile = path.join(this.encryptCodeDir, 'electron', filename);
+        fs.writeFileSync(this.mapFile, '');
+        const content = {
+          nameMap: {}
+        };
+        utility.writeJSONSync(this.tmpFile, content);
+      }
+    }
+
     return true;
   }
 
@@ -233,12 +235,32 @@ class Encrypt {
       fs.chmodSync(path, mode);
     }
   };
+
+  loadConfig (prop) {
+    const filepath = path.join(this.basePath, 'electron', 'config', 'config.default.js');
+    const obj = require(filepath);
+    if (!obj) return obj;
+
+    let ret = obj;
+    if (is.function(obj) && !is.class(obj)) {
+      ret = obj();
+    }
+    return ret[prop] || {};
+  };
+
+  md5 (file) {
+    const buffer = fs.readFileSync(file);
+    const hash = crypto.createHash('md5');
+    hash.update(buffer, 'utf8');
+    const str = hash.digest('hex');
+    return str;
+  }
 }
 
 const run = () => {
   const e = new Encrypt();
-  if (!e.check()) return;
   if (!e.backup()) return;
+  //if (!e.prepare()) return;
   e.encrypt();
 }
 
