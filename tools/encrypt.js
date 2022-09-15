@@ -14,7 +14,7 @@ class Encrypt {
     this.basePath = process.cwd();
     this.dirs = [];
     this.encryptCodeDir = path.join(this.basePath, 'public');
-    this.config = this.loadConfig('encrypt');
+    this.config = this.loadConfig('encrypt.js');
     this.filesExt = this.config.fileExt || ['.js'];
     this.type = this.config.type || 'bytecode';
     const directory = this.config.directory || ['electron'];
@@ -239,7 +239,7 @@ class Encrypt {
   };
 
   loadConfig (prop) {
-    const filepath = path.join(this.basePath, 'electron', 'config', 'config.default.js');
+    const filepath = path.join(this.basePath, 'electron', 'config', prop);
     const obj = require(filepath);
     if (!obj) return obj;
 
@@ -247,7 +247,8 @@ class Encrypt {
     if (is.function(obj) && !is.class(obj)) {
       ret = obj();
     }
-    return ret[prop] || {};
+
+    return ret || {};
   };
 
   md5 (file) {
