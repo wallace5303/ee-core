@@ -245,17 +245,6 @@ module.exports = appInfo => {
    */
   config.hardGpu = {
     enable: false
-  }; 
-
-  /**
-   * 加密配置
-   */
-  config.encrypt = {
-    type: 'bytecode', // bytecode | confusion
-    directory: [
-      'electron'
-    ],
-    fileExt: ['.js'],
   };
 
   /**

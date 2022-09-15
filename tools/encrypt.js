@@ -21,11 +21,13 @@ class Encrypt {
     this.tmpFile = '';
     this.mapFile = '';
 
-    // argv
-    for (let i = 0; i < process.argv.length; i++) {
-      let tmpArgv = process.argv[i];
-      if (tmpArgv.indexOf('--type=') !== -1) {
-        this.type = tmpArgv.substring(7);
+    // cli
+    if (Object.keys(this.config).length == 0) {
+      for (let i = 0; i < process.argv.length; i++) {
+        let tmpArgv = process.argv[i];
+        if (tmpArgv.indexOf('--type=') !== -1) {
+          this.type = tmpArgv.substring(7);
+        }
       }
     }
 
@@ -150,8 +152,8 @@ class Encrypt {
       },
     }
     let options = defaultOpt;
-    if (is.object(this.config)) {
-      options = Object.assign(defaultOpt, this.config);
+    if (is.object(this.config.uglifyOpt)) {
+      options = Object.assign(defaultOpt, this.config.uglifyOpt);
     }
 
     let code = fs.readFileSync(file, "utf8");
