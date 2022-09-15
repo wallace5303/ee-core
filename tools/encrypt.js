@@ -240,6 +240,9 @@ class Encrypt {
 
   loadConfig (prop) {
     const filepath = path.join(this.basePath, 'electron', 'config', prop);
+    if (!fs.existsSync(filepath)) {
+      return {};
+    }
     const obj = require(filepath);
     if (!obj) return obj;
 
