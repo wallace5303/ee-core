@@ -222,6 +222,10 @@ module.exports = appInfo => {
     },
     body: {
       multipart: true, // 文件类型
+    },
+    filterRequest: {
+      uris:  [],
+      returnData: ''
     }
   };  
 
