@@ -441,6 +441,7 @@ const loaders = [
   require('./mixin/config'),
   require('./mixin/service'),
   require('./mixin/controller'),
+  require('./mixin/addon'),
 ];
 
 for (const loader of loaders) {

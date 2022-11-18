@@ -104,6 +104,18 @@ module.exports = {
     
     return isClass;
   },
+
+  /**
+   * 文件类型
+   */
+  filePatterns () {
+    const files = (process.env.EE_TYPESCRIPT === 'true' && Module._extensions['.ts'])
+    ? [ '**/*.(js|ts)', '!**/*.d.ts' ]
+    : [ '**/*.js','**/*.jsc' ];
+
+    return files;
+  }
+
 };
 
 
