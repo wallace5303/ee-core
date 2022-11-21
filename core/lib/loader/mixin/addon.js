@@ -10,8 +10,8 @@ const utils = require('../../utils/index');
 module.exports = {
 
   /**
-   * Load config/config.js
-   *
+   * Load app/addon
+   * @param {Object} opt - LoaderOptions
    * @function 
    * @since 1.0.0
    */
@@ -20,23 +20,28 @@ module.exports = {
 
     const target = {};
 
-    const files = utils.filePatterns();
+    const files = '*';
     const directory = path.join(this.options.framework, 'addon');
-    const filepaths = globby.sync(files, { cwd: directory });
-    console.log('filepaths:', filepaths);
-    // for (const filename of filepaths) {
-    //   const fullpath = path.join(directory, filename);
-    //   if (!fs.statSync(fullpath).isFile()) continue;
+    const addonpaths = globby.sync(files, { cwd: directory, deep: 1, onlyDirectories: true});
+    for (const addonName of addonpaths) {
+      const fullpath = path.join(directory, addonName, 'index');
+      let file = this.resolveModule(fullpath);
+      if (!fs.statSync(file).isFile()) continue;
+      target[addonName] = this.loadFile(fullpath);
+      console.log('addonName:', addonName);
+    }
 
-    //   let filepath = this.resolveModule(fullpath);
-    
-    //   target[filename] = this.loadFile(filepath);
-    // }
-
+    // // 载入到 app.serviceClasses
+    // let opt = Object.assign({
+    //   call: true,
+    //   caseStyle: 'lower',
+    //   fieldClass: 'serviceClasses',
+    //   directory: path.join(this.options.framework, 'controller'),
+    // }, opt);    
+    // this.loadToApp(controllerBase, 'controller', opt);
     this.addon = target;
     this.timing.end('Load Addon');
   },
-
 };
 
 

@@ -157,6 +157,15 @@ class EeCore extends KoaApplication {
     return this.loader ? this.loader.config : {};
   }
 
+  /**
+   * The addon of application
+   * @member {Addon}
+   * @since 1.0.0
+   */
+  get addon() {
+    return this.loader ? this.loader.addon : {};
+  }  
+
   get [EE_LOADER]() {
     return require('./loader/ee_loader');
   }
