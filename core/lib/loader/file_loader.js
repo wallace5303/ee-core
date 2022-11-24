@@ -188,36 +188,53 @@ class FileLoader {
     const files = '*';
     const app = this.options.inject;
     const loader = this.options.loader;
-
-    const directory = path.join(app.eeCoreDir, 'addon');
-    const addonpaths = globby.sync(files, { cwd: directory, deep: 1, onlyDirectories: true});
-    for (const addonName of addonpaths) {
-      let fullpath = path.join(directory, addonName, 'index');
-      fullpath = loader.resolveModule(fullpath);
-      if (!fs.statSync(fullpath).isFile()) continue;
-
-      let exports = getExports(fullpath, this.options, addonName);
-      if (exports == null) continue;
-
-      const properties = [addonName];
-      if (is.class(exports) || utils.isBytecodeClass(exports)) {
-        exports.prototype.pathName = addonName;
-        exports.prototype.fullPath = fullpath;
-      }
-
-      items.push({ fullpath, properties, exports });
+    const target = this.options.target;
+    let directories = this.options.directory;
+    
+    if (!Array.isArray(directories)) {
+      directories = [ directories ];
     }
 
-    const target = this.options.target;
-    for (const item of items) {
-      const property = item.properties[0];
-      let obj = item.exports;
-      if (obj && !is.primitive(obj)) {
-        obj[FULLPATH] = item.fullpath;
-        obj[EXPORTS] = true;
+    // check addon 
+    const config = app.config.addons;
+    let filterAddons = [];
+    for (let key of Object.keys(config)) {
+      if (!config[key].enable) {
+        filterAddons.push(key);
       }
-      
-      target[property] = obj;
+    }
+
+    for (const directory of directories) {
+      const addonpaths = globby.sync(files, { cwd: directory, deep: 1, onlyDirectories: true});
+      for (const addonName of addonpaths) {
+        if (filterAddons.includes(addonName)) continue;
+
+        let fullpath = path.join(directory, addonName, 'index');
+        fullpath = loader.resolveModule(fullpath);
+        if (!fs.statSync(fullpath).isFile()) continue;
+  
+        let exports = getExports(fullpath, this.options, addonName);
+        if (exports == null) continue;
+  
+        const properties = [addonName];
+        if (is.class(exports) || utils.isBytecodeClass(exports)) {
+          exports.prototype.pathName = addonName;
+          exports.prototype.fullPath = fullpath;
+        }
+  
+        items.push({ fullpath, properties, exports });
+      }
+  
+      for (const item of items) {
+        const property = item.properties[0];
+        let obj = item.exports;
+        if (obj && !is.primitive(obj)) {
+          obj[FULLPATH] = item.fullpath;
+          obj[EXPORTS] = true;
+        }
+        
+        target[property] = obj;
+      }
     }
 
     return target;

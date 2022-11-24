@@ -261,7 +261,16 @@ module.exports = appInfo => {
   /**
    * loading页（废弃）
    */
-  config.loadingPage = false;  
+  config.loadingPage = false;
+
+  /**
+   * addons
+   */
+  config.addons = {
+    window: {
+      enable: true,
+    }
+  }; 
 
   return config;
 };

@@ -4,7 +4,7 @@ const { BrowserWindow } = require('electron');
  * 窗口插件
  * @class
  */
-class Win {
+class WinAddon {
 
   constructor(app) {
     this.app = app;
@@ -89,4 +89,4 @@ class Win {
   }  
 }
 
-module.exports = Win;
+module.exports = WinAddon;
