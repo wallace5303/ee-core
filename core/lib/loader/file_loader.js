@@ -219,7 +219,7 @@ class FileLoader {
       
       target[property] = obj;
     }
-    console.log('addon target', target);
+
     return target;
   }
 }
