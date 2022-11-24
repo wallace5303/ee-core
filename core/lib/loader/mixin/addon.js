@@ -1,10 +1,4 @@
-'use strict';
-
-const debug = require('debug')('ee-core:addon');
 const path = require('path');
-const fs = require('fs');
-const assert = require('assert');
-const globby = require('globby');
 
 module.exports = {
 
