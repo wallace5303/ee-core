@@ -4,10 +4,10 @@ const path = require('path');
 const fs = require('fs');
 const fsPro = require('fs-extra');
 const is = require('is-type-of');
-const UglifyJS = require('uglify-js');
 const bytenode = require('bytenode');
 const utility = require('utility');
 const crypto = require('crypto');
+const JavaScriptObfuscator = require('javascript-obfuscator');
 
 class Encrypt {
   constructor() {
@@ -130,13 +130,33 @@ class Encrypt {
   generate (curPath) {
     if (this.type == 'bytecode') {
       this.generateBytecodeFile(curPath);
+    } else if (this.type == 'confuse') {
+      this.generateJSConfuseFile(curPath);
     } else {
-      this.generateConfuseFile(curPath);
+      this.generateJSConfuseFile(curPath);
+      this.generateBytecodeFile(curPath);
     }
   }
 
   /**
-   * 生成压缩/混淆文件
+   * 使用 javascript-obfuscator 生成压缩/混淆文件
+   */  
+  generateJSConfuseFile (file) {
+    let defaultOpt = {
+      compact: true,
+      stringArray: true,
+      rotateStringArray: true,
+      stringArrayEncoding: ['base64'],
+      stringArrayThreshold: 1,
+      disableConsoleOutput: true,
+    }
+    let code = fs.readFileSync(file, "utf8");
+    let result = JavaScriptObfuscator.obfuscate(code, defaultOpt);
+    fs.writeFileSync(file, result.getObfuscatedCode(), "utf8"); 
+  }
+
+  /**
+   * (废弃) 使用 uglify 生成压缩/混淆文件
    */  
   generateConfuseFile (file) {
     let defaultOpt = {
@@ -175,6 +195,9 @@ class Encrypt {
       output: jscFile,
       electron: true
     });
+
+    //fs.writeFileSync(curPath, 'require("bytenode");module.exports = require("./'+path.basename(jscFile)+'");', 'utf8');
+
 	  fsPro.removeSync(curPath);
   }
 

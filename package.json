@@ -37,7 +37,7 @@
     "path-to-regexp": "^6.2.0",
     "socket.io": "^4.4.1",
     "socket.io-client": "^4.4.1",
-    "uglify-js": "^3.14.5",
+    "javascript-obfuscator": "^4.0.0",
     "urllib": "^2.38.0",
     "utility": "^1.17.0"
   },
