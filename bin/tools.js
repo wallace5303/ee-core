@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-const codeCompress = require('../tools/codeCompress');
 const replaceDist = require('../tools/replaceDist');
 const encrypt = require('../tools/encrypt');
 
@@ -12,14 +11,6 @@ console.log('[ee-core] cmd:', cmd);
 
 if (cmd == 'rd') {
   replaceDist.run();
-}
-
-if (cmd == 'compress') {
-  codeCompress.compress();
-}
-
-if (cmd == 'restore') {
-  codeCompress.restore();
 }
 
 if (cmd == 'encrypt') {

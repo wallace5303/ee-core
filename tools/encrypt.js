@@ -130,7 +130,7 @@ class Encrypt {
   generate (curPath) {
     if (this.type == 'bytecode') {
       this.generateBytecodeFile(curPath);
-    } else if (this.type == 'confuse') {
+    } else if (this.type == 'confusion') {
       this.generateJSConfuseFile(curPath);
     } else {
       this.generateJSConfuseFile(curPath);
