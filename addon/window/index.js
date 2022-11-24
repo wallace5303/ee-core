@@ -1,13 +1,15 @@
 const { BrowserWindow } = require('electron');
 
-const windowContentsIdMap = {}
-
 /**
- * 窗口模块
+ * 窗口插件
+ * @class
  */
-module.exports = (app) => {
+class Win {
 
-  const f = {}
+  constructor(app) {
+    this.app = app;
+    this.windowContentsIdMap = {};
+  }
 
   /**
    * create window
@@ -15,7 +17,7 @@ module.exports = (app) => {
    * @function 
    * @since 1.0.0
    */
-  f.create = (name, opt) => {
+  create(name, opt) {
     const options = Object.assign({
       x: 10,
       y: 10,
@@ -26,21 +28,19 @@ module.exports = (app) => {
         nodeIntegration: true,
       },
     }, opt);
-    console.log('options:', options);
     const win = new BrowserWindow(options)
     
     const winContentsId = win.webContents.id;
     win.webContents.on('did-finish-load', () => {
-      f.registerWCid(name, winContentsId);
+      this.registerWCid(name, winContentsId);
     })
  
     win.webContents.on('destroyed', () => {
-      f.removeWCid(name);
+      this.removeWCid(name);
     })
 
     win.webContents.on('render-process-gone', (event, details) => {
-      f.removeWCid(name);
-      console.log('render-process-gone:', windowContentsIdMap)
+      this.removeWCid(name);
     })
 
     return win;
@@ -52,8 +52,8 @@ module.exports = (app) => {
    * @function 
    * @since 1.0.0
    */
-  f.getWCid = (name) => {
-    const id = windowContentsIdMap[name] || null;
+  getWCid(name) {
+    const id = this.windowContentsIdMap[name] || null;
     return id;
   }
 
@@ -63,8 +63,8 @@ module.exports = (app) => {
    * @function 
    * @since 1.0.0
    */
-  f.getMWCid = () => {
-    const id = windowContentsIdMap['main'] || null;
+  getMWCid() {
+    const id = this.windowContentsIdMap['main'] || null;
     return id;
   }
 
@@ -74,8 +74,8 @@ module.exports = (app) => {
    * @function 
    * @since 1.0.0
    */
-  f.registerWCid = (name, id) => {
-    windowContentsIdMap[name] = id;
+  registerWCid (name, id) {
+    this.windowContentsIdMap[name] = id;
   }
 
   /**
@@ -84,9 +84,9 @@ module.exports = (app) => {
    * @function 
    * @since 1.0.0
    */
-   f.removeWCid = (name) => {
-    delete windowContentsIdMap[name];
-  }
-
-  return f;
+   removeWCid (name) {
+    delete this.windowContentsIdMap[name];
+  }  
 }
+
+module.exports = Win;

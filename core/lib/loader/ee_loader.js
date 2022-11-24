@@ -373,10 +373,16 @@ class EeLoader {
       directory,
       property,
       inject: this.app,
+      loader: this
     }, opt);
     const timingKey = `Load "${String(property)}" to Context`;
     this.timing.start(timingKey);
-    new ContextLoader(opt).load();
+    if (['addon'].includes(property)) {
+      new ContextLoader(opt).loadAddons();
+    } else {
+      new ContextLoader(opt).load();
+    }
+    
     this.timing.end(timingKey);
   }
 

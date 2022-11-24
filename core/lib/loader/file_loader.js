@@ -23,6 +23,7 @@ const defaults = {
   override: false,
   inject: undefined,
   filter: null,
+  loader: undefined,
 };
 
 /**
@@ -44,6 +45,7 @@ class FileLoader {
    * @param {Object} options.inject - an object that be the argument when invoke the function
    * @param {Function} options.filter - a function that filter the exports which can be loaded
    * @param {String|Function} options.caseStyle - set property's case when converting a filepath to property list.
+   * @param {Object} options.loader - an object that be the argument when invoke the function
    */
   constructor(options) {
     assert(options.directory, 'options.directory is required');
@@ -175,6 +177,51 @@ class FileLoader {
     return items;
   }
 
+  /**
+   * attach items to target object for addons.
+   * `app/addon/group/index.js` => `target.group`
+   * @return {Object} target
+   * @since 1.0.0
+   */
+  loadAddons() {
+    const items = [];
+    const files = '*';
+    const app = this.options.inject;
+    const loader = this.options.loader;
+
+    const directory = path.join(app.eeCoreDir, 'addon');
+    const addonpaths = globby.sync(files, { cwd: directory, deep: 1, onlyDirectories: true});
+    for (const addonName of addonpaths) {
+      let fullpath = path.join(directory, addonName, 'index');
+      fullpath = loader.resolveModule(fullpath);
+      if (!fs.statSync(fullpath).isFile()) continue;
+
+      let exports = getExports(fullpath, this.options, addonName);
+      if (exports == null) continue;
+
+      const properties = [addonName];
+      if (is.class(exports) || utils.isBytecodeClass(exports)) {
+        exports.prototype.pathName = addonName;
+        exports.prototype.fullPath = fullpath;
+      }
+
+      items.push({ fullpath, properties, exports });
+    }
+
+    const target = this.options.target;
+    for (const item of items) {
+      const property = item.properties[0];
+      let obj = item.exports;
+      if (obj && !is.primitive(obj)) {
+        obj[FULLPATH] = item.fullpath;
+        obj[EXPORTS] = true;
+      }
+      
+      target[property] = obj;
+    }
+    console.log('addon target', target);
+    return target;
+  }
 }
 
 module.exports = FileLoader;
