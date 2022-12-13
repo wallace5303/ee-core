@@ -17,9 +17,12 @@ class Encrypt {
     this.config = this.loadConfig('encrypt.js');
     this.filesExt = this.config.fileExt || ['.js'];
     this.type = this.config.type || 'bytecode';
+    this.bOpt = this.config.bytecodeOptions || {};
+    this.cOpt = this.config.confusionOptions || {};
+
     const directory = this.config.directory || ['electron'];
-    this.tmpFile = '';
-    this.mapFile = '';
+    this.tmpFile = ''; // todo
+    this.mapFile = ''; // todo
 
     // cli
     if (Object.keys(this.config).length == 0) {
@@ -142,43 +145,15 @@ class Encrypt {
    * 使用 javascript-obfuscator 生成压缩/混淆文件
    */  
   generateJSConfuseFile (file) {
-    let defaultOpt = {
+    let opt = Object.assign({
       compact: true,
       stringArray: true,
-      rotateStringArray: true,
-      stringArrayEncoding: ['base64'],
       stringArrayThreshold: 1,
-      disableConsoleOutput: true,
-    }
+    }, this.cOpt);
+    
     let code = fs.readFileSync(file, "utf8");
-    let result = JavaScriptObfuscator.obfuscate(code, defaultOpt);
+    let result = JavaScriptObfuscator.obfuscate(code, opt);
     fs.writeFileSync(file, result.getObfuscatedCode(), "utf8"); 
-  }
-
-  /**
-   * (废弃) 使用 uglify 生成压缩/混淆文件
-   */  
-  generateConfuseFile (file) {
-    let defaultOpt = {
-      mangle: {
-        toplevel: false,
-      },
-      compress: {
-        drop_console: true,
-        passes: 2
-      },
-      output: {
-        beautify: false
-      },
-    }
-    let options = defaultOpt;
-    if (is.object(this.config.uglifyOpt)) {
-      options = Object.assign(defaultOpt, this.config.uglifyOpt);
-    }
-
-    let code = fs.readFileSync(file, "utf8");
-    let result = UglifyJS.minify(code, options);
-    fs.writeFileSync(file, result.code, "utf8"); 
   }
 
   /**
@@ -190,11 +165,13 @@ class Encrypt {
     }
     //let jscFile = curPath.replace(/.js/g, '.jsc');
     let jscFile = curPath + 'c';
-    bytenode.compileFile({
+    let opt = Object.assign({
       filename: curPath,
       output: jscFile,
       electron: true
-    });
+    }, this.bOpt);
+
+    bytenode.compileFile(opt);
 
     //fs.writeFileSync(curPath, 'require("bytenode");module.exports = require("./'+path.basename(jscFile)+'");', 'utf8');
 
