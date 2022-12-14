@@ -36,9 +36,7 @@ const fsPro = require('fs-extra');
     };
     
     const sourceDir = path.join(homeDir, distDir);
-    const targetDir = path.join(homeDir, 'app', 'public');
     const sourceIndexFile = path.join(sourceDir, 'index.html');
-    const targetIndexFile = path.join(homeDir, 'app', 'view', 'index.ejs');
     
     if (!fileExist(sourceIndexFile)) {
       console.error('[ee-core] [replace_dist] ERROR 前端资源不存在，请构建!!!');
@@ -54,19 +52,6 @@ const fsPro = require('fs-extra');
 
     fsPro.copySync(sourceDir, eeResourceDir);
     console.log('[ee-core] [replace_dist] 复制资源到:', eeResourceDir);
-
-    // 复制到egg资源目录
-    if (fs.existsSync(targetDir)) {
-      console.log('[ee-core] [replace_dist] 重置egg资源：', targetDir);
-      fs.rmdirSync(targetDir, {recursive: true});
-      
-      console.log('[ee-core] [replace_dist] 复制资源到egg:', sourceDir);
-      fsPro.copySync(sourceDir, targetDir);
-      
-      // replace ejs
-      fsPro.copySync(sourceIndexFile, targetIndexFile);
-      console.log('[ee-core] [replace_dist] 替换 egg index.ejs');
-    }
 
     console.log('[ee-core] [replace_dist] 结束');
   }

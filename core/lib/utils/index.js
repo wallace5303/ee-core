@@ -32,7 +32,7 @@ module.exports = {
       if (obj.__esModule) return 'default' in obj ? obj.default : obj;
       return obj;
     } catch (err) {
-      err.message = `[egg-core] load file: ${filepath}, error: ${err.message}`;
+      err.message = `[ee-core] load file: ${filepath}, error: ${err.message}`;
       throw err;
     }
   },
@@ -65,8 +65,6 @@ module.exports = {
     let fileName;
     /* istanbul ignore else */
     if (callSite) {
-      // egg-mock will create a proxy
-      // https://github.com/eggjs/egg-mock/blob/master/lib/app.js#L174
       fileName = callSite.getFileName();
       /* istanbul ignore if */
       if (fileName && fileName.endsWith('egg-mock/lib/app.js')) {

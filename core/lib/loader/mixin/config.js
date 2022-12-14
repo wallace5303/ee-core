@@ -107,7 +107,7 @@ module.exports = {
       this._setConfigMeta(envConfig, '<process.env.EE_APP_CONFIG>');
       return envConfig;
     } catch (err) {
-      this.options.logger.warn('[egg-loader] process.env.EE_APP_CONFIG is not invalid JSON: %s', envConfigStr);
+      this.options.logger.warn('[ee-loader] process.env.EE_APP_CONFIG is not invalid JSON: %s', envConfigStr);
     }
   },
 

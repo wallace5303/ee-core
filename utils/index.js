@@ -53,16 +53,6 @@ exports.getEeConfig = function() {
 }
 
 /**
- * 获取 egg配置
- */
-exports.getEggConfig = function() {
-  const cdb = this.getCoreDB();
-  const config = cdb.getItem('config');
-
-  return config.egg;
-}
-
-/**
  * 获取 数据库存储路径
  */
 exports.getStorageDir = function() {

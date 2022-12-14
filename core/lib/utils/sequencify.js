@@ -1,6 +1,6 @@
 'use strict';
 
-const debug = require('debug')('egg-core#sequencify');
+const debug = require('debug')('ee-core#sequencify');
 
 function sequence(tasks, names, results, missing, recursive, nest, optional, parent) {
   names.forEach(function(name) {
