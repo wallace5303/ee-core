@@ -43,6 +43,16 @@ exports.getCoreDB = function() {
 }
 
 /**
+ * 获取 当前环境
+ */
+exports.getEnv = function() {
+  const cdb = this.getCoreDB();
+  const env = cdb.getItem('config').env;
+
+  return env;
+}
+
+/**
  * 获取 ee配置
  */
 exports.getEeConfig = function() {
@@ -56,7 +66,13 @@ exports.getEeConfig = function() {
  * 获取 数据库存储路径
  */
 exports.getStorageDir = function() {
-  return utilsCommon.getStorageDir();
+  const cdb = this.getCoreDB();
+  const env = cdb.getItem('config').env;
+
+  const appDir = env === 'local' || env === 'unittest' ? this.getHomeDir() : this.getAppUserDataDir();
+  const storageDir = path.join(appDir, 'data');
+
+  return storageDir;
 }
 
 /**
@@ -77,6 +93,96 @@ exports.getLogDir = function() {
   const cdb = this.getCoreDB();
   const logPath = cdb.getItem('config').logger.dir;
   return logPath;
+}
+
+/**
+ * 获取 home目录
+ */
+exports.getHomeDir = function() {
+  const cdb = this.getCoreDB();
+  const homePath = cdb.getItem('config').homeDir;
+  return homePath;
+}
+
+/**
+ * 获取 base目录
+ */
+exports.getBaseDir = function() {
+  const cdb = this.getCoreDB();
+  const basePath = cdb.getItem('config').baseDir;
+  return basePath;
+}
+
+/**
+ * 获取 root目录
+ */
+exports.getRootDir = function() {
+  const cdb = this.getCoreDB();
+  const rootPath = cdb.getItem('config').root;
+  return rootPath;
+}
+
+/**
+ * 获取 appUserData目录
+ */
+exports.getAppUserDataDir = function() {
+  const cdb = this.getCoreDB();
+  const dataPath = cdb.getItem('config').appUserDataDir;
+  return dataPath;
+}
+
+/**
+ * 获取 app version
+ */
+exports.getAppVersion = function() {
+  const cdb = this.getCoreDB();
+  const v = cdb.getItem('config').appVersion;
+  return v;
+}
+
+/**
+ * 获取 exec目录
+ */
+exports.getExecDir = function() {
+  const cdb = this.getCoreDB();
+  const execPath = cdb.getItem('config').execDir;
+  return execPath;
+}
+
+/**
+ * 获取 插件配置
+ */
+exports.getAddonConfig = function() {
+  const cdb = this.getCoreDB();
+  const cfg = cdb.getItem('config').addons;
+  return cfg;
+}
+
+/**
+ * 获取 mainServer配置
+ */
+exports.getMainServerConfig = function() {
+  const cdb = this.getCoreDB();
+  const cfg = cdb.getItem('config').mainServer;
+  return cfg;
+}
+
+/**
+ * 获取 httpServer配置
+ */
+exports.getHttpServerConfig = function() {
+  const cdb = this.getCoreDB();
+  const cfg = cdb.getItem('config').httpServer;
+  return cfg;
+}
+
+/**
+ * 获取 socketServer配置
+ */
+exports.getSocketServerConfig = function() {
+  const cdb = this.getCoreDB();
+  const cfg = cdb.getItem('config').socketServer;
+  return cfg;
 }
 
 /**
