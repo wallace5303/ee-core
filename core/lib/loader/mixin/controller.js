@@ -47,7 +47,7 @@ module.exports = {
     const controllerBase = opt.directory;
 
     this.loadToApp(controllerBase, 'controller', opt);
-    this.options.logger.info('[ee:loader] Controller loaded: %s', controllerBase);
+    this.options.logger.info('[ee-core:loader] Controller loaded: %s', controllerBase);
     this.timing.end('Load Controller');
   },
 
