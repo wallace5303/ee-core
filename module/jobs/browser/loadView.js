@@ -9,7 +9,8 @@ const loadView = function (opt = {}) {
   const title = opt.title;
   const script = opt.script;
 
-  const scriptUrl = new URL('eefile://' + src);
+  //const scriptUrl = new URL('eefile://' + src);
+  const scriptUrl = 'eefile://' + src;
   console.log('[ee-core:job] scriptUrl: ', scriptUrl);
 
   // 脚本内容
