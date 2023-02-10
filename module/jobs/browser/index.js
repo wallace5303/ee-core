@@ -1,9 +1,9 @@
 //require('bytenode');
 const { BrowserWindow } = require('electron');
 const fs = require('fs');
-const { isDev, fnDebounce, getRandomString } = require('../../utils/');
 const loadView = require('./loadView');
 // const MessageChannel = require('./MessageChannel.class');
+// const { isDev, fnDebounce, getRandomString } = require('../../utils/');
 
 class BrowserJob {
 
@@ -137,22 +137,6 @@ class BrowserJob {
       console.error(err);
     });
   }
-
-  // /**
-  //  * 创建视图数据
-  //  */
-  // _createViewData() {
-
-  //   let param = {
-  //     webSecurity: true,
-  //     script: buffer.toString(),
-  //     title: `${this.name} job`,
-  //     base: path
-  //   }
-  //   const viewData = loadView(param);
-
-  //   return viewData;
-  // }
 }
 
 module.exports = BrowserJob;

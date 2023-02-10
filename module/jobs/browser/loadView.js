@@ -1,29 +1,26 @@
+const { URL } = require('url');
+
 /**
-  * loadView 生成可以供直接读取显示到BrowserWindow的html content
-  * 
-  * @param {String} title - 标题
-  * @param {String} script - 脚本内容
-  * @return {String}
+  * loadView 生成BrowserWindow的html content
   */
-const loadView = ({ webSecurity, src, title, script, base = '.' }) => {
+const loadView = function (opt = {}) {
+  const webSecurity = opt.webSecurity;
+  const src = opt.src;
+  const title = opt.title;
+  const script = opt.script;
 
-  /* script content  */
-  const scriptContent =
-    webSecurity ? `<script> ${ script } </script>` 
-    : `<script src='${
-        url.format({
-          pathname: (path.posix.join(...(src).split(path.sep))),
-          protocol: 'eefile:',
-          slashes: true
-        })
-      }'></script>`;
+  const scriptUrl = new URL('eefile://' + src);
+  console.log('[ee-core:job] scriptUrl: ', scriptUrl);
 
+  // 脚本内容
+  const scriptContent = webSecurity ? `<script> ${ script } </script>` : `<script src='${scriptUrl}'></script>`;
+
+  // html内容
   const htmlContent = (`
     <!DOCTYPE html>
     <html>
       <head>
         <title>${title}</title>
-        <base href="${base}">
         <meta charset="UTF-8">
       </head>
       <body>
@@ -32,7 +29,10 @@ const loadView = ({ webSecurity, src, title, script, base = '.' }) => {
     </html>
   `);
 
-  return 'data:text/html;charset=UTF-8,' + encodeURIComponent(htmlContent);
+  const DataURI = 'data:text/html;charset=UTF-8,';
+  const data = DataURI + encodeURIComponent(htmlContent);
+
+  return data;
 };
 
 module.exports = loadView;
