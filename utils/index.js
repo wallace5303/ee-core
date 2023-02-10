@@ -10,18 +10,15 @@ const eis = require('electron-is');
 const utilsCommon = require('./common');
 
 /**
- * 创建文件夹
+ * utils common
  */
-exports.mkdir = function (dirpath, dirname) {
-  return utilsCommon.mkdir(dirpath, dirname);
-}
-
-/**
- * 修改文件权限
- */
-exports.chmodPath = function (path, mode) {
-  return utilsCommon.chmodPath(path, mode);
-}
+exports.mkdir = utilsCommon.mkdir;
+exports.chmodPath = utilsCommon.chmodPath;
+exports.compareVersion = utilsCommon.compareVersion;
+exports.isDev = utilsCommon.isDev;
+exports.isRenderer = utilsCommon.isRenderer;
+exports.isMain = utilsCommon.isMain;
+exports.isForkedChild = utilsCommon.isForkedChild;
 
 /**
  * 获取项目根目录package.json
@@ -239,9 +236,4 @@ exports.middleware = function (fn) {
   return is.generatorFunction(fn) ? convert(fn) : fn;
 }
 
-/**
- * 版本号比较
- */
-exports.compareVersion = function (v1, v2) {
-  return utilsCommon.compareVersion(v1, v2);
-}
+
