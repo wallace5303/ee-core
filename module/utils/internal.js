@@ -1,10 +1,21 @@
 /**
- * Utils
+ * 内部 Utils
  */
 
 const fs = require('fs');
 const path = require('path');
 const storage = require('../../lib/storage');
+const mkdirp = require('mkdirp');
+
+/**
+ * 获取数据存储路径
+ */
+exports.getStorageDir = function () {
+  let env = process.env.EE_SERVER_ENV;
+  const appDir = env === 'local' || env === 'unittest' ? process.env.EE_HOME : process.env.EE_APP_USER_DATA;
+  const storageDir = path.join(appDir, 'data');
+  return storageDir;
+}
 
 /**
  * 获取 coredb
@@ -118,3 +129,60 @@ exports.isMain = function() {
 exports.isForkedChild = function() {
   return (Number(process.env.ELECTRON_RUN_AS_NODE) === 1);
 };
+
+/**
+ * 创建文件夹
+ */
+exports.mkdir = function(filepath) {
+  mkdirp.sync(path.dirname(filepath));
+  return
+}
+
+/**
+ * 修改文件权限
+ */
+exports.chmodPath = function(path, mode) {
+  let files = [];
+  if (fs.existsSync(path)) {
+    files = fs.readdirSync(path);
+    files.forEach((file, index) => {
+      const curPath = path + '/' + file;
+      if (fs.statSync(curPath).isDirectory()) {
+        this.chmodPath(curPath, mode); // 递归删除文件夹
+      } else {
+        fs.chmodSync(curPath, mode);
+      }
+    });
+    fs.chmodSync(path, mode);
+  }
+};
+
+/**
+ * 版本号比较
+ */
+exports.compareVersion = function (v1, v2) {
+  v1 = v1.split('.')
+  v2 = v2.split('.')
+  const len = Math.max(v1.length, v2.length)
+
+  while (v1.length < len) {
+    v1.push('0')
+  }
+  while (v2.length < len) {
+    v2.push('0')
+  }
+  
+  for (let i = 0; i < len; i++) {
+    const num1 = parseInt(v1[i])
+    const num2 = parseInt(v2[i])
+
+    if (num1 > num2) {
+      return 1
+    } else if (num1 < num2) {
+      return -1
+    }
+  }
+
+  return 0
+}
+

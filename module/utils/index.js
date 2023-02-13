@@ -1,24 +1,21 @@
-'use strict';
-
 const path = require('path');
-const constant = require('../lib/constant');
+const constant = require('../../lib/constant');
 const convert = require('koa-convert');
 const is = require('is-type-of');
 const co = require('co');
 const eis = require('electron-is');
-const utilsJson = require('../module/utils/json');
-const utilsCommon = require('./common');
+const utilsJson = require('./json');
+const interUtils = require('./internal');
 
-/**
- * utils common
- */
-exports.mkdir = utilsCommon.mkdir;
-exports.chmodPath = utilsCommon.chmodPath;
-exports.compareVersion = utilsCommon.compareVersion;
-exports.isDev = utilsCommon.isDev;
-exports.isRenderer = utilsCommon.isRenderer;
-exports.isMain = utilsCommon.isMain;
-exports.isForkedChild = utilsCommon.isForkedChild;
+// internal utils apis
+exports.isDev = interUtils.isDev;
+exports.isRenderer = interUtils.isRenderer;
+exports.isMain = interUtils.isMain;
+exports.isForkedChild = interUtils.isForkedChild;
+exports.mkdir = interUtils.mkdir;
+exports.chmodPath = interUtils.chmodPath;
+exports.compareVersion = interUtils.compareVersion;
+exports.chmodPath = interUtils.chmodPath;
 
 /**
  * 获取项目根目录package.json
@@ -57,19 +54,6 @@ exports.getEeConfig = function() {
   const config = cdb.getItem('config');
 
   return config;
-}
-
-/**
- * 获取 数据库存储路径
- */
-exports.getStorageDir = function() {
-  const cdb = this.getCoreDB();
-  const env = cdb.getItem('config').env;
-
-  const appDir = env === 'local' || env === 'unittest' ? this.getHomeDir() : this.getAppUserDataDir();
-  const storageDir = path.join(appDir, 'data');
-
-  return storageDir;
 }
 
 /**

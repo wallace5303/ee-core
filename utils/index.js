@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * 该模块不在增加新功能，请使用 /module/utils/index 模块
+ */
+
 const path = require('path');
 const constant = require('../lib/constant');
 const convert = require('koa-convert');

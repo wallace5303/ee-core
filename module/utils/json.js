@@ -1,9 +1,9 @@
-var fs = require('fs');
-var path = require('path');
-var mkdirp = require('mkdirp');
+const fs = require('fs');
+const path = require('path');
+const mkdirp = require('mkdirp');
 
 exports.strictParse = function (str) {
-  var obj = JSON.parse(str);
+  const obj = JSON.parse(str);
   if (!obj || typeof obj !== 'object') {
     throw new Error('JSON string is not object');
   }
