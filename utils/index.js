@@ -9,9 +9,9 @@ const constant = require('../lib/constant');
 const convert = require('koa-convert');
 const is = require('is-type-of');
 const co = require('co');
-const utility = require('utility');
 const eis = require('electron-is');
 const utilsCommon = require('./common');
+const utilsJson = require('../module/utils/json');
 
 /**
  * 创建文件夹
@@ -33,7 +33,7 @@ exports.chmodPath = function (path, mode) {
 exports.getPackage = function() {
   const cdb = this.getCoreDB();
   const config = cdb.getItem('config');
-  const json = utility.readJSONSync(path.join(config.homeDir, 'package.json'));
+  const json = utilsJson.readSync(path.join(config.homeDir, 'package.json'));
   
   return json;
 };

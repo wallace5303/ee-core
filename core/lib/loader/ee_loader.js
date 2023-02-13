@@ -7,7 +7,6 @@ const is = require('is-type-of');
 const debug = require('debug')('ee-core:EeLoader');
 const FileLoader = require('./file_loader');
 const ContextLoader = require('./context_loader');
-const utility = require('utility');
 const utils = require('../utils');
 const Timing = require('../utils/timing');
 
@@ -433,7 +432,11 @@ class EeLoader {
 
   getPkg() {
     const filePath = path.join(this.options.homeDir, 'package.json');
-    const json = utility.readJSONSync(filePath);
+    if (!fs.existsSync(filePath)) {
+      throw new Error(filePath + ' is not found');
+    }
+    const json = JSON.parse(fs.readFileSync(filePath));
+
     return json;
   }  
 }

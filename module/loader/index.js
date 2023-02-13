@@ -1,11 +1,11 @@
 const is = require('is-type-of');
 const fs = require('fs');
-const { utils } = require('../../core');
+const utils = require('../../core/lib/utils');
 
 module.exports = {
 
   /**
-   * 加载单个文件
+   * 加载单个文件(如果是函数，将被执行)
    *
    * @param {String} filepath - fullpath
    * @param {Array} inject - pass rest arguments into the function when invoke
@@ -43,21 +43,23 @@ module.exports = {
     return fullPath;
   },
 
-  // /**
-  //  * 模块的绝对路径
-  //  */
-  // isAbsolute(filepath) {
-  //   name = filepath.replace(/[/\\]/g, '/');
-  //   if (name.indexOf('/') !== -1) {
-  //     const isAbsolute = path.isAbsolute(name);
-  //     if (isAbsolute) {
-  //       mode = 'absolute';
-  //     } else {
-  //       mode = 'relative';
-  //     }
-  //     return mode;
-  //   }
-  // },
+  /**
+   * 加载模块(子进程中使用)
+   *
+   * @param {String} filepath - fullpath
+   * @return {Object} exports
+   * @since 1.0.0
+   */
+  requireModule (filepath) {
+    filepath = filepath && this.resolveModule(filepath);
+    if (!filepath) {
+      return null;
+    }
+    console.log('111111111111 filepath:', filepath);
+    const ret = utils.loadFile(filepath);
+    console.log('222222222222 ret:', ret);
+    return ret;
+  },  
 
 }
 

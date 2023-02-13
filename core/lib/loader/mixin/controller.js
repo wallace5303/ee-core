@@ -2,7 +2,7 @@
 
 const path = require('path');
 const is = require('is-type-of');
-const utility = require('utility');
+const utilsFn = require('../../utils/function');
 const utils = require('../../utils');
 const FULLPATH = require('../file_loader').FULLPATH;
 
@@ -97,7 +97,7 @@ function wrapObject(obj, path, prefix) {
   const ret = {};
   for (const key of keys) {
     if (is.function(obj[key])) {
-      const names = utility.getParamNames(obj[key]);
+      const names = utilsFn.getParamNames(obj[key]);
       if (names[0] === 'next') {
         throw new Error(`controller \`${prefix || ''}${key}\` should not use next as argument from file ${path}`);
       }
@@ -122,3 +122,4 @@ function wrapObject(obj, path, prefix) {
     return objectControllerMiddleware;
   }
 }
+
