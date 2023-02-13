@@ -6,6 +6,7 @@ const co = require('co');
 const eis = require('electron-is');
 const utilsJson = require('./json');
 const interUtils = require('./internal');
+const storage = require('../../lib/storage');
 
 // internal utils apis
 exports.isDev = interUtils.isDev;
@@ -15,7 +16,6 @@ exports.isForkedChild = interUtils.isForkedChild;
 exports.mkdir = interUtils.mkdir;
 exports.chmodPath = interUtils.chmodPath;
 exports.compareVersion = interUtils.compareVersion;
-exports.chmodPath = interUtils.chmodPath;
 
 /**
  * 获取项目根目录package.json
@@ -32,7 +32,7 @@ exports.getPackage = function() {
  * 获取 coredb
  */
 exports.getCoreDB = function() {
-  const coreDB = require('../lib/storage/index').JsonDB.connection('system');
+  const coreDB = storage.JsonDB.connection('system');
   return coreDB;
 }
 

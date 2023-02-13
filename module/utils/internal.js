@@ -8,16 +8,6 @@ const storage = require('../../lib/storage');
 const mkdirp = require('mkdirp');
 
 /**
- * 获取数据存储路径
- */
-exports.getStorageDir = function () {
-  let env = process.env.EE_SERVER_ENV;
-  const appDir = env === 'local' || env === 'unittest' ? process.env.EE_HOME : process.env.EE_APP_USER_DATA;
-  const storageDir = path.join(appDir, 'data');
-  return storageDir;
-}
-
-/**
  * 获取 coredb
  */
 exports.getCoreDB = function() {
