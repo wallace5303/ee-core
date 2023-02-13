@@ -40,18 +40,11 @@ const Utils = require('./utils/index');
  */
 const Socket = require('./lib/socket/io');
 
-/**
- * @member {Jobs}
- * @since 1.0.0
- */
-const Jobs = require('./module/jobs');
-
 module.exports = {
   Appliaction,
   Controller,
   Service,
   Storage,
   Socket,
-  Jobs,
   Utils
 };

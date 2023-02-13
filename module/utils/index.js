@@ -1,16 +1,41 @@
-/**
- * Utils
- */
+'use strict';
 
-const fs = require('fs');
 const path = require('path');
-const storage = require('../../lib/storage');
+const constant = require('../lib/constant');
+const convert = require('koa-convert');
+const is = require('is-type-of');
+const co = require('co');
+const eis = require('electron-is');
+const utilsJson = require('../module/utils/json');
+const utilsCommon = require('./common');
+
+/**
+ * utils common
+ */
+exports.mkdir = utilsCommon.mkdir;
+exports.chmodPath = utilsCommon.chmodPath;
+exports.compareVersion = utilsCommon.compareVersion;
+exports.isDev = utilsCommon.isDev;
+exports.isRenderer = utilsCommon.isRenderer;
+exports.isMain = utilsCommon.isMain;
+exports.isForkedChild = utilsCommon.isForkedChild;
+
+/**
+ * 获取项目根目录package.json
+ */
+exports.getPackage = function() {
+  const cdb = this.getCoreDB();
+  const config = cdb.getItem('config');
+  const json = utilsJson.readSync(path.join(config.homeDir, 'package.json'));
+  
+  return json;
+};
 
 /**
  * 获取 coredb
  */
 exports.getCoreDB = function() {
-  const coreDB = storage.JsonDB.connection('system');
+  const coreDB = require('../lib/storage/index').JsonDB.connection('system');
   return coreDB;
 }
 
@@ -25,6 +50,58 @@ exports.getEnv = function() {
 }
 
 /**
+ * 获取 ee配置
+ */
+exports.getEeConfig = function() {
+  const cdb = this.getCoreDB();
+  const config = cdb.getItem('config');
+
+  return config;
+}
+
+/**
+ * 获取 数据库存储路径
+ */
+exports.getStorageDir = function() {
+  const cdb = this.getCoreDB();
+  const env = cdb.getItem('config').env;
+
+  const appDir = env === 'local' || env === 'unittest' ? this.getHomeDir() : this.getAppUserDataDir();
+  const storageDir = path.join(appDir, 'data');
+
+  return storageDir;
+}
+
+/**
+ * 获取 应用程序数据目录 (开发环境时，为项目根目录)
+ */
+exports.getAppUserDataDir = function() {
+  const cdb = this.getCoreDB();
+  const config = cdb.getItem('config');
+  const env = config.env;
+  const dir = env === 'local' || env === 'unittest' ? config.homeDir : config.appUserDataDir;
+  return dir;
+}
+
+/**
+ * 获取 日志目录
+ */
+exports.getLogDir = function() {
+  const cdb = this.getCoreDB();
+  const logPath = cdb.getItem('config').logger.dir;
+  return logPath;
+}
+
+/**
+ * 获取 home目录
+ */
+exports.getHomeDir = function() {
+  const cdb = this.getCoreDB();
+  const homePath = cdb.getItem('config').homeDir;
+  return homePath;
+}
+
+/**
  * 获取 base目录
  */
 exports.getBaseDir = function() {
@@ -34,42 +111,129 @@ exports.getBaseDir = function() {
 }
 
 /**
- * fnDebounce
- * 
- * @param  {Function} fn - 回调函数
- * @param  {Time} delayTime - 延迟时间(ms)
- * @param  {Boolean} isImediate - 是否需要立即调用
- * @param  {type} args - 回调函数传入参数
-*/
-exports.fnDebounce = function() {
-  const fnObject = {};
-  let timer;
-
-  return (fn, delayTime, isImediate, args) => {
-    const setTimer = () => {
-      timer = setTimeout(() => {
-        fn(args);
-        clearTimeout(timer);
-        delete fnObject[fn];
-      }, delayTime);
-
-      fnObject[fn] = { delayTime, timer };
-    };
-
-    if (!delayTime || isImediate) return fn(args);
-
-    if (fnObject[fn]) {
-      clearTimeout(timer);
-      setTimer(fn, delayTime, args);
-    } else {
-      setTimer(fn, delayTime, args);
-    }
-  };
+ * 获取 root目录
+ */
+exports.getRootDir = function() {
+  const cdb = this.getCoreDB();
+  const rootPath = cdb.getItem('config').root;
+  return rootPath;
 }
 
 /**
- * 随机10位字符串
+ * 获取 appUserData目录
  */
-exports.getRandomString = function() {
-  return Math.random().toString(36).substring(2);
-};
+exports.getAppUserDataDir = function() {
+  const cdb = this.getCoreDB();
+  const dataPath = cdb.getItem('config').appUserDataDir;
+  return dataPath;
+}
+
+/**
+ * 获取 app version
+ */
+exports.getAppVersion = function() {
+  const cdb = this.getCoreDB();
+  const v = cdb.getItem('config').appVersion;
+  return v;
+}
+
+/**
+ * 获取 exec目录
+ */
+exports.getExecDir = function() {
+  const cdb = this.getCoreDB();
+  const execPath = cdb.getItem('config').execDir;
+  return execPath;
+}
+
+/**
+ * 获取 插件配置
+ */
+exports.getAddonConfig = function() {
+  const cdb = this.getCoreDB();
+  const cfg = cdb.getItem('config').addons;
+  return cfg;
+}
+
+/**
+ * 获取 mainServer配置
+ */
+exports.getMainServerConfig = function() {
+  const cdb = this.getCoreDB();
+  const cfg = cdb.getItem('config').mainServer;
+  return cfg;
+}
+
+/**
+ * 获取 httpServer配置
+ */
+exports.getHttpServerConfig = function() {
+  const cdb = this.getCoreDB();
+  const cfg = cdb.getItem('config').httpServer;
+  return cfg;
+}
+
+/**
+ * 获取 socketServer配置
+ */
+exports.getSocketServerConfig = function() {
+  const cdb = this.getCoreDB();
+  const cfg = cdb.getItem('config').socketServer;
+  return cfg;
+}
+
+/**
+ * 获取 socketio port
+ */
+exports.getSocketPort = function() {
+  const cdb = this.getCoreDB();
+  const port = cdb.getItem('config').socketServer.port;
+  return parseInt(port);
+}
+
+/**
+ * 获取 socket channel
+ */
+exports.getSocketChannel = function() {
+  return constant.socketIo.channel;
+}
+
+/**
+ * 获取 额外资源目录
+ */
+exports.getExtraResourcesDir = function() {
+  const cdb = this.getCoreDB();
+  const config = cdb.getItem('config');
+  const execDir = config.execDir;
+
+  // 资源路径不同
+  let dir = '';
+  if (config.isPackaged) {
+    // 打包后  execDir为 应用程序 exe\dmg\dep软件所在目录；打包前该值是项目根目录
+    // windows和MacOs不一样
+    dir = path.join(execDir, "resources", "extraResources");
+    if (eis.macOS()) {
+      dir = path.join(execDir, "..", "Resources", "extraResources");
+    }
+  } else {
+    // 打包前
+    dir = path.join(execDir, "build", "extraResources");
+  }
+  return dir;
+}
+
+/**
+ * 执行一个函数
+ */
+exports.callFn = async function (fn, args, ctx) {
+  args = args || [];
+  if (!is.function(fn)) return;
+  if (is.generatorFunction(fn)) fn = co.wrap(fn);
+  return ctx ? fn.call(ctx, ...args) : fn(...args);
+}
+
+exports.middleware = function (fn) {
+  return is.generatorFunction(fn) ? convert(fn) : fn;
+}
+
+
