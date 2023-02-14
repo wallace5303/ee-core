@@ -134,6 +134,7 @@ module.exports = appInfo => {
    * @property {Boolean} enablePerformanceTimer - using performance.now() timer instead of Date.now() for more more precise milliseconds, defaults to false. e.g.: logger will set 1.456ms instead of 1ms.
    */
   config.logger = {
+    type: 'application',
     dir: path.join(appInfo.root, 'logs'),
     encoding: 'utf8',
     env: appInfo.env,
@@ -150,6 +151,13 @@ module.exports = appInfo => {
     allowDebugAtProd: false,
     enablePerformanceTimer: false,
   };
+
+  /**
+   * customLogger options
+   * @member Config#customLogger
+   * 
+   */  
+  config.customLogger = {}
 
   /**
    * The option for httpclient
