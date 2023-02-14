@@ -32,7 +32,7 @@ exports.getPackage = function() {
  * 获取 coredb
  */
 exports.getCoreDB = function() {
-  const coreDB = storage.JsonDB.connection('system');
+  const coreDB = storage.connection('system');
   return coreDB;
 }
 

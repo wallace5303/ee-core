@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * 该模块不在增加新功能，请使用 /module/utils/index 模块
  */
@@ -12,6 +10,7 @@ const co = require('co');
 const eis = require('electron-is');
 const utilsCommon = require('./common');
 const utilsJson = require('../module/utils/json');
+const storage = require('../lib/storage');
 
 /**
  * 创建文件夹
@@ -42,7 +41,7 @@ exports.getPackage = function() {
  * 获取 coredb
  */
 exports.getCoreDB = function() {
-  const coreDB = require('../lib/storage/index').JsonDB.connection('system');
+  const coreDB = storage.connection('system');
   return coreDB;
 }
 
