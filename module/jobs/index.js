@@ -1,9 +1,9 @@
-const BrowserJob = require('./browser');
-const utils = require('../utils');
-const loader = require('../loader');
 const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
+const BrowserJob = require('./browser');
+const utils = require('../utils');
+const loader = require('../loader');
 
 class Jobs  {
   constructor() {

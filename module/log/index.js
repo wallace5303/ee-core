@@ -7,9 +7,9 @@ const Log = {};
  * 创建日志实例
  */
 Log.create = function (config) {
-  const eeLoggers = new Logger(config);
+  const eeLog = Logger.create(config);
 
-  return eeLoggers;
+  return eeLog;
 };
 
 /**
@@ -17,7 +17,7 @@ Log.create = function (config) {
  */
 Log.logger = function () {
   if (!this[EELoggers]) {
-    this[EELoggers] = new Logger();
+    this[EELoggers] = Logger.create();
   }
 
   return this[EELoggers]['logger'] || null;
@@ -28,7 +28,7 @@ Log.logger = function () {
  */
 Log.coreLogger = function () {
   if (!this[EELoggers]) {
-    this[EELoggers] = new Logger();
+    this[EELoggers] = Logger.create();
   }
 
   return this[EELoggers]['coreLogger'] || null;
