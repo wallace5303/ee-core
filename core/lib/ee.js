@@ -33,7 +33,7 @@ class EeCore extends KoaApplication {
 
     this.timing = new Timing();
 
-    this.console = new EggConsoleLogger();
+    this.console = new EggConsoleLogger({level: 'INFO'});
 
     /**
      * @member {Object} EeCore#options

@@ -1,6 +1,7 @@
 const is = require('is-type-of');
 const fs = require('fs');
 const utils = require('../../core/lib/utils');
+const { logger } = require('../log');
 
 module.exports = {
 
@@ -51,13 +52,15 @@ module.exports = {
    * @since 1.0.0
    */
   requireModule (filepath) {
+    
     filepath = filepath && this.resolveModule(filepath);
+    logger.info('111111111111 filepath:', filepath);
     if (!filepath) {
       return null;
     }
-    console.log('111111111111 filepath:', filepath);
+
     const ret = utils.loadFile(filepath);
-    console.log('222222222222 ret:', ret);
+    logger.info('222222222222 ret:', ret);
     return ret;
   },  
 
