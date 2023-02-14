@@ -4,20 +4,8 @@ const assert = require('assert');
 const storage = require('../storage');
 
 class Logger {
-  constructor (config) {
+  constructor (config = {}) {
     debug('Loaded logger');
-
-    assert(Object.keys(config).length != 0, `logger config is null`);
-    this.eggLogger = this.init(config);
-  }
-
-  /**
-   * 单例
-   */
-  static getInstance (config = {}) {
-    if (typeof this.instance === 'object') {
-      return this.instance.eggLogger;
-    }
 
     if (Object.keys(config).length == 0) {
       const sysConfig = this._getCoreDB().getItem('config');
@@ -26,19 +14,17 @@ class Logger {
         customLogger: sysConfig.customLogger || {}
       });
     }
-
     console.log('log---------', config);
 
-    this.instance = new Logger(config);
-
-    // 返回egg-logger实例
-    return this.instance.eggLogger;
+    this.loggers = this._init(config);
   }
 
   /**
    * 初始化模块
    */
-  init(config) {
+  _init(config) {
+    assert(Object.keys(config).length != 0, `logger config is null`);
+
     const loggers = new Loggers(config);
     loggers.coreLogger.info('[ee-core:logger] init all loggers with options: %j', config);
 
@@ -51,7 +37,7 @@ class Logger {
   _getCoreDB() {
     const coreDB = storage.connection('system');
     return coreDB;
-  }
+  }  
 }
 
 module.exports = Logger;
