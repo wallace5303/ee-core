@@ -4,7 +4,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const storage = require('../../lib/storage');
+const storage = require('../storage');
 const mkdirp = require('mkdirp');
 
 /**

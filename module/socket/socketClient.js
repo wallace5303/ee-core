@@ -2,9 +2,9 @@
 
 const assert = require('assert');
 const IoClient = require('socket.io-client');
-const constant = require('../constant');
+const constant = require('../const');
 const EggConsoleLogger = require('egg-logger').EggConsoleLogger;
-const Storage = require('../../lib/storage');
+const Storage = require('../storage');
 
 class SocketClient {
   constructor (port) {

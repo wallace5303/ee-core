@@ -3,14 +3,14 @@
  */
 
 const path = require('path');
-const constant = require('../lib/constant');
 const convert = require('koa-convert');
 const is = require('is-type-of');
 const co = require('co');
 const eis = require('electron-is');
 const utilsCommon = require('./common');
 const utilsJson = require('../module/utils/json');
-const storage = require('../lib/storage');
+const storage = require('../module/storage');
+const constant = require('../module/const');
 
 /**
  * 创建文件夹

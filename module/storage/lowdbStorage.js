@@ -6,7 +6,7 @@ const path = require('path');
 const lowdb = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 const _ = require('lodash');
-const constant = require('../constant');
+const constant = require('../const');
 const helper = require('./helper');
 
 class LowdbStorage {

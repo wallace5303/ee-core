@@ -1,7 +1,7 @@
 const debug = require('debug')('ee-core:logger');
 const Loggers = require('egg-logger').EggLoggers;
 const assert = require('assert');
-const storage = require('../../lib/storage');
+const storage = require('../storage');
 
 class Logger {
   constructor (config) {

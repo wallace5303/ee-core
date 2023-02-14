@@ -2,10 +2,10 @@
 
 const assert = require('assert');
 const { Server } = require('socket.io');
-const constant = require('../constant');
+const constant = require('../const');
 const EggConsoleLogger = require('egg-logger').EggConsoleLogger;
 const is = require('is-type-of');
-const Storage = require('../../lib/storage');
+const Storage = require('../storage');
 
 /**
  * socket server

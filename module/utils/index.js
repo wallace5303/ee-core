@@ -1,12 +1,12 @@
 const path = require('path');
-const constant = require('../../lib/constant');
+const constant = require('../const');
 const convert = require('koa-convert');
 const is = require('is-type-of');
 const co = require('co');
 const eis = require('electron-is');
 const utilsJson = require('./json');
 const interUtils = require('./internal');
-const storage = require('../../lib/storage');
+const storage = require('../storage');
 
 // internal utils apis
 exports.isDev = interUtils.isDev;

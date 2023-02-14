@@ -26,7 +26,7 @@ const Service = require('./core/lib/utils/base_context_class');
  * @member {Storage}
  * @since 1.0.0
  */
-const Storage = require('./lib/storage/index');
+const Storage = require('./module/storage/index');
 
 /**
  * @member {Utils}
@@ -38,7 +38,7 @@ const Utils = require('./utils/index');
  * @member {Socket}
  * @since 1.0.0
  */
-const Socket = require('./lib/socket/io');
+const Socket = require('./module/socket/io');
 
 module.exports = {
   Appliaction,
