@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
-const BrowserJob = require('./browser');
+const RendererJob = require('./renderer');
 const utils = require('../utils');
 const loader = require('../loader');
 
@@ -15,7 +15,7 @@ class Jobs  {
    * 创建 job
    */
   create (name, opt = {}) {
-    this.type = opt.type || 'browser';
+    this.type = opt.type || 'renderer';
     this.dev = opt.dev || false;
     this.winOptions = opt.winOptions || {};
     this.path = opt.path || null;
@@ -32,7 +32,7 @@ class Jobs  {
     this.path = filepath;
 
     if (this.type == 'browser') {
-      this.instance = new BrowserJob(name, filepath, this.winOptions);
+      this.instance = new RendererJob(name, filepath, this.winOptions);
     }
 
     if (this.dev) {
@@ -42,7 +42,7 @@ class Jobs  {
   }
 
   /**
-   * 显示开发者工具栏（仅支持 BrowserJob）
+   * 显示开发者工具栏（仅支持 RendererJob)
    */
   openDevTools () {
     this.instance.openDevTools();

@@ -5,7 +5,7 @@ const loadView = require('./loadView');
 // const MessageChannel = require('./MessageChannel.class');
 // const { isDev, fnDebounce, getRandomString } = require('../../utils/');
 
-class BrowserJob {
+class RendererJob {
 
   /**
     * constructor
@@ -139,4 +139,4 @@ class BrowserJob {
   }
 }
 
-module.exports = BrowserJob;
+module.exports = RendererJob;
