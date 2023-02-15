@@ -19,8 +19,11 @@ exports.getCoreDB = function() {
  * 获取 当前环境
  */
 exports.getEnv = function() {
-  const cdb = this.getCoreDB();
-  const env = cdb.getItem('config').env;
+  let env = process.env.EE_SERVER_ENV || null;
+  if (!env) {
+    const cdb = this.getCoreDB();
+    env = cdb.getItem('config').env;
+  }
 
   return env;
 }
@@ -29,8 +32,12 @@ exports.getEnv = function() {
  * 获取 base目录
  */
 exports.getBaseDir = function() {
-  const cdb = this.getCoreDB();
-  const basePath = cdb.getItem('config').baseDir;
+  let basePath = process.env.EE_BASE_DIR || null;
+  if (!basePath) {
+    const cdb = this.getCoreDB();
+    basePath = cdb.getItem('config').baseDir;
+  }
+
   return basePath;
 }
 

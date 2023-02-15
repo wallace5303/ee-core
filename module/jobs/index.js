@@ -24,20 +24,19 @@ class Jobs  {
     if (!isAbsolute) {
       this.path = path.join(utils.getBaseDir(), 'jobs', this.path);
     }
-    console.log('[ee-core:job] this.path: ', this.path);
     const filepath = loader.resolveModule(this.path);
 
     assert(fs.existsSync(filepath), `file ${filepath} not exists`);
 
     this.path = filepath;
-
-    if (this.type == 'browser') {
+    if (this.type == 'renderer') {
       this.instance = new RendererJob(name, filepath, this.winOptions);
     }
 
     if (this.dev) {
       this.openDevTools();
     }
+    
     return;
   }
 

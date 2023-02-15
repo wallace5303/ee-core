@@ -1,7 +1,8 @@
 const is = require('is-type-of');
 const fs = require('fs');
-const utils = require('../../core/lib/utils');
-const { logger } = require('../log');
+const path = require('path');
+const utilsCore = require('../../core/lib/utils');
+const utilsInternal = require('../utils/internal');
 
 module.exports = {
 
@@ -19,8 +20,8 @@ module.exports = {
       return null;
     }
 
-    const ret = utils.loadFile(filepath);
-    if (is.function(ret) && !is.class(ret) && !utils.isBytecodeClass(ret)) {
+    const ret = utilsCore.loadFile(filepath);
+    if (is.function(ret) && !is.class(ret) && !utilsCore.isBytecodeClass(ret)) {
       ret = ret(...inject);
     }
     return ret;
@@ -30,6 +31,11 @@ module.exports = {
    * 模块的绝对路径
    */
   resolveModule(filepath) {
+    const isAbsolute = path.isAbsolute(filepath);
+    if (!isAbsolute) {
+      filepath = path.join(utilsInternal.getBaseDir(), 'jobs', filepath);
+    }
+
     let fullPath;
     try {
       fullPath = require.resolve(filepath);
@@ -52,15 +58,12 @@ module.exports = {
    * @since 1.0.0
    */
   requireModule (filepath) {
-    
     filepath = filepath && this.resolveModule(filepath);
-    logger.info('111111111111 filepath:', filepath);
     if (!filepath) {
       return null;
     }
+    const ret = utilsCore.loadFile(filepath);
 
-    const ret = utils.loadFile(filepath);
-    logger.info('222222222222 ret:', ret);
     return ret;
   },  
 
