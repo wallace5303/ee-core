@@ -5,7 +5,8 @@ const lowdb = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 const _ = require('lodash');
 const constant = require('../const');
-const helper = require('./helper');
+const helper = require('../utils/helper');
+const ps = require('../utils/ps');
 
 class LowdbStorage {
   constructor (name, opt = {}) {
@@ -16,7 +17,7 @@ class LowdbStorage {
     // 数据库key列表
     this.storageKey = constant.storageKey;
 
-    const storageDir = helper.getStorageDir();
+    const storageDir = ps.getStorageDir();
     if (!fs.existsSync(storageDir)) {
       helper.mkdir(storageDir);
       helper.chmodPath(storageDir, '777');
@@ -51,7 +52,7 @@ class LowdbStorage {
    * 获取文件绝对路径
    */
   getFilePath (name) {
-    const storageDir = helper.getStorageDir();
+    const storageDir = ps.getStorageDir();
     const dbFile = path.join(storageDir, this.getFileName(name));
     return dbFile;
   }

@@ -16,6 +16,8 @@ exports.isForkedChild = interUtils.isForkedChild;
 exports.mkdir = interUtils.mkdir;
 exports.chmodPath = interUtils.chmodPath;
 exports.compareVersion = interUtils.compareVersion;
+exports.getEnv = interUtils.getEnv;
+exports.getBaseDir = interUtils.getBaseDir;
 
 /**
  * 获取项目根目录package.json
@@ -34,16 +36,6 @@ exports.getPackage = function() {
 exports.getCoreDB = function() {
   const coreDB = storage.connection('system');
   return coreDB;
-}
-
-/**
- * 获取 当前环境
- */
-exports.getEnv = function() {
-  const cdb = this.getCoreDB();
-  const env = cdb.getItem('config').env;
-
-  return env;
 }
 
 /**
@@ -83,15 +75,6 @@ exports.getHomeDir = function() {
   const cdb = this.getCoreDB();
   const homePath = cdb.getItem('config').homeDir;
   return homePath;
-}
-
-/**
- * 获取 base目录
- */
-exports.getBaseDir = function() {
-  const cdb = this.getCoreDB();
-  const basePath = cdb.getItem('config').baseDir;
-  return basePath;
 }
 
 /**

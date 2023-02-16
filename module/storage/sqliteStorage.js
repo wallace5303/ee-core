@@ -4,7 +4,8 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const Database = require('better-sqlite3');
-const helper = require('./helper');
+const helper = require('../utils/helper');
+const ps = require('../utils/ps');
 
 class SqliteStorage {
   constructor (name, opt = {}) {
@@ -12,13 +13,8 @@ class SqliteStorage {
 
     this.name = name;
     this.mode = this.getMode(name);
-
-    const storageDir = this._createStorageDir();
-    this.storageDir = storageDir;
-
-    const fileName = this._formatFileName(name);
-    this.fileName = fileName;
-
+    this.storageDir = this._createStorageDir();
+    this.fileName = this._formatFileName(name);
     this.db = this._initDB(opt);
   }
 
@@ -62,7 +58,7 @@ class SqliteStorage {
    * 创建storage目录
    */
   _createStorageDir () {
-    let storageDir = helper.getStorageDir();
+    let storageDir = ps.getStorageDir();
 
     if (this.mode == 'absolute') {
       storageDir = path.dirname(this.name); 
