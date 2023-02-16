@@ -1,10 +1,10 @@
-'use strict';
-
 const Agent = require('agentkeepalive');
 const HttpsAgent = require('agentkeepalive').HttpsAgent;
 const urllib = require('urllib');
 const ms = require('humanize-ms');
 const { FrameworkBaseError } = require('egg-errors');
+const Storage = require('../storage');
+const { coreLogger } = require('../Log');
 
 class HttpClientError extends FrameworkBaseError {
   get module() {
@@ -13,17 +13,51 @@ class HttpClientError extends FrameworkBaseError {
 }
 
 class HttpClient extends urllib.HttpClient2 {
-  constructor(app) {
-    normalizeConfig(app);
-    const config = app.config.httpclient;
+  constructor(options = {}) {
+
+    if (Object.keys(options).length == 0) {
+      const sysConfig = this._getCoreDB().getItem('config');
+      options = sysConfig.httpclient;
+    }
+
+    const config = Object.assign({
+      enableDNSCache: false,
+      dnsCacheLookupInterval: 10000,
+      dnsCacheMaxLength: 1000,
+      request: {
+        timeout: 5000,
+      },
+      httpAgent: {
+        keepAlive: true,
+        freeSocketTimeout: 4000,
+        maxSockets: Number.MAX_SAFE_INTEGER,
+        maxFreeSockets: 256,
+      },
+      httpsAgent: {
+        keepAlive: true,
+        freeSocketTimeout: 4000,
+        maxSockets: Number.MAX_SAFE_INTEGER,
+        maxFreeSockets: 256,
+      },
+    }, options);
+
+    normalizeConfig(config);
+
     super({
-      app,
       defaultArgs: config.request,
       agent: new Agent(config.httpAgent),
       httpsAgent: new HttpsAgent(config.httpsAgent),
     });
-    this.app = app;
+    this.config = config;
   }
+
+  /**
+   * 获取 coredb
+   */
+  _getCoreDB() {
+    const coreDB = Storage.connection('system');
+    return coreDB;
+  }  
 
   request(url, args, callback) {
     if (typeof args === 'function') {
@@ -74,8 +108,8 @@ class HttpClient extends urllib.HttpClient2 {
   }
 }
 
-function normalizeConfig(app) {
-  const config = app.config.httpclient;
+function normalizeConfig(httpConfig) {
+  const config = httpConfig;
 
   // compatibility
   if (typeof config.keepAlive === 'boolean') {
@@ -118,12 +152,12 @@ function normalizeConfig(app) {
   }
 
   if (config.httpAgent.timeout < 30000) {
-    app.coreLogger.warn('[ee:httpclient] config.httpclient.httpAgent.timeout(%s) can\'t below 30000, auto reset to 30000',
+    coreLogger.warn('[ee:httpclient] config.httpclient.httpAgent.timeout(%s) can\'t below 30000, auto reset to 30000',
       config.httpAgent.timeout);
     config.httpAgent.timeout = 30000;
   }
   if (config.httpsAgent.timeout < 30000) {
-    app.coreLogger.warn('[ee:httpclient] config.httpclient.httpsAgent.timeout(%s) can\'t below 30000, auto reset to 30000',
+    coreLogger.warn('[ee:httpclient] config.httpclient.httpsAgent.timeout(%s) can\'t below 30000, auto reset to 30000',
       config.httpsAgent.timeout);
     config.httpsAgent.timeout = 30000;
   }

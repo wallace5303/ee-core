@@ -1,6 +1,6 @@
 const Loggers = require('egg-logger').EggLoggers;
 const assert = require('assert');
-const storage = require('../storage');
+const Storage = require('../storage');
 
 module.exports = {
 
@@ -33,7 +33,7 @@ module.exports = {
    * 获取 coredb
    */
   _getCoreDB() {
-    const coreDB = storage.connection('system');
+    const coreDB = Storage.connection('system');
     return coreDB;
   }
 };

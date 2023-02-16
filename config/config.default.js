@@ -181,7 +181,6 @@ module.exports = appInfo => {
     enableDNSCache: false,
     dnsCacheLookupInterval: 10000,
     dnsCacheMaxLength: 1000,
-
     request: {
       timeout: 5000,
     },
