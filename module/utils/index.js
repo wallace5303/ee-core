@@ -7,6 +7,7 @@ const eis = require('electron-is');
 const utilsJson = require('./json');
 const interUtils = require('./internal');
 const storage = require('../storage');
+const Ps = require('./ps');
 
 // internal utils apis
 exports.isDev = interUtils.isDev;
@@ -51,11 +52,10 @@ exports.getEeConfig = function() {
 /**
  * 获取 应用程序数据目录 (开发环境时，为项目根目录)
  */
-exports.getAppUserDataDir = function() {
+exports.getAppDataDir = function() {
   const cdb = this.getCoreDB();
   const config = cdb.getItem('config');
-  const env = config.env;
-  const dir = env === 'local' || env === 'unittest' ? config.homeDir : config.appUserDataDir;
+  const dir = Ps.isDev() ? config.homeDir : config.appUserDataDir;
   return dir;
 }
 

@@ -49,7 +49,22 @@ exports.isForkedChild = function() {
  * 获取数据存储路径
  */
 exports.getStorageDir = function () {
-  const appDir = this.isDev() ? process.env.EE_HOME : process.env.EE_APP_USER_DATA;
-  const storageDir = path.join(appDir, 'data');
+  const storageDir = path.join(this.getAppDataDir(), 'data');
   return storageDir;
+}
+
+/**
+ * 获取日志存储路径
+ */
+exports.getLogsDir = function () {
+  const dir = path.join(this.getAppDataDir(), 'logs');
+  return dir;
+}
+
+/**
+ * 获取appData目录
+ */
+exports.getAppDataDir = function () {
+  const appDir = this.isDev() ? process.env.EE_HOME : process.env.EE_APP_USER_DATA;
+  return appDir;
 }

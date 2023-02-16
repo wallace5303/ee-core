@@ -9,6 +9,7 @@ const FileLoader = require('./file_loader');
 const ContextLoader = require('./context_loader');
 const utils = require('../utils');
 const Timing = require('../utils/timing');
+const Ps = require('../../../module/utils/ps');
 
 const REQUIRE_COUNT = Symbol('EeLoader#requireCount');
 
@@ -198,7 +199,7 @@ class EeLoader {
        * The directory whether is homeDir or appUserData depend on env.
        * @member {String} AppInfo#root
        */
-      root: env === 'local' || env === 'unittest' ? this.getHomedir() : this.options.appUserData,
+      root: Ps.getAppDataDir(),
 
       /**
        * electron application data dir

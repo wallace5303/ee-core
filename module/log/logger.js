@@ -1,5 +1,6 @@
 const Loggers = require('egg-logger').EggLoggers;
 const assert = require('assert');
+const Ps = require('../utils/ps');
 const Storage = require('../storage');
 
 module.exports = {
@@ -11,8 +12,29 @@ module.exports = {
     let opt = {};
     
     if (Object.keys(config).length == 0) {
+      const defaultConfig = {
+        logger: {
+          type: 'application',
+          dir: Ps.getLogsDir(),
+          encoding: 'utf8',
+          env: appInfo.env,
+          level: 'INFO',
+          consoleLevel: 'INFO',
+          disableConsoleAfterReady: !Ps.isDev(),
+          outputJSON: false,
+          buffer: true,
+          appLogName: `ee.log`,
+          coreLogName: 'ee-core.log',
+          agentLogName: 'ee-agent.log',
+          errorLogName: `ee-error.log`,
+          coreLogger: {},
+          allowDebugAtProd: false,
+          enablePerformanceTimer: false,
+        },
+        customLogger: {}
+      }
       const sysConfig = this._getCoreDB().getItem('config');
-      opt = Object.assign({}, {
+      opt = Object.assign(defaultConfig, {
         logger: sysConfig.logger,
         customLogger: sysConfig.customLogger || {}
       });
