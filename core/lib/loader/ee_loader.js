@@ -199,7 +199,7 @@ class EeLoader {
        * The directory whether is homeDir or appUserData depend on env.
        * @member {String} AppInfo#root
        */
-      root: Ps.getAppDataDir(),
+      root: Ps.getRootDir(),
 
       /**
        * electron application data dir

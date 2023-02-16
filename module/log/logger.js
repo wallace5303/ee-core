@@ -17,7 +17,7 @@ module.exports = {
           type: 'application',
           dir: Ps.getLogsDir(),
           encoding: 'utf8',
-          env: appInfo.env,
+          env: Ps.env(),
           level: 'INFO',
           consoleLevel: 'INFO',
           disableConsoleAfterReady: !Ps.isDev(),

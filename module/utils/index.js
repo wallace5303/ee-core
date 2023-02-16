@@ -50,9 +50,9 @@ exports.getEeConfig = function() {
 }
 
 /**
- * 获取 应用程序数据目录 (开发环境时，为项目根目录)
+ * 获取 root 目录 (开发环境时，为项目根目录)
  */
-exports.getAppDataDir = function() {
+exports.getRootDir = function() {
   const cdb = this.getCoreDB();
   const config = cdb.getItem('config');
   const dir = Ps.isDev() ? config.homeDir : config.appUserDataDir;
