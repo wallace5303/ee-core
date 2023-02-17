@@ -1,11 +1,11 @@
 const { fork } = require('child_process');
 
 class ForkProcess {
-  constructor(host, modulePath, args = [], options = {}) {
+  constructor(host, modulePath, processArgs = [], processOptions = {}) {
     this.host = host;
     this.modulePath = modulePath;
-    this.args = args;
-    this.options = options;
+    this.args = processArgs;
+    this.options = processOptions;
     this.sleeping = false;
     this.activitiesCount = 0;
     this.activitiesMap = new Map();

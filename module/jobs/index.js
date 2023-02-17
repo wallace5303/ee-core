@@ -2,8 +2,9 @@ const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
 const RendererJob = require('./renderer');
-const utils = require('../utils');
-const loader = require('../loader');
+const ChildJob = require('./child');
+const Utils = require('../utils');
+const Loader = require('../loader');
 
 class Jobs  {
   constructor() {
@@ -18,13 +19,15 @@ class Jobs  {
     this.type = opt.type || 'renderer';
     this.dev = opt.dev || false;
     this.winOptions = opt.winOptions || {};
+    this.childOptions = opt.childOptions || {};
     this.path = opt.path || null;
+
 
     const isAbsolute = path.isAbsolute(this.path);
     if (!isAbsolute) {
-      this.path = path.join(utils.getBaseDir(), 'jobs', this.path);
+      this.path = path.join(Utils.getBaseDir(), 'jobs', this.path);
     }
-    const filepath = loader.resolveModule(this.path);
+    const filepath = Loader.resolveModule(this.path);
 
     assert(fs.existsSync(filepath), `file ${filepath} not exists`);
 
@@ -35,7 +38,7 @@ class Jobs  {
         this.openDevTools();
       }
     } else if (this.type == 'child') {
-      
+      this.instance = new ChildJob(name, filepath, this.childOptions);
     }
     
     return;

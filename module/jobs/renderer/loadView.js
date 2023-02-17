@@ -1,4 +1,4 @@
-const { URL } = require('url');
+const Ps = require('../../utils/ps');
 
 /**
   * loadView 生成BrowserWindow的html content
@@ -14,6 +14,7 @@ const loadView = function (opt = {}) {
   console.log('[ee-core:job] scriptUrl: ', scriptUrl);
 
   // 脚本内容
+  //const scriptBytenode = Ps.isDev() ? '' : `<script> require('bytenode') </script>`;
   const scriptContent = webSecurity ? `<script> ${ script } </script>` : `<script src='${scriptUrl}'></script>`;
 
   // html内容

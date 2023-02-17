@@ -9,10 +9,10 @@ class RendererJob {
   /**
     * constructor
     * @param  {String} name - job name
-    * @param  {String} path - path to file
+    * @param  {String} filepath - filepath to file
     * @param  {Object} options - options to create BrowserWindow
     */
-  constructor(name, path, opt = {}) {
+  constructor(name, filepath, opt = {}) {
     let options = Object.assign({
       show: false,
       webPreferences: {
@@ -26,7 +26,7 @@ class RendererJob {
     this.subWin = new BrowserWindow(options);
 
     this.jobReady = false;
-    this.exec = path;
+    this.exec = filepath;
     this.name = name;
     this.listeners = [];
     this.callbacks = [];
@@ -79,20 +79,20 @@ class RendererJob {
   /**
    * 加载任务
    */
-  _loadJob(path) {
+  _loadJob(filepath) {
     if (!this.webSecurity) {
-      this._loadURLUnsafe(path);
+      this._loadURLUnsafe(filepath);
     } else {
-      this._loadURLSafe(path);
+      this._loadURLSafe(filepath);
     }
   }
 
   /**
    * 安全的脚本注入
    */
-  _loadURLSafe(path) {
+  _loadURLSafe(filepath) {
     return new Promise((resolve, reject) => {
-      fs.readFile(path, { encoding: 'utf-8' }, (err, buffer) => {
+      fs.readFile(filepath, { encoding: 'utf-8' }, (err, buffer) => {
         if (err) {
           reject(err);
           this._didFailLoad(err);
@@ -103,7 +103,7 @@ class RendererJob {
           webSecurity: true,
           script: buffer.toString(),
           title: `${this.name} job`,
-          base: path
+          base: filepath
         }
         const viewData = loadView(param);
 
@@ -121,12 +121,12 @@ class RendererJob {
   /**
    * 不安全的脚本注入
    */
-  _loadURLUnsafe(path) {
+  _loadURLUnsafe(filepath) {
     let param = {
       webSecurity: false,
       src: this.exec,
       title: `${this.name} job`,
-      base: path
+      base: filepath
     }
     const viewData = loadView(param);
 

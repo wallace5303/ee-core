@@ -1,6 +1,13 @@
 const path = require('path');
 
 /**
+ * 当前进程的所有env
+ */
+exports.allEnv = function() {
+  return process.env;
+}
+
+/**
  * 当前环境 - local | prod
  */
 exports.env = function() {
@@ -51,6 +58,13 @@ exports.isMain = function() {
 exports.isForkedChild = function() {
   return (Number(process.env.ELECTRON_RUN_AS_NODE) === 1);
 };
+
+/**
+ * 获取数据存储路径
+ */
+exports.getHomeDir = function () {
+  return process.env.EE_HOME;
+}
 
 /**
  * 获取数据存储路径

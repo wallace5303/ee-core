@@ -1,42 +1,33 @@
 //require('bytenode');
-const fs = require('fs');
+const path = require('path');
+const ForkProcess = require('./forkProcess');
+const Ps = require('../../utils/ps');
+const Constants = require('../../const');
 
 class ChildJob {
 
   /**
     * constructor
     * @param  {String} name - job name
-    * @param  {String} path - path to file
-    * @param  {Object} options - options 
+    * @param  {String} filepath - filepath
+    * @param  {Object} opt - child process options 
     */
-  constructor(name, path, opt = {}) {
+  constructor(name, filepath, opt = {}) {
     let options = Object.assign({
-      show: false,
+      processArgs: Ps.isDev() ?  [`--inspect=${Constants.jobs.inspectStartIndex}`] : [],
+      processOptions: { 
+        cwd: path.dirname(filepath),
+        env: Ps.allEnv(), 
+        stdio: 'pipe' 
+      }
     }, opt);
 
-    this.childProcess = new BrowserWindow(options);
+    this.childProcess = new ForkProcess(this, filepath, options.processArgs, options.processOptions);
 
     this.jobReady = false;
-    this.exec = path;
+    this.exec = filepath;
     this.name = name;
-
-
-    // load job
-    this._loadJob(this.exec);
   }
-
-  /**
-   * 加载任务
-   */
-  _loadJob(path) {
-    if (!this.webSecurity) {
-      this._loadURLUnsafe(path);
-    } else {
-      this._loadURLSafe(path);
-    }
-  }
-
-
 }
 
 module.exports = ChildJob;

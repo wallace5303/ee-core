@@ -6,5 +6,8 @@ module.exports = {
     channel: {
       partySoftware: 'c1',
     }
+  },
+  jobs: {
+    inspectStartIndex: 5858
   }
 };
