@@ -31,10 +31,11 @@ class Jobs  {
     this.path = filepath;
     if (this.type == 'renderer') {
       this.instance = new RendererJob(name, filepath, this.winOptions);
-    }
-
-    if (this.dev) {
-      this.openDevTools();
+      if (this.dev) {
+        this.openDevTools();
+      }
+    } else if (this.type == 'child') {
+      
     }
     
     return;

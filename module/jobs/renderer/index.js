@@ -3,7 +3,6 @@ const { BrowserWindow } = require('electron');
 const fs = require('fs');
 const loadView = require('./loadView');
 // const MessageChannel = require('./MessageChannel.class');
-// const { isDev, fnDebounce, getRandomString } = require('../../utils/');
 
 class RendererJob {
 
