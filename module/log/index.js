@@ -33,6 +33,21 @@ const Log = {
     return this[EELoggers]['coreLogger'] || null;
   },
 
+  get error() {
+    return this.logger.error.bind(this.logger);
+  },
+
+  get warn() {
+    return this.logger.warn.bind(this.logger);
+  },
+
+  get info() {
+    return this.logger.info.bind(this.logger);
+  },
+
+  get debug() {
+    return this.logger.debug.bind(this.logger);
+  },
 };
 
 module.exports = Log;

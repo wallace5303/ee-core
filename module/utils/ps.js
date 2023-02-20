@@ -122,3 +122,38 @@ exports.getHomeDir = function () {
 exports.getExecDir = function() {
   return process.env.EE_EXEC_DIR;
 }
+
+/**
+ * 获取操作系统用户目录
+ */
+exports.getUserHomeDir = function () {
+  return process.env.EE_USER_HOME;
+}
+
+/**
+ * 获取appUserData目录前一层目录
+ */
+exports.getUserHomeDir = function () {
+  return process.env.EE_APP_DATA;
+}
+
+/**
+ * 获取主进程端口
+ */
+exports.getUserHomeDir = function () {
+  return process.env.EE_MAIN_PORT;
+}
+
+/**
+ * 获取内置socket端口
+ */
+exports.getSocketPort = function () {
+  return process.env.EE_SOCKET_PORT;
+}
+
+/**
+ * 获取内置http端口
+ */
+exports.getHttpPort = function () {
+  return process.env.EE_HTTP_PORT;
+}

@@ -7,13 +7,14 @@ const eis = require('electron-is');
 const UtilsJson = require('../module/utils/json');
 const UtilsPs = require('../module/utils/ps');
 const UtilsHelper = require('../module/utils/helper');
+const Copy = require('../module/utils/copyto');
 const Storage = require('../module/storage');
 const Constants = require('../module/const');
 
 /**
  * other module
  */
-copy(UtilsPs)
+Copy(UtilsPs)
 .and(UtilsHelper)
 .to(exports);
 

@@ -5,11 +5,12 @@ const Constants = require('../const');
 const Ps = require('./ps');
 const Helper = require('./helper');
 const UtilsJson = require('./json');
+const Copy = require('./copyto');
 
 /**
  * other module
  */
-copy(Ps)
+Copy(Ps)
 .and(Helper)
 .to(exports);
 
