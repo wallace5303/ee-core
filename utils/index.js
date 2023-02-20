@@ -3,36 +3,25 @@
  */
 
 const path = require('path');
-const convert = require('koa-convert');
-const is = require('is-type-of');
-const co = require('co');
 const eis = require('electron-is');
-const utilsCommon = require('./common');
-const utilsJson = require('../module/utils/json');
-const storage = require('../module/storage');
-const constant = require('../module/const');
+const UtilsJson = require('../module/utils/json');
+const UtilsPs = require('../module/utils/ps');
+const UtilsHelper = require('../module/utils/helper');
+const Storage = require('../module/storage');
+const Constants = require('../module/const');
 
 /**
- * 创建文件夹
+ * other module
  */
-exports.mkdir = function (dirpath, dirname) {
-  return utilsCommon.mkdir(dirpath, dirname);
-}
-
-/**
- * 修改文件权限
- */
-exports.chmodPath = function (path, mode) {
-  return utilsCommon.chmodPath(path, mode);
-}
+copy(UtilsPs)
+.and(UtilsHelper)
+.to(exports);
 
 /**
  * 获取项目根目录package.json
  */
 exports.getPackage = function() {
-  const cdb = this.getCoreDB();
-  const config = cdb.getItem('config');
-  const json = utilsJson.readSync(path.join(config.homeDir, 'package.json'));
+  const json = UtilsJson.readSync(path.join(this.getHomeDir(), 'package.json'));
   
   return json;
 };
@@ -41,18 +30,8 @@ exports.getPackage = function() {
  * 获取 coredb
  */
 exports.getCoreDB = function() {
-  const coreDB = storage.connection('system');
+  const coreDB = Storage.connection('system');
   return coreDB;
-}
-
-/**
- * 获取 当前环境
- */
-exports.getEnv = function() {
-  const cdb = this.getCoreDB();
-  const env = cdb.getItem('config').env;
-
-  return env;
 }
 
 /**
@@ -66,90 +45,12 @@ exports.getEeConfig = function() {
 }
 
 /**
- * 获取 数据库存储路径
- */
-exports.getStorageDir = function() {
-  const cdb = this.getCoreDB();
-  const env = cdb.getItem('config').env;
-
-  const appDir = env === 'local' || env === 'unittest' ? this.getHomeDir() : this.getAppUserDataDir();
-  const storageDir = path.join(appDir, 'data');
-
-  return storageDir;
-}
-
-/**
- * 获取 应用程序数据目录 (开发环境时，为项目根目录)
- */
-exports.getAppUserDataDir = function() {
-  const cdb = this.getCoreDB();
-  const config = cdb.getItem('config');
-  const env = config.env;
-  const dir = env === 'local' || env === 'unittest' ? config.homeDir : config.appUserDataDir;
-  return dir;
-}
-
-/**
- * 获取 日志目录
- */
-exports.getLogDir = function() {
-  const cdb = this.getCoreDB();
-  const logPath = cdb.getItem('config').logger.dir;
-  return logPath;
-}
-
-/**
- * 获取 home目录
- */
-exports.getHomeDir = function() {
-  const cdb = this.getCoreDB();
-  const homePath = cdb.getItem('config').homeDir;
-  return homePath;
-}
-
-/**
- * 获取 base目录
- */
-exports.getBaseDir = function() {
-  const cdb = this.getCoreDB();
-  const basePath = cdb.getItem('config').baseDir;
-  return basePath;
-}
-
-/**
- * 获取 root目录
- */
-exports.getRootDir = function() {
-  const cdb = this.getCoreDB();
-  const rootPath = cdb.getItem('config').root;
-  return rootPath;
-}
-
-/**
- * 获取 appUserData目录
- */
-exports.getAppUserDataDir = function() {
-  const cdb = this.getCoreDB();
-  const dataPath = cdb.getItem('config').appUserDataDir;
-  return dataPath;
-}
-
-/**
  * 获取 app version
  */
 exports.getAppVersion = function() {
   const cdb = this.getCoreDB();
   const v = cdb.getItem('config').appVersion;
   return v;
-}
-
-/**
- * 获取 exec目录
- */
-exports.getExecDir = function() {
-  const cdb = this.getCoreDB();
-  const execPath = cdb.getItem('config').execDir;
-  return execPath;
 }
 
 /**
@@ -201,16 +102,14 @@ exports.getSocketPort = function() {
  * 获取 socket channel
  */
 exports.getSocketChannel = function() {
-  return constant.socketIo.channel;
+  return Constants.socketIo.channel;
 }
 
 /**
  * 获取 额外资源目录
  */
 exports.getExtraResourcesDir = function() {
-  const cdb = this.getCoreDB();
-  const config = cdb.getItem('config');
-  const execDir = config.execDir;
+  const execDir = this.getExecDir();
 
   // 资源路径不同
   let dir = '';
@@ -226,25 +125,4 @@ exports.getExtraResourcesDir = function() {
     dir = path.join(execDir, "build", "extraResources");
   }
   return dir;
-}
-
-/**
- * 执行一个函数
- */
-exports.callFn = async function (fn, args, ctx) {
-  args = args || [];
-  if (!is.function(fn)) return;
-  if (is.generatorFunction(fn)) fn = co.wrap(fn);
-  return ctx ? fn.call(ctx, ...args) : fn(...args);
-}
-
-exports.middleware = function (fn) {
-  return is.generatorFunction(fn) ? convert(fn) : fn;
-}
-
-/**
- * 版本号比较
- */
-exports.compareVersion = function (v1, v2) {
-  return utilsCommon.compareVersion(v1, v2);
 }

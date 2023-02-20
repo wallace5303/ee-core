@@ -1,6 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
+const convert = require('koa-convert');
+const is = require('is-type-of');
+const co = require('co');
 
 /**
  * fnDebounce
@@ -97,4 +100,18 @@ exports.compareVersion = function (v1, v2) {
   }
 
   return 0
+}
+
+/**
+ * 执行一个函数
+ */
+exports.callFn = async function (fn, args, ctx) {
+  args = args || [];
+  if (!is.function(fn)) return;
+  if (is.generatorFunction(fn)) fn = co.wrap(fn);
+  return ctx ? fn.call(ctx, ...args) : fn(...args);
+}
+
+exports.middleware = function (fn) {
+  return is.generatorFunction(fn) ? convert(fn) : fn;
 }

@@ -1,7 +1,4 @@
 const path = require('path');
-const convert = require('koa-convert');
-const is = require('is-type-of');
-const co = require('co');
 const eis = require('electron-is');
 const Storage = require('../storage');
 const Constants = require('../const');
@@ -124,20 +121,6 @@ exports.getExtraResourcesDir = function() {
     dir = path.join(execDir, "build", "extraResources");
   }
   return dir;
-}
-
-/**
- * 执行一个函数
- */
-exports.callFn = async function (fn, args, ctx) {
-  args = args || [];
-  if (!is.function(fn)) return;
-  if (is.generatorFunction(fn)) fn = co.wrap(fn);
-  return ctx ? fn.call(ctx, ...args) : fn(...args);
-}
-
-exports.middleware = function (fn) {
-  return is.generatorFunction(fn) ? convert(fn) : fn;
 }
 
 
