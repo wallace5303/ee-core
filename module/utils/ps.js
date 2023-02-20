@@ -15,6 +15,11 @@ exports.env = function() {
 }
 
 /**
+ * 获取 当前环境
+ */
+exports.getEnv = this.env
+
+/**
  * 是否为开发环境
  */
 exports.isDev = function() {
@@ -75,17 +80,31 @@ exports.getStorageDir = function () {
 }
 
 /**
- * 获取日志存储路径
+ * 获取日志存储路径 
  */
-exports.getLogsDir = function () {
+exports.getLogDir = function () {
   const dir = path.join(this.getRootDir(), 'logs');
   return dir;
 }
 
 /**
- * 获取root目录
+ * 获取root目录  (dev-项目根目录，pro-app user data目录)
  */
 exports.getRootDir = function () {
   const appDir = this.isDev() ? process.env.EE_HOME : process.env.EE_APP_USER_DATA;
   return appDir;
+}
+
+/**
+ * 获取 base目录
+ */
+exports.getBaseDir = function() {
+  return process.env.EE_BASE_DIR;
+}
+
+/**
+ * 获取 appUserData目录
+ */
+exports.getAppUserDataDir = function() {
+  return process.env.EE_APP_USER_DATA;
 }

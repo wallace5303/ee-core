@@ -1,32 +1,37 @@
 const path = require('path');
-const constant = require('../const');
 const convert = require('koa-convert');
 const is = require('is-type-of');
 const co = require('co');
 const eis = require('electron-is');
-const utilsJson = require('./json');
-const interUtils = require('./internal');
-const storage = require('../storage');
+const Storage = require('../storage');
+const Constant = require('../const');
 const Ps = require('./ps');
+const Helper = require('./helper');
+const UtilsJson = require('./json');
+
+/**
+ * process function
+ */
+copy(Ps)
+.and(Helper)
+.to(exports);
 
 // internal utils apis
-exports.isDev = interUtils.isDev;
-exports.isRenderer = interUtils.isRenderer;
-exports.isMain = interUtils.isMain;
-exports.isForkedChild = interUtils.isForkedChild;
-exports.mkdir = interUtils.mkdir;
-exports.chmodPath = interUtils.chmodPath;
-exports.compareVersion = interUtils.compareVersion;
-exports.getEnv = interUtils.getEnv;
-exports.getBaseDir = interUtils.getBaseDir;
+// exports.isDev = interUtils.isDev;
+// exports.isRenderer = interUtils.isRenderer;
+// exports.isMain = interUtils.isMain;
+// exports.isForkedChild = interUtils.isForkedChild;
+// exports.mkdir = interUtils.mkdir;
+// exports.chmodPath = interUtils.chmodPath;
+// exports.compareVersion = interUtils.compareVersion;
+// exports.getEnv = interUtils.getEnv;
+// exports.getBaseDir = interUtils.getBaseDir;
 
 /**
  * 获取项目根目录package.json
  */
 exports.getPackage = function() {
-  const cdb = this.getCoreDB();
-  const config = cdb.getItem('config');
-  const json = utilsJson.readSync(path.join(config.homeDir, 'package.json'));
+  const json = UtilsJson.readSync(path.join(this.getHomeDir(), 'package.json'));
   
   return json;
 };
@@ -35,7 +40,7 @@ exports.getPackage = function() {
  * 获取 coredb
  */
 exports.getCoreDB = function() {
-  const coreDB = storage.connection('system');
+  const coreDB = Storage.connection('system');
   return coreDB;
 }
 
@@ -47,52 +52,6 @@ exports.getEeConfig = function() {
   const config = cdb.getItem('config');
 
   return config;
-}
-
-/**
- * 获取 root 目录 (开发环境时，为项目根目录)
- */
-exports.getRootDir = function() {
-  const cdb = this.getCoreDB();
-  const config = cdb.getItem('config');
-  const dir = Ps.isDev() ? config.homeDir : config.appUserDataDir;
-  return dir;
-}
-
-/**
- * 获取 日志目录
- */
-exports.getLogDir = function() {
-  const cdb = this.getCoreDB();
-  const logPath = cdb.getItem('config').logger.dir;
-  return logPath;
-}
-
-/**
- * 获取 home目录
- */
-exports.getHomeDir = function() {
-  const cdb = this.getCoreDB();
-  const homePath = cdb.getItem('config').homeDir;
-  return homePath;
-}
-
-/**
- * 获取 root目录
- */
-exports.getRootDir = function() {
-  const cdb = this.getCoreDB();
-  const rootPath = cdb.getItem('config').root;
-  return rootPath;
-}
-
-/**
- * 获取 appUserData目录
- */
-exports.getAppUserDataDir = function() {
-  const cdb = this.getCoreDB();
-  const dataPath = cdb.getItem('config').appUserDataDir;
-  return dataPath;
 }
 
 /**
@@ -162,7 +121,7 @@ exports.getSocketPort = function() {
  * 获取 socket channel
  */
 exports.getSocketChannel = function() {
-  return constant.socketIo.channel;
+  return Constant.socketIo.channel;
 }
 
 /**

@@ -15,7 +15,7 @@ module.exports = {
       const defaultConfig = {
         logger: {
           type: 'application',
-          dir: Ps.getLogsDir(),
+          dir: Ps.getLogDir(),
           encoding: 'utf8',
           env: Ps.env(),
           level: 'INFO',
