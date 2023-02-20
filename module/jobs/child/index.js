@@ -16,7 +16,7 @@ class ChildJob {
     let options = Object.assign({
       processArgs: Ps.isDev() ?  [`--inspect=${Constants.jobs.inspectStartIndex}`] : [],
       processOptions: { 
-        cwd: path.dirname(filepath),
+        //cwd: path.dirname(filepath),
         env: Ps.allEnv(), 
         stdio: 'pipe' 
       }

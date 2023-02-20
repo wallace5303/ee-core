@@ -65,6 +65,22 @@ exports.isForkedChild = function() {
 };
 
 /**
+ * 当前进程类型
+ */
+exports.processType = function() {
+  let type = '';
+  if (this.isMain()) {
+    type = 'browser';
+  } else if (this.isRenderer()) {
+    type = 'renderer';
+  } else if (this.isForkedChild()) {
+    type = 'child';
+  }
+
+  return type;
+};
+
+/**
  * 获取数据存储路径
  */
 exports.getHomeDir = function () {
@@ -131,16 +147,9 @@ exports.getUserHomeDir = function () {
 }
 
 /**
- * 获取appUserData目录前一层目录
- */
-exports.getUserHomeDir = function () {
-  return process.env.EE_APP_DATA;
-}
-
-/**
  * 获取主进程端口
  */
-exports.getUserHomeDir = function () {
+exports.getMainPort = function () {
   return process.env.EE_MAIN_PORT;
 }
 
@@ -156,4 +165,11 @@ exports.getSocketPort = function () {
  */
 exports.getHttpPort = function () {
   return process.env.EE_HTTP_PORT;
+}
+
+/**
+ * 是否打包
+ */
+exports.isPackaged = function () {
+  return process.env.EE_IS_PACKAGED;
 }

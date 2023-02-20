@@ -16,7 +16,7 @@ class Jobs  {
    * 创建 job
    */
   create (name, opt = {}) {
-    this.type = opt.type || 'renderer';
+    this.type = opt.type || 'child';
     this.dev = opt.dev || false;
     this.winOptions = opt.winOptions || {};
     this.childOptions = opt.childOptions || {};
@@ -32,13 +32,13 @@ class Jobs  {
     assert(fs.existsSync(filepath), `file ${filepath} not exists`);
 
     this.path = filepath;
-    if (this.type == 'renderer') {
+    if (this.type == 'child') {
+      this.instance = new ChildJob(name, filepath, this.childOptions);
+    } else if (this.type == 'renderer') {
       this.instance = new RendererJob(name, filepath, this.winOptions);
       if (this.dev) {
         this.openDevTools();
       }
-    } else if (this.type == 'child') {
-      this.instance = new ChildJob(name, filepath, this.childOptions);
     }
     
     return;

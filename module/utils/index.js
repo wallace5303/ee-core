@@ -87,15 +87,6 @@ exports.getSocketServerConfig = function() {
 }
 
 /**
- * 获取 socketio port
- */
-exports.getSocketPort = function() {
-  const cdb = this.getCoreDB();
-  const port = cdb.getItem('config').socketServer.port;
-  return parseInt(port);
-}
-
-/**
  * 获取 socket channel
  */
 exports.getSocketChannel = function() {
@@ -107,10 +98,12 @@ exports.getSocketChannel = function() {
  */
 exports.getExtraResourcesDir = function() {
   const execDir = this.getExecDir();
+  const isPackaged = this.isPackaged();
+
 
   // 资源路径不同
   let dir = '';
-  if (config.isPackaged) {
+  if (isPackaged) {
     // 打包后  execDir为 应用程序 exe\dmg\dep软件所在目录；打包前该值是项目根目录
     // windows和MacOs不一样
     dir = path.join(execDir, "resources", "extraResources");
