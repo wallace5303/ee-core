@@ -1,8 +1,8 @@
 const is = require('is-type-of');
 const fs = require('fs');
 const path = require('path');
-const utilsCore = require('../../core/lib/utils');
-const utilsInternal = require('../utils/internal');
+const UtilsCore = require('../../core/lib/utils');
+const Ps = require('../utils/ps');
 
 module.exports = {
 
@@ -20,8 +20,8 @@ module.exports = {
       return null;
     }
 
-    const ret = utilsCore.loadFile(filepath);
-    if (is.function(ret) && !is.class(ret) && !utilsCore.isBytecodeClass(ret)) {
+    const ret = UtilsCore.loadFile(filepath);
+    if (is.function(ret) && !is.class(ret) && !UtilsCore.isBytecodeClass(ret)) {
       ret = ret(...inject);
     }
     return ret;
@@ -33,7 +33,7 @@ module.exports = {
   resolveModule(filepath) {
     const isAbsolute = path.isAbsolute(filepath);
     if (!isAbsolute) {
-      filepath = path.join(utilsInternal.getBaseDir(), 'jobs', filepath);
+      filepath = path.join(Ps.getBaseDir(), 'jobs', filepath);
     }
 
     let fullPath;
@@ -62,7 +62,7 @@ module.exports = {
     if (!filepath) {
       return null;
     }
-    const ret = utilsCore.loadFile(filepath);
+    const ret = UtilsCore.loadFile(filepath);
 
     return ret;
   },  

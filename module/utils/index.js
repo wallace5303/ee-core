@@ -4,28 +4,17 @@ const is = require('is-type-of');
 const co = require('co');
 const eis = require('electron-is');
 const Storage = require('../storage');
-const Constant = require('../const');
+const Constants = require('../const');
 const Ps = require('./ps');
 const Helper = require('./helper');
 const UtilsJson = require('./json');
 
 /**
- * process function
+ * other module
  */
 copy(Ps)
 .and(Helper)
 .to(exports);
-
-// internal utils apis
-// exports.isDev = interUtils.isDev;
-// exports.isRenderer = interUtils.isRenderer;
-// exports.isMain = interUtils.isMain;
-// exports.isForkedChild = interUtils.isForkedChild;
-// exports.mkdir = interUtils.mkdir;
-// exports.chmodPath = interUtils.chmodPath;
-// exports.compareVersion = interUtils.compareVersion;
-// exports.getEnv = interUtils.getEnv;
-// exports.getBaseDir = interUtils.getBaseDir;
 
 /**
  * 获取项目根目录package.json
@@ -61,15 +50,6 @@ exports.getAppVersion = function() {
   const cdb = this.getCoreDB();
   const v = cdb.getItem('config').appVersion;
   return v;
-}
-
-/**
- * 获取 exec目录
- */
-exports.getExecDir = function() {
-  const cdb = this.getCoreDB();
-  const execPath = cdb.getItem('config').execDir;
-  return execPath;
 }
 
 /**
@@ -121,16 +101,14 @@ exports.getSocketPort = function() {
  * 获取 socket channel
  */
 exports.getSocketChannel = function() {
-  return Constant.socketIo.channel;
+  return Constants.socketIo.channel;
 }
 
 /**
  * 获取 额外资源目录
  */
 exports.getExtraResourcesDir = function() {
-  const cdb = this.getCoreDB();
-  const config = cdb.getItem('config');
-  const execDir = config.execDir;
+  const execDir = this.getExecDir();
 
   // 资源路径不同
   let dir = '';

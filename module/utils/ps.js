@@ -108,3 +108,17 @@ exports.getBaseDir = function() {
 exports.getAppUserDataDir = function() {
   return process.env.EE_APP_USER_DATA;
 }
+
+/**
+ * 获取数据存储路径
+ */
+exports.getHomeDir = function () {
+  return process.env.EE_HOME;
+}
+
+/**
+ * 获取 exec目录
+ */
+exports.getExecDir = function() {
+  return process.env.EE_EXEC_DIR;
+}

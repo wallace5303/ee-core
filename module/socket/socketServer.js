@@ -2,10 +2,10 @@
 
 const assert = require('assert');
 const { Server } = require('socket.io');
-const constant = require('../const');
 const EggConsoleLogger = require('egg-logger').EggConsoleLogger;
 const is = require('is-type-of');
 const Storage = require('../storage');
+const Constants = require('../const');
 
 /**
  * socket server
@@ -34,7 +34,7 @@ class SocketServer {
     const self = this;
     this.consoleLogger.info('[ee-core:socket:server] connection .....');
     this.io.on('connection', (socket) => {
-      const channel = constant.socketIo.channel.partySoftware;
+      const channel = Constants.socketIo.channel.partySoftware;
       socket.on(channel, async (message, callback) => {
         self.consoleLogger.info('[ee-core:socket:server] socket id:' + socket.id + ' message cmd: ' + message.cmd);
 

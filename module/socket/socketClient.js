@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const IoClient = require('socket.io-client');
-const constant = require('../const');
+const Constants = require('../const');
 const EggConsoleLogger = require('egg-logger').EggConsoleLogger;
 const Storage = require('../storage');
 
@@ -30,7 +30,7 @@ class SocketClient {
   call (method = '', ...params) {
     return new Promise((resolve, reject) => {
       // 获取通信频道
-      const channel = constant.socketIo.channel.partySoftware;
+      const channel = Constants.socketIo.channel.partySoftware;
       this.client.emit(channel, { cmd: method, params: params }, (response) => {
         resolve(response);
       });

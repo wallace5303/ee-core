@@ -5,8 +5,8 @@ const { ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const globby = require('globby');
-const utils = require('../../core/lib/utils');
-const wrap = require('../../module/utils/wrap');
+const Utils = require('../../core/lib/utils');
+const Wrap = require('../utils/wrap');
 
 class IpcServer {
   constructor (app) {
@@ -22,7 +22,7 @@ class IpcServer {
 
     const self = this;
     // 遍历方法
-    const files = utils.filePatterns();
+    const files = Utils.filePatterns();
     const directory = path.join(this.app.config.baseDir, 'controller');
     const filepaths = globby.sync(files, { cwd: directory });
 
@@ -30,13 +30,13 @@ class IpcServer {
       const fullpath = path.join(directory, filepath);
       if (!fs.statSync(fullpath).isFile()) continue;
 
-      const properties = wrap.getProperties(filepath, {caseStyle: 'lower'});
+      const properties = Wrap.getProperties(filepath, {caseStyle: 'lower'});
       const pathName = directory.split(/[/\\]/).slice(-1) + '.' + properties.join('.');
 
-      let fileObj = utils.loadFile(fullpath);
+      let fileObj = Utils.loadFile(fullpath);
       const fns = {};
       // 为了统一，仅支持class文件
-      if (is.class(fileObj) || utils.isBytecodeClass(fileObj)) {
+      if (is.class(fileObj) || Utils.isBytecodeClass(fileObj)) {
         let proto = fileObj.prototype;
         // 不遍历父类的方法
         //while (proto !== Object.prototype) {

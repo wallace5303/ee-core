@@ -1,8 +1,7 @@
 //require('bytenode');
 const { BrowserWindow } = require('electron');
 const fs = require('fs');
-const loadView = require('./loadView');
-// const MessageChannel = require('./MessageChannel.class');
+const LoadView = require('./loadView');
 
 class RendererJob {
 
@@ -105,7 +104,7 @@ class RendererJob {
           title: `${this.name} job`,
           base: filepath
         }
-        const viewData = loadView(param);
+        const viewData = LoadView(param);
 
         this.subWin.loadURL(viewData)
         .then(resolve)
@@ -128,7 +127,7 @@ class RendererJob {
       title: `${this.name} job`,
       base: filepath
     }
-    const viewData = loadView(param);
+    const viewData = LoadView(param);
 
     this.subWin.loadURL(viewData)
     .catch(err => {

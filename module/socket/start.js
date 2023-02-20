@@ -1,22 +1,22 @@
 'use strict';
 
-const socketServer = require('./socketServer');
-const ipcServer = require('./ipcServer');
-const httpServer = require('./httpServer');
+const SocketServer = require('./socketServer');
+const IpcServer = require('./ipcServer');
+const HttpServer = require('./httpServer');
 
 /**
  * server
  */
- module.exports = (app) => {
+module.exports = (app) => {
 
   // 启动 socket server
-  new socketServer(app);
+  new SocketServer(app);
 
   // 启动 http server
-  new httpServer(app);  
+  new HttpServer(app);  
 
   // 启动 electron ipc server
-  new ipcServer(app);
+  new IpcServer(app);
 
 }
 

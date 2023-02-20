@@ -1,4 +1,4 @@
-const { isDev, isRenderer, isMain } = require('../utils/internal');
+const { isDev, isRenderer, isMain } = require('../utils/ps');
 
 const m = {};
 
