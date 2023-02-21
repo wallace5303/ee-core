@@ -1,12 +1,9 @@
-const lodash = require('lodash')
-const isPromise = require('./isPromise')
+const lodash = require('lodash');
+const assert = require('assert');
+const is = require('is-type-of');
 
 module.exports = function(adapter) {
-  if (typeof adapter !== 'object') {
-    throw new Error(
-      'An adapter must be provided, see https://github.com/typicode/lowdb/#usage'
-    )
-  }
+  assert(typeof adapter === 'object', 'An adapter must be provided');
 
   // Create a fresh copy of lodash
   const _ = lodash.runInContext()
@@ -24,18 +21,17 @@ module.exports = function(adapter) {
     return db
   }
 
-  // Lowdb API
   // Expose _ for mixins
   db._ = _
 
   db.read = () => {
     const r = adapter.read()
-    return isPromise(r) ? r.then(plant) : plant(r)
+    return is.promise(r) ? r.then(plant) : plant(r)
   }
 
   db.write = returnValue => {
     const w = adapter.write(db.getState())
-    return isPromise(w) ? w.then(() => returnValue) : returnValue
+    return is.promise(w) ? w.then(() => returnValue) : returnValue
   }
 
   db.getState = () => db.__wrapped__

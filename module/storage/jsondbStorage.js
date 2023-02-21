@@ -1,26 +1,26 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
-const lowdb = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
+const Jsondb = require('./jsondb/main');
+const FileSync = require('./jsondb/adapters/FileSync');
 const _ = require('lodash');
-const constant = require('../const');
-const helper = require('../utils/helper');
-const ps = require('../utils/ps');
+const Constants = require('../const');
+const Helper = require('../utils/helper');
+const Ps = require('../utils/ps');
 
-class LowdbStorage {
+class JsondbStorage {
   constructor (name, opt = {}) {
     assert(name, `db name ${name} Cannot be empty`);
 
     this.name = name;
 
     // 数据库key列表
-    this.storageKey = constant.storageKey;
+    this.storageKey = Constants.storageKey;
 
-    const storageDir = ps.getStorageDir();
+    const storageDir = Ps.getStorageDir();
     if (!fs.existsSync(storageDir)) {
-      helper.mkdir(storageDir);
-      helper.chmodPath(storageDir, '777');
+      Helper.mkdir(storageDir);
+      Helper.chmodPath(storageDir, '777');
     }
 
     this.db = this.table(name);
@@ -34,7 +34,7 @@ class LowdbStorage {
 
     const dbFile = this.getFilePath(name);
     const adapter = new FileSync(dbFile);
-    const db = lowdb(adapter);
+    const db = Jsondb(adapter);
 
     assert(fs.existsSync(dbFile), `error: storage ${dbFile} not exists`);
 
@@ -52,7 +52,7 @@ class LowdbStorage {
    * 获取文件绝对路径
    */
   getFilePath (name) {
-    const storageDir = ps.getStorageDir();
+    const storageDir = Ps.getStorageDir();
     const dbFile = path.join(storageDir, this.getFileName(name));
     return dbFile;
   }
@@ -95,4 +95,4 @@ class LowdbStorage {
   }   
 }
 
-module.exports = LowdbStorage;
+module.exports = JsondbStorage;

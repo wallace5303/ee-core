@@ -3,9 +3,9 @@ const _ = require('lodash');
 const DB = {};
 
 DB.connection = function (database, options = {}) {
-  let driver = options.driver || 'lowdb';
+  let driver = options.driver || 'jsondb';
   let opt = options.default || {};
-  if (!_.includes(['lowdb', 'sqlite'], driver)) {
+  if (!_.includes(['jsondb', 'lowdb', 'sqlite'], driver)) {
     assert(database, `db driver ${driver} is not supported`);
   }
   if (_.isEmpty(database)) {
@@ -13,15 +13,17 @@ DB.connection = function (database, options = {}) {
   }
   let storage;
   switch (driver)  {
-    case 'lowdb':
-      const LowdbStorage = require('./lowdbStorage');
-      storage = new LowdbStorage(database);
+    case 'jsondb':
+      const JsondbStorage = require('./jsondbStorage');
+      storage = new JsondbStorage(database);
       break;
     case 'sqlite':
       const SqliteStorage = require('./sqliteStorage');
       storage = new SqliteStorage(database, opt);
       break;
     default:  
+      const JsondbStorage = require('./jsondbStorage');
+      storage = new JsondbStorage(database);
   }
 
   return storage;
