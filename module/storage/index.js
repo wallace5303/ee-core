@@ -4,8 +4,12 @@ const DB = {};
 
 DB.connection = function (database, options = {}) {
   let driver = options.driver || 'jsondb';
+  
+  // 兼容之前api
+  driver = driver == 'lowdb' ? 'jsondb' : driver;
+
   let opt = options.default || {};
-  if (!_.includes(['jsondb', 'lowdb', 'sqlite'], driver)) {
+  if (!_.includes(['jsondb', 'sqlite'], driver)) {
     assert(database, `db driver ${driver} is not supported`);
   }
   if (_.isEmpty(database)) {
@@ -21,9 +25,7 @@ DB.connection = function (database, options = {}) {
       const SqliteStorage = require('./sqliteStorage');
       storage = new SqliteStorage(database, opt);
       break;
-    default:  
-      const JsondbStorage = require('./jsondbStorage');
-      storage = new JsondbStorage(database);
+    default:
   }
 
   return storage;

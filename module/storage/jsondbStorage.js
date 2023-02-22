@@ -20,7 +20,6 @@ class JsondbStorage {
     const storageDir = Ps.getStorageDir();
     if (!fs.existsSync(storageDir)) {
       Helper.mkdir(storageDir);
-      Helper.chmodPath(storageDir, '777');
     }
 
     this.db = this.table(name);

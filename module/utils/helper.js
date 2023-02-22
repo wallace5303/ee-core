@@ -49,8 +49,8 @@ exports.getRandomString = function() {
 /**
  * 创建文件夹
  */
-exports.mkdir = function(filepath) {
-  mkdirp.sync(path.dirname(filepath));
+exports.mkdir = function(filepath, opt = {}) {
+  mkdirp.sync(filepath, opt);
   return
 }
 
