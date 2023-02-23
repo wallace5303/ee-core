@@ -7,7 +7,7 @@ const is = require('is-type-of');
 const debug = require('debug')('ee-core:EeLoader');
 const FileLoader = require('./file_loader');
 const ContextLoader = require('./context_loader');
-const utils = require('../utils');
+const Utils = require('../utils');
 const Timing = require('../utils/timing');
 const Ps = require('../../../module/utils/ps');
 
@@ -255,7 +255,7 @@ class EeLoader {
     if (inject.length === 0) inject = [ this.app ];
 
     let ret = this.requireFile(filepath);
-    if (is.function(ret) && !is.class(ret) && !utils.isBytecodeClass(ret)) {
+    if (is.function(ret) && !is.class(ret) && !Utils.isBytecodeClass(ret)) {
       ret = ret(...inject);
     }
     return ret;
@@ -267,9 +267,9 @@ class EeLoader {
    * @private
    */
   requireFile(filepath) {
-    const timingKey = `Require(${this[REQUIRE_COUNT]++}) ${utils.getResolvedFilename(filepath, this.options.baseDir)}`;
+    const timingKey = `Require(${this[REQUIRE_COUNT]++}) ${Utils.getResolvedFilename(filepath, this.options.baseDir)}`;
     this.timing.start(timingKey);
-    const ret = utils.loadFile(filepath);
+    const ret = Utils.loadFile(filepath);
     this.timing.end(timingKey);
     return ret;
   }

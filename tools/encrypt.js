@@ -7,7 +7,7 @@ const is = require('is-type-of');
 const bytenode = require('bytenode');
 const crypto = require('crypto');
 const JavaScriptObfuscator = require('javascript-obfuscator');
-const utilsJson = require('../module/utils/json');
+const UtilsJson = require('../module/utils/json');
 
 class Encrypt {
   constructor() {
@@ -86,7 +86,7 @@ class Encrypt {
         const content = {
           nameMap: {}
         };
-        utilsJson.writeSync(this.tmpFile, content);
+        UtilsJson.writeSync(this.tmpFile, content);
       }
     }
 

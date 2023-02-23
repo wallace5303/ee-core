@@ -3,7 +3,6 @@
  */
 
 const path = require('path');
-const eis = require('electron-is');
 const UtilsJson = require('../module/utils/json');
 const UtilsPs = require('../module/utils/ps');
 const UtilsHelper = require('../module/utils/helper');

@@ -1,8 +1,5 @@
-//require('bytenode');
-const path = require('path');
 const ForkProcess = require('./forkProcess');
 const Ps = require('../../utils/ps');
-const Constants = require('../../const');
 
 class ChildJob {
 
@@ -13,10 +10,10 @@ class ChildJob {
     * @param  {Object} opt - child process options 
     */
   constructor(name, filepath, opt = {}) {
-    // todo
+
     //processArgs: Ps.isDev() ?  [`--inspect=${Constants.jobs.inspectStartIndex}`] : [],
     let options = Object.assign({
-      processArgs: Ps.isDev() ?  [] : [],
+      processArgs: [],
       processOptions: { 
         //cwd: path.dirname(filepath),
         env: Ps.allEnv(), 

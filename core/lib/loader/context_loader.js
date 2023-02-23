@@ -5,7 +5,7 @@ const is = require('is-type-of');
 const FileLoader = require('./file_loader');
 const CLASSLOADER = Symbol('classLoader');
 const EXPORTS = FileLoader.EXPORTS;
-const utils = require('../utils');
+const Utils = require('../utils');
 
 class ClassLoader {
 
@@ -89,7 +89,7 @@ function getInstance(values, ctx) {
   const Class = values[EXPORTS] ? values : null;
   let instance;
   if (Class) {
-    if (is.class(Class) || utils.isBytecodeClass(Class)) {
+    if (is.class(Class) || Utils.isBytecodeClass(Class)) {
       instance = new Class(ctx);
     } else {
       // it's just an object

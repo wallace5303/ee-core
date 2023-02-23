@@ -2,22 +2,13 @@ const path = require('path');
 const Storage = require('../storage');
 const Constants = require('../const');
 const Ps = require('./ps');
-const Helper = require('./helper');
 const UtilsJson = require('./json');
-const Copy = require('./copyto');
-
-/**
- * other module
- */
-Copy(Ps)
-.and(Helper)
-.to(exports);
 
 /**
  * 获取项目根目录package.json
  */
 exports.getPackage = function() {
-  const json = UtilsJson.readSync(path.join(this.getHomeDir(), 'package.json'));
+  const json = UtilsJson.readSync(path.join(Ps.getHomeDir(), 'package.json'));
   
   return json;
 };
