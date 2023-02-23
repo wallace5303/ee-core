@@ -112,9 +112,16 @@ exports.getRootDir = function () {
 }
 
 /**
- * 获取 base目录
+ * 获取base目录
  */
 exports.getBaseDir = function() {
+  return process.env.EE_BASE_DIR;
+}
+
+/**
+ * 获取electron目录
+ */
+exports.getElectronDir = function() {
   return process.env.EE_BASE_DIR;
 }
 
@@ -171,5 +178,19 @@ exports.getHttpPort = function () {
  * 是否打包
  */
 exports.isPackaged = function () {
-  return process.env.EE_IS_PACKAGED;
+  return process.env.EE_IS_PACKAGED === 'true';
+}
+
+/**
+ * 是否加密
+ */
+exports.isEncrypted = function () {
+  return process.env.EE_IS_ENCRYPTED === 'true';
+}
+
+/**
+ * 是否热重启
+ */
+exports.isHotReload = function () {
+  return process.env.HOT_RELOAD === 'true';
 }

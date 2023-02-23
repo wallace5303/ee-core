@@ -1,6 +1,6 @@
+
 const path = require('path');
 const fs = require('fs');
-const assert = require('assert');
 const RendererJob = require('./renderer');
 const ChildJob = require('./child');
 const Utils = require('../utils');
@@ -25,12 +25,14 @@ class Jobs  {
 
     const isAbsolute = path.isAbsolute(this.path);
     if (!isAbsolute) {
-      this.path = path.join(Utils.getBaseDir(), 'jobs', this.path);
+      this.path = path.join(Utils.getBaseDir(), this.path);
     }
     const filepath = Loader.resolveModule(this.path);
 
-    assert(fs.existsSync(filepath), `file ${filepath} not exists`);
-
+    if (!fs.existsSync(filepath)) {
+      throw new Error(`[ee-core] [jobs-create] file ${this.path} not exists`);
+    }
+    
     this.path = filepath;
     if (this.type == 'child') {
       this.instance = new ChildJob(name, filepath, this.childOptions);

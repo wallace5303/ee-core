@@ -7,7 +7,7 @@ class FileSync extends Base {
     if (fs.existsSync(this.source)) {
       // Read database
       try {
-        const data = fs.readFileSync(this.source, {encoding: 'utf8'})
+        const data = fs.readFileSync(this.source, {encoding: 'utf8'}).trim()
 
         // Handle blank file
         return data ? this.deserialize(data) : this.defaultValue
@@ -19,13 +19,13 @@ class FileSync extends Base {
       }
     } else {
       // Initialize
-      fs.writeFileSync(this.source, this.serialize(this.defaultValue))
+      fs.writeFileSync(this.source, this.serialize(this.defaultValue), {flag:'w+'})
       return this.defaultValue
     }
   }
 
   write(data) {
-    return fs.writeFileSync(this.source, this.serialize(data))
+    return fs.writeFileSync(this.source, this.serialize(data), {flag:'w+'})
   }
 }
 

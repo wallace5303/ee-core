@@ -83,25 +83,8 @@ class EeLoader {
   getServerEnv() {
     let serverEnv = this.options.env;
 
-    const envPath = path.join(this.options.baseDir, 'config/env');
-    if (!serverEnv && fs.existsSync(envPath)) {
-      serverEnv = fs.readFileSync(envPath, 'utf8').trim();
-    }
-
     if (!serverEnv) {
-      serverEnv = process.env.EE_SERVER_ENV;
-    }
-
-    if (!serverEnv) {
-      if (process.env.NODE_ENV === 'test') {
-        serverEnv = 'unittest';
-      } else if (process.env.NODE_ENV === 'production') {
-        serverEnv = 'prod';
-      } else {
-        serverEnv = 'local';
-      }
-    } else {
-      serverEnv = serverEnv.trim();
+      throw new Error('[core] [lib] [loader] getServerEnv serverEnv can not be empty!');
     }
 
     return serverEnv;
@@ -313,15 +296,6 @@ class EeLoader {
 
     const dirs = this.dirs = [];
 
-    if (this.orderPlugins) {
-      for (const plugin of this.orderPlugins) {
-        dirs.push({
-          path: plugin.path,
-          type: 'plugin',
-        });
-      }
-    }
-
     // framework or Ee path
     for (const EePath of this.EePaths) {
       dirs.push({
@@ -404,31 +378,31 @@ class EeLoader {
 
   getTypeFiles(filename) {
     const files = [ `${filename}.default` ];
-    if (this.serverScope) files.push(`${filename}.${this.serverScope}`);
-    if (this.serverEnv === 'default') return files;
-
     files.push(`${filename}.${this.serverEnv}`);
-    if (this.serverScope) files.push(`${filename}.${this.serverScope}_${this.serverEnv}`);
+
     return files;
   }
 
   resolveModule(filepath) {
-    let fullPath;
+    let fullpath;
     try {
-      fullPath = require.resolve(filepath);
+      fullpath = require.resolve(filepath);
     } catch (e) {
-      let jscFile = filepath + '.jsc';
-      if (fs.existsSync(jscFile)) {
-        return jscFile;
+
+      // 特殊后缀处理
+      if (filepath && (filepath.endsWith('.defalut') || filepath.endsWith('.prod'))) {
+        fullpath = filepath + '.jsc';
+      } else if (filepath && filepath.endsWith('.js')) {
+        fullpath = filepath + 'c';
       }
-      return undefined;
+      
+      if (!fs.existsSync(filepath) && !fs.existsSync(fullpath)) {
+        this.options.logger.warn(`[ee-core] [core/lib/loader/ee_loader] resolveModule unknow filepath: ${filepath}`)
+        return undefined;
+      }
     }
 
-    if (process.env.Ee_TYPESCRIPT !== 'true' && fullPath.endsWith('.ts')) {
-      return undefined;
-    }
-
-    return fullPath;
+    return fullpath;
   }
 
   getPkg() {

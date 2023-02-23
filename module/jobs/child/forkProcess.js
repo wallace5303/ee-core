@@ -1,20 +1,25 @@
+const path = require('path');
 const { fork } = require('child_process');
 
 class ForkProcess {
   constructor(host, modulePath, processArgs = [], processOptions = {}) {
     this.host = host;
     this.modulePath = modulePath;
-    this.args = processArgs;
+    this.args;
     this.options = processOptions;
     this.sleeping = false;
     this.activitiesCount = 0;
     this.activitiesMap = new Map();
 
-    this.child = fork(
-      this.modulePath,
-      this.args,
-      this.options
-    );
+    // 传递给子进程的参数
+    let scriptArgs = {
+      jobPath: modulePath
+    }
+    processArgs.push(JSON.stringify(scriptArgs));
+    this.args = processArgs;
+    
+    const appPath = path.join(__dirname, 'app.js');
+    this.child = fork(appPath, this.args, this.options);
 
     this.pid = this.child.pid;
     this._init();

@@ -13,8 +13,10 @@ class ChildJob {
     * @param  {Object} opt - child process options 
     */
   constructor(name, filepath, opt = {}) {
+    // todo
+    //processArgs: Ps.isDev() ?  [`--inspect=${Constants.jobs.inspectStartIndex}`] : [],
     let options = Object.assign({
-      processArgs: Ps.isDev() ?  [`--inspect=${Constants.jobs.inspectStartIndex}`] : [],
+      processArgs: Ps.isDev() ?  [] : [],
       processOptions: { 
         //cwd: path.dirname(filepath),
         env: Ps.allEnv(), 
