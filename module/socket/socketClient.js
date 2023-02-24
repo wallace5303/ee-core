@@ -3,19 +3,16 @@
 const assert = require('assert');
 const IoClient = require('socket.io-client');
 const Constants = require('../const');
-const EggConsoleLogger = require('egg-logger').EggConsoleLogger;
 const Storage = require('../storage');
 
 class SocketClient {
   constructor (port) {
-    this.consoleLogger = new EggConsoleLogger();
     port = port ? parseInt(port) : this.getSocketcPort();
 
     assert(typeof port === 'number', 'port required, and must be a number');
-    this.consoleLogger.info('[ee-core:socket:client] start client');
     
     const url  = 'http://127.0.0.1:' + port;
-    this.consoleLogger.info('[ee-core:socket:client] url:', url);
+    console.log('[ee-core] [module/socket/socketClient] url:', url);
     this.client = IoClient(url);
   }
 

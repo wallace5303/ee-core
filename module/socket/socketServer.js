@@ -2,10 +2,10 @@
 
 const assert = require('assert');
 const { Server } = require('socket.io');
-const EggConsoleLogger = require('egg-logger').EggConsoleLogger;
 const is = require('is-type-of');
 const Storage = require('../storage');
 const Constants = require('../const');
+const Log = require('../log');
 
 /**
  * socket server
@@ -14,7 +14,6 @@ class SocketServer {
   constructor (app) {
     this.app = app;
     const options = this.app.config.socketServer;
-    this.consoleLogger = new EggConsoleLogger();
 
     if (!options.enable) {
       return;
@@ -22,7 +21,7 @@ class SocketServer {
 
     let port = process.env.EE_SOCKET_PORT ? parseInt(process.env.EE_SOCKET_PORT) : parseInt(this.getSocketPort());
     assert(typeof port === 'number', 'socekt port required, and must be a number');
-    this.consoleLogger.info('[ee-core:socket:server] socket server port is:', port);
+    this.consoleLogger.info('[ee-core] [module/socket/socketServer] port is:', port);
 
     // let opt = Object.assign({}, options);
     // delete opt.enable;
@@ -32,11 +31,10 @@ class SocketServer {
 
   connec () {
     const self = this;
-    this.consoleLogger.info('[ee-core:socket:server] connection .....');
     this.io.on('connection', (socket) => {
       const channel = Constants.socketIo.channel.partySoftware;
       socket.on(channel, async (message, callback) => {
-        self.consoleLogger.info('[ee-core:socket:server] socket id:' + socket.id + ' message cmd: ' + message.cmd);
+        console.log('[ee-core] [module/socket/socketServer] socket id:' + socket.id + ' message cmd: ' + message.cmd);
 
         try {
           // 找函数
@@ -57,7 +55,7 @@ class SocketServer {
           const result = await fn.call(self.app, args);
           callback(result);
         } catch (err) {
-          self.app.console.error('[ee-core:socket:server] throw error:', err);
+          Log.coreLogger.error('[ee-core] [module/socket/socketServer] throw error:', err);
         }
       });
     });

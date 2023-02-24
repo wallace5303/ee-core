@@ -11,7 +11,7 @@ class ChildApp {
   }
 
   run () {
-    Log.info('[child-process] run');
+    Log.info('[ee-core] [child-process] run');
     
     const jobFile = this.opt.jobPath;
 

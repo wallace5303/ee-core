@@ -9,6 +9,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
+const Log = require('../log');
 
 /**
  * http server
@@ -60,16 +61,16 @@ class HttpServer {
       })
       .use(this.dispatch);
 
-    let msg = '[ee-core:http:server] server is: ' + url;
+    let msg = '[ee-core] [module/socket/httpServer] server is: ' + url;
     if (isHttps) {
       https.createServer(sslOptions, koaApp.callback()).listen(httpServer.port, (err) => {
         msg = err ? err : msg;
-        self.app.coreLogger.info(msg);
+        Log.coreLogger.info(msg);
       });
     } else {
       koaApp.listen(httpServer.port, (e) => {
         msg = e ? e : msg;
-        self.app.coreLogger.info(msg);
+        Log.coreLogger.info(msg);
       });
     }  
   }

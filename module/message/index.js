@@ -1,13 +1,7 @@
-const { isDev, isRenderer, isMain } = require('../utils/ps');
+const Ps = require('../utils/ps');
 
-const m = {};
+const message = {};
 
-if (isMain) {
-  m.d = require();
-}
 
-if (isRenderer) {
-  m.d = require();
-}
 
-module.exports = m;
+module.exports = message;

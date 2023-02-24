@@ -1,5 +1,4 @@
 const debug = require('debug')('ee-core:ipcServer');
-const EggConsoleLogger = require('egg-logger').EggConsoleLogger;
 const is = require('is-type-of');
 const { ipcMain } = require('electron');
 const path = require('path');
@@ -7,18 +6,16 @@ const fs = require('fs');
 const globby = require('globby');
 const Utils = require('../../core/lib/utils');
 const Wrap = require('../utils/wrap');
+const Log = require('../log');
 
 class IpcServer {
   constructor (app) {
-
     this.app = app;
-    this.consoleLogger = new EggConsoleLogger();
-    this.consoleLogger.info('[ee-core:socket:ipcMain] start ipcMain');
     this.register();
   }
 
   register () {
-    this.consoleLogger.info('[ee-core:socket:ipcMain] register channels');
+    console.log('[ee-core] [module/socket/IpcServer] register channels');
 
     const self = this;
     // 遍历方法
@@ -78,7 +75,7 @@ class IpcServer {
             
             return fn;
           } catch (err) {
-            app.logger.error('[ee:socket:ipcMain] throw error:', err);
+            Log.coreLogger.error('[ee-core] [module/socket/IpcServer] throw error:', err);
           }
           return null;
         }

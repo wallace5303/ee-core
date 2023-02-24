@@ -41,20 +41,20 @@ class Encrypt {
         this.dirs.push(directory[i]);
       }
     }
-    console.log('[ee-core] [encrypt] dirs:', this.dirs);
+    console.log('[ee-core] [tools/encrypt] dirs:', this.dirs);
   }
 
   /**
    * 备份 electron 目录代码
    */
   backup () {
-    console.log('[ee-core] [encrypt] backup start');
+    console.log('[ee-core] [tools/encrypt] backup start');
 
     for (let i = 0; i < this.dirs.length; i++) {
       // check code dir
       let codeDirPath = path.join(this.basePath, this.dirs[i]);
       if (!fs.existsSync(codeDirPath)) {
-        console.log('[ee-core] [encrypt] ERROR: backup %s is not exist', codeDirPath);
+        console.log('[ee-core] [tools/encrypt] ERROR: backup %s is not exist', codeDirPath);
         return
       }
 
@@ -64,7 +64,7 @@ class Encrypt {
       this.rmBackup(targetDir);
 
       // copy
-      console.log('[ee-core] [encrypt] backup target Dir:', targetDir);
+      console.log('[ee-core] [tools/encrypt] backup target Dir:', targetDir);
       if (!fs.existsSync(targetDir)) {
         this.mkdir(targetDir);
         this.chmodPath(targetDir, '777');
@@ -72,7 +72,7 @@ class Encrypt {
 
       fsPro.copySync(codeDirPath, targetDir);
     }
-    console.log('[ee-core] [encrypt] backup end');
+    console.log('[ee-core] [tools/encrypt] backup end');
     return true;
   }
   
@@ -97,13 +97,13 @@ class Encrypt {
    * 加密代码
    */
   encrypt () {
-    console.log('[ee-core] [encrypt] start ciphering');
+    console.log('[ee-core] [tools/encrypt] start ciphering');
     for (let i = 0; i < this.dirs.length; i++) {
       let codeDirPath = path.join(this.encryptCodeDir, this.dirs[i]);
       this.loop(codeDirPath);
     }
 
-    console.log('[ee-core] [encrypt] end ciphering');
+    console.log('[ee-core] [tools/encrypt] end ciphering');
   };
 
   /**
@@ -183,7 +183,7 @@ class Encrypt {
    */
   rmBackup (dir) {
     if (fs.existsSync(dir)) {
-      console.log('[ee-core] [encrypt] clean old directory:', dir);
+      console.log('[ee-core] [tools/encrypt] clean old directory:', dir);
       fsPro.removeSync(dir);
     }
     return;
