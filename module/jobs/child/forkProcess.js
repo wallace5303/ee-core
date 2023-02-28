@@ -9,9 +9,12 @@ class ForkProcess {
     this.sleeping = false;
 
     // 传递给子进程的参数
-    this.args.push(JSON.stringify(opt.scriptArgs));
+    this.args.push(JSON.stringify(opt.params));
 
     const appPath = path.join(__dirname, 'app.js');
+    console.log('appPath:', appPath);
+    console.log('this.args:', this.args);
+
     this.child = fork(appPath, this.args, opt.processOptions);
 
     this.pid = this.child.pid;
@@ -28,7 +31,6 @@ class ForkProcess {
 
     this.child.on('disconnect', () => {
       Log.coreLogger.info(`[ee-core] [module/jobs/child/forkProcess] from childProcess event-disconnect !`);
-      // this.host.emit('forked_error', err, this.pid);
     });
 
     this.child.on('close', (code, signal) => {

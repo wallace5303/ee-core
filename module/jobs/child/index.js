@@ -8,21 +8,48 @@ const Log = require('../../log');
 
 class ChildJob extends EventEmitter {
 
-  /**
-    * constructor
-    */
   constructor() {
-    this.pools = new Map();
-    this._initEvents();
+    super();
+    this.jobList = new Map();
   }
 
-  _initEvents() {
-    // ddd
+  /**
+   * 运行任务
+   */  
+  run(name, filepath, opt = {}) {
 
+    const jobPath = this._getFullpath(filepath);
+
+    let options = Object.assign({
+      times: 1,
+      params: {
+        jobPath
+      },
+      processOptions: { 
+        //cwd: path.dirname(filepath),
+        env: Ps.allEnv(), 
+        stdio: 'pipe' 
+      }
+    }, opt);
+
+    // 消息对象
+    let msg = {
+      jobPath: jobPath,
+      params: options.params
+    }
+    let subProcess;
+    for (let i = 1; i <= options.times; i++) {
+      subProcess = new ForkProcess(this, options);
+      //this.jobList.set(name, i);
+
+      // 发消息到子进程
+      //subProcess.child.send(msg);
+    }
+  
+    return;
   }
 
-  create(name, filepath, opt = {}) {
-
+  _getFullpath(filepath) {
     const isAbsolute = path.isAbsolute(filepath);
     if (!isAbsolute) {
       filepath = path.join(Ps.getBaseDir(), filepath);
@@ -33,33 +60,7 @@ class ChildJob extends EventEmitter {
       throw new Error(`[ee-core] [module/jobs/child] file ${fullpath} not exists`);
     }
 
-    let options = Object.assign({
-      scriptArgs: {
-        name: name,
-        jobPath: fullpath
-      },
-      processArgs: [],
-      processOptions: { 
-        //cwd: path.dirname(filepath),
-        env: Ps.allEnv(), 
-        stdio: 'pipe' 
-      }
-    }, opt);
-
-    const subProcess = new ForkProcess(this, options);
-    this.pools.set(subProcess.pid, subProcess);
-
-    return subProcess;
-  }
-
-  sendToChild(pid, message, ...other) {
-    if (!this.pools.has(pid)) {
-      Log.coreLogger.warn(`[ee-core] [module/jobs/child] process dose not exist  ${pid}`);
-      return;
-    }
-    const subProcess = this.pools.get(pid);
-    subProcess.child.send(message, ...other);
-    return
+    return fullpath;
   }
 
 }
