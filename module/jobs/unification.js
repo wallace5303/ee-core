@@ -1,11 +1,9 @@
 const path = require('path');
 const fs = require('fs');
 const RendererJob = require('./renderer');
-const ChildJob = require('./child');
-const Utils = require('../utils');
+const ChildJob = require('./child/pool');
+const Ps = require('../utils/ps');
 const Loader = require('../loader');
-
-let EEJobs;
 
 class Jobs  {
   constructor() {
@@ -31,7 +29,7 @@ class Jobs  {
 
     const isAbsolute = path.isAbsolute(this.path);
     if (!isAbsolute) {
-      this.path = path.join(Utils.getBaseDir(), this.path);
+      this.path = path.join(Ps.getBaseDir(), this.path);
     }
     const filepath = Loader.resolveModule(this.path);
 
@@ -63,8 +61,4 @@ class Jobs  {
   }
 }
 
-if (!EEJobs) {
-  EEJobs = new Jobs();
-}
-
-module.exports = EEJobs;
+module.exports = Jobs;

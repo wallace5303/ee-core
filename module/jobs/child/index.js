@@ -26,27 +26,29 @@ class ChildJob extends EventEmitter {
         jobPath
       },
       processOptions: { 
-        //cwd: path.dirname(filepath),
+        //cwd: path.dirname(jobPath),
         env: Ps.allEnv(), 
         stdio: 'pipe' 
       }
     }, opt);
 
     // 消息对象
-    let msg = {
-      jobPath: jobPath,
-      params: options.params
-    }
-    let subProcess;
-    for (let i = 1; i <= options.times; i++) {
-      subProcess = new ForkProcess(this, options);
-      //this.jobList.set(name, i);
+    // let msg = {
+    //   jobPath: jobPath,
+    //   params: options.params
+    // }
+    // let subProcess;
+    // for (let i = 1; i <= options.times; i++) {
+    //   subProcess = new ForkProcess(this, options);
+    //   //this.jobList.set(name, i);
 
-      // 发消息到子进程
-      //subProcess.child.send(msg);
-    }
+    //   // 发消息到子进程
+    //   //subProcess.child.send(msg);
+    // }
+
+    let subProcess = new ForkProcess(this, options);
   
-    return;
+    return subProcess;
   }
 
   _getFullpath(filepath) {

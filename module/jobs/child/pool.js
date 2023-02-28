@@ -6,14 +6,14 @@ const Ps = require('../../utils/ps');
 const Loader = require('../../loader');
 const Log = require('../../log');
 
-class ChildJob extends EventEmitter {
+class ChildJob {
 
   /**
     * constructor
     */
-  constructor() {
+  constructor(name, filepath, opt) {
     this.pools = new Map();
-    this._initEvents();
+    this.create(name, filepath, opt);
   }
 
   _initEvents() {
