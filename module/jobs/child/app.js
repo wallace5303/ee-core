@@ -1,8 +1,8 @@
 const Exception = require('ee-core/module/exception');
-Exception.start();
-
 const Loader = require('ee-core/module/loader');
 const Log = require('ee-core/module/log');
+
+Exception.start();
 
 class ChildApp {
   constructor() {

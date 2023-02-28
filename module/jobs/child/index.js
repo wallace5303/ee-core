@@ -1,18 +1,43 @@
+const EventEmitter = require('events');
+const path = require('path');
+const fs = require('fs');
 const ForkProcess = require('./forkProcess');
 const Ps = require('../../utils/ps');
+const Loader = require('../../loader');
+const Log = require('../../log');
 
-class ChildJob {
+class ChildJob extends EventEmitter {
 
   /**
     * constructor
-    * @param  {String} name - job name
-    * @param  {String} filepath - filepath
-    * @param  {Object} opt - child process options 
     */
-  constructor(name, filepath, opt = {}) {
+  constructor() {
+    this.pools = new Map();
+    this._initEvents();
+  }
 
-    //processArgs: Ps.isDev() ?  [`--inspect=${Constants.jobs.inspectStartIndex}`] : [],
+  _initEvents() {
+    // ddd
+
+  }
+
+  create(name, filepath, opt = {}) {
+
+    const isAbsolute = path.isAbsolute(filepath);
+    if (!isAbsolute) {
+      filepath = path.join(Ps.getBaseDir(), filepath);
+    }
+
+    const fullpath = Loader.resolveModule(filepath);
+    if (!fs.existsSync(fullpath)) {
+      throw new Error(`[ee-core] [module/jobs/child] file ${fullpath} not exists`);
+    }
+
     let options = Object.assign({
+      scriptArgs: {
+        name: name,
+        jobPath: fullpath
+      },
       processArgs: [],
       processOptions: { 
         //cwd: path.dirname(filepath),
@@ -21,12 +46,22 @@ class ChildJob {
       }
     }, opt);
 
-    this.childProcess = new ForkProcess(this, filepath, options.processArgs, options.processOptions);
+    const subProcess = new ForkProcess(this, options);
+    this.pools.set(subProcess.pid, subProcess);
 
-    this.jobReady = false;
-    this.exec = filepath;
-    this.name = name;
+    return subProcess;
   }
+
+  sendToChild(pid, message, ...other) {
+    if (!this.pools.has(pid)) {
+      Log.coreLogger.warn(`[ee-core] [module/jobs/child] process dose not exist  ${pid}`);
+      return;
+    }
+    const subProcess = this.pools.get(pid);
+    subProcess.child.send(message, ...other);
+    return
+  }
+
 }
 
 module.exports = ChildJob;
