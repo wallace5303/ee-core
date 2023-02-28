@@ -1,21 +1,34 @@
 const path = require('path');
 const { fork } = require('child_process');
 const Log = require('../../log');
+const Ps = require('../../utils/ps');
 
 class ForkProcess {
   constructor(host, opt = {}) {
+
+    let processCWD = Ps.getHomeDir();
+    // if (Ps.isDev()) {
+    //   cwd = path.join(Ps.getHomeDir());
+    // }
+
+    let options = Object.assign({
+      params: {},
+      processOptions: { 
+        cwd: processCWD,
+        env: Ps.allEnv(), 
+        stdio: 'pipe' 
+      }
+    }, opt);
+
     this.host = host;
     this.args = [];
     this.sleeping = false;
 
     // 传递给子进程的参数
-    this.args.push(JSON.stringify(opt.params));
+    this.args.push(JSON.stringify(options.params));
 
     const appPath = path.join(__dirname, 'app.js');
-    console.log('appPath:', appPath);
-    console.log('this.args:', this.args);
-
-    this.child = fork(appPath, this.args, opt.processOptions);
+    this.child = fork(appPath, this.args, options.processOptions);
 
     this.pid = this.child.pid;
     this._init();

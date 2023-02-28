@@ -4,7 +4,6 @@ const fs = require('fs');
 const ForkProcess = require('./forkProcess');
 const Ps = require('../../utils/ps');
 const Loader = require('../../loader');
-const Log = require('../../log');
 
 class ChildJob extends EventEmitter {
 
@@ -19,34 +18,26 @@ class ChildJob extends EventEmitter {
   run(name, filepath, opt = {}) {
 
     const jobPath = this._getFullpath(filepath);
-
     let options = Object.assign({
       times: 1,
       params: {
         jobPath
-      },
-      processOptions: { 
-        //cwd: path.dirname(jobPath),
-        env: Ps.allEnv(), 
-        stdio: 'pipe' 
       }
     }, opt);
 
     // 消息对象
-    // let msg = {
-    //   jobPath: jobPath,
-    //   params: options.params
-    // }
-    // let subProcess;
-    // for (let i = 1; i <= options.times; i++) {
-    //   subProcess = new ForkProcess(this, options);
-    //   //this.jobList.set(name, i);
+    let msg = {
+      jobPath: jobPath,
+      params: options.params
+    }
+    let subProcess;
+    for (let i = 1; i <= options.times; i++) {
+      subProcess = new ForkProcess(this, options);
+      this.jobList.set(name, i);
 
-    //   // 发消息到子进程
-    //   //subProcess.child.send(msg);
-    // }
-
-    let subProcess = new ForkProcess(this, options);
+      // 发消息到子进程
+      subProcess.child.send(msg);
+    }
   
     return subProcess;
   }
