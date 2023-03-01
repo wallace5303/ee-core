@@ -15,7 +15,7 @@ class IpcServer {
   }
 
   register () {
-    console.log('[ee-core] [module/socket/IpcServer] register channels');
+    console.log('[ee-core] [socket/IpcServer] register channels');
 
     const self = this;
     // 遍历方法
@@ -75,7 +75,7 @@ class IpcServer {
             
             return fn;
           } catch (err) {
-            Log.coreLogger.error('[ee-core] [module/socket/IpcServer] throw error:', err);
+            Log.coreLogger.error('[ee-core] [socket/IpcServer] throw error:', err);
           }
           return null;
         }

@@ -47,7 +47,7 @@ class ChildJob extends EventEmitter {
 
     const fullpath = Loader.resolveModule(filepath);
     if (!fs.existsSync(fullpath)) {
-      throw new Error(`[ee-core] [module/jobs/child] file ${fullpath} not exists`);
+      throw new Error(`[ee-core] [jobs/child] file ${fullpath} not exists`);
     }
 
     return fullpath;

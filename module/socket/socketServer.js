@@ -21,7 +21,7 @@ class SocketServer {
 
     let port = process.env.EE_SOCKET_PORT ? parseInt(process.env.EE_SOCKET_PORT) : parseInt(this.getSocketPort());
     assert(typeof port === 'number', 'socekt port required, and must be a number');
-    this.consoleLogger.info('[ee-core] [module/socket/socketServer] port is:', port);
+    this.consoleLogger.info('[ee-core] [socket/socketServer] port is:', port);
 
     // let opt = Object.assign({}, options);
     // delete opt.enable;
@@ -34,7 +34,7 @@ class SocketServer {
     this.io.on('connection', (socket) => {
       const channel = Constants.socketIo.channel.partySoftware;
       socket.on(channel, async (message, callback) => {
-        console.log('[ee-core] [module/socket/socketServer] socket id:' + socket.id + ' message cmd: ' + message.cmd);
+        console.log('[ee-core] [socket/socketServer] socket id:' + socket.id + ' message cmd: ' + message.cmd);
 
         try {
           // 找函数
@@ -55,7 +55,7 @@ class SocketServer {
           const result = await fn.call(self.app, args);
           callback(result);
         } catch (err) {
-          Log.coreLogger.error('[ee-core] [module/socket/socketServer] throw error:', err);
+          Log.coreLogger.error('[ee-core] [socket/socketServer] throw error:', err);
         }
       });
     });

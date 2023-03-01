@@ -61,7 +61,7 @@ class HttpServer {
       })
       .use(this.dispatch);
 
-    let msg = '[ee-core] [module/socket/httpServer] server is: ' + url;
+    let msg = '[ee-core] [socket/httpServer] server is: ' + url;
     if (isHttps) {
       https.createServer(sslOptions, koaApp.callback()).listen(httpServer.port, (err) => {
         msg = err ? err : msg;

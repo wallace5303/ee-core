@@ -13,10 +13,10 @@ class ChildMessage {
    */
   initEvents() {
     process.on('disconnect', () => {
-      Log.coreLogger.info(`[ee-core] [module/message/childMessage] child process disconnected:${process.pid} !`);
+      Log.coreLogger.info(`[ee-core] [message/childMessage] child process disconnected:${process.pid} !`);
     });
     process.on('exit', () => {
-      Log.coreLogger.info(`[ee-core] [module/message/childMessage] child process exited:${process.pid} !`);
+      Log.coreLogger.info(`[ee-core] [message/childMessage] child process exited:${process.pid} !`);
     });
   }
 
@@ -24,7 +24,7 @@ class ChildMessage {
    * 监听消息
    */
   onMessage(handle) {
-    Log.coreLogger.info(`[ee-core] [module/message/childMessage] Received a message ${params} from the mainProcess`);
+    Log.coreLogger.info(`[ee-core] [message/childMessage] Received a message ${params} from the mainProcess`);
 
     process.on('message', handle.bind(this));
   }
@@ -33,7 +33,7 @@ class ChildMessage {
    * 消息处理
    */
   // _handleMessage(params = {}) {
-  //   Log.coreLogger.info(`[ee-core] [module/message/childMessage] Received a message ${params} from the mainProcess`);
+  //   Log.coreLogger.info(`[ee-core] [message/childMessage] Received a message ${params} from the mainProcess`);
   // }
 
   /**

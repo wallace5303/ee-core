@@ -30,7 +30,7 @@ class ChildJob {
 
     const fullpath = Loader.resolveModule(filepath);
     if (!fs.existsSync(fullpath)) {
-      throw new Error(`[ee-core] [module/jobs/child] file ${fullpath} not exists`);
+      throw new Error(`[ee-core] [jobs/child] file ${fullpath} not exists`);
     }
 
     let options = Object.assign({
@@ -54,7 +54,7 @@ class ChildJob {
 
   sendToChild(pid, message, ...other) {
     if (!this.pools.has(pid)) {
-      Log.coreLogger.warn(`[ee-core] [module/jobs/child] process dose not exist  ${pid}`);
+      Log.coreLogger.warn(`[ee-core] [jobs/child] process dose not exist  ${pid}`);
       return;
     }
     const subProcess = this.pools.get(pid);

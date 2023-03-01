@@ -39,23 +39,23 @@ class ForkProcess {
    */
   _init() {
     this.child.on('message', (data) => {
-      Log.coreLogger.info(`[ee-core] [module/jobs/child/forkProcess] from childProcess event-message ${data}`);
+      Log.coreLogger.info(`[ee-core] [jobs/child/forkProcess] from childProcess event-message ${data}`);
     });
 
     this.child.on('disconnect', () => {
-      Log.coreLogger.info(`[ee-core] [module/jobs/child/forkProcess] from childProcess event-disconnect !`);
+      Log.coreLogger.info(`[ee-core] [jobs/child/forkProcess] from childProcess event-disconnect !`);
     });
 
     this.child.on('close', (code, signal) => {
-      Log.coreLogger.info(`[ee-core] [module/jobs/child/forkProcess] from childProcess event-close code:${code}, signal:${signal}`);
+      Log.coreLogger.info(`[ee-core] [jobs/child/forkProcess] from childProcess event-close code:${code}, signal:${signal}`);
     });
 
     this.child.on('exit', (code, signal) => {
-      Log.coreLogger.info(`[ee-core] [module/jobs/child/forkProcess] from childProcess event-exit code:${code}, signal:${signal}`);
+      Log.coreLogger.info(`[ee-core] [jobs/child/forkProcess] from childProcess event-exit code:${code}, signal:${signal}`);
     });
 
     this.child.on('error', (err) => {
-      Log.coreLogger.error(`[ee-core] [module/jobs/child/forkProcess] from childProcess event-error :${err} !`);
+      Log.coreLogger.error(`[ee-core] [jobs/child/forkProcess] from childProcess event-error :${err} !`);
     });
   }
 

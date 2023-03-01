@@ -12,7 +12,7 @@ class SocketClient {
     assert(typeof port === 'number', 'port required, and must be a number');
     
     const url  = 'http://127.0.0.1:' + port;
-    console.log('[ee-core] [module/socket/socketClient] url:', url);
+    console.log('[ee-core] [socket/socketClient] url:', url);
     this.client = IoClient(url);
   }
 

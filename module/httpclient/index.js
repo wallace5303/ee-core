@@ -152,12 +152,12 @@ function normalizeConfig(httpConfig) {
   }
 
   if (config.httpAgent.timeout < 30000) {
-    Log.coreLogger.warn('[ee-core] [module/httpclient] config.httpclient.httpAgent.timeout(%s) can\'t below 30000, auto reset to 30000',
+    Log.coreLogger.warn('[ee-core] [httpclient] config.httpclient.httpAgent.timeout(%s) can\'t below 30000, auto reset to 30000',
       config.httpAgent.timeout);
     config.httpAgent.timeout = 30000;
   }
   if (config.httpsAgent.timeout < 30000) {
-    Log.coreLogger.warn('[ee-core] [module/httpclient] config.httpclient.httpsAgent.timeout(%s) can\'t below 30000, auto reset to 30000',
+    Log.coreLogger.warn('[ee-core] [httpclient] config.httpclient.httpsAgent.timeout(%s) can\'t below 30000, auto reset to 30000',
       config.httpsAgent.timeout);
     config.httpsAgent.timeout = 30000;
   }
