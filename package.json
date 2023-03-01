@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "bin": {
-    "ee-core": "./bin/tools.js"
+    "ee-core": "./module/bin/tools.js"
   },
   "dependencies": {
     "agentkeepalive": "^4.2.0",

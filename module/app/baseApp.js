@@ -3,11 +3,11 @@ const EE_PATH = Symbol.for('ee#eePath');
 const path = require('path');
 const EE_LOADER = Symbol.for('ee#loader');
 const AppLoader = require('./appLoader');
-const HttpClient = require('../module/httpclient');
+const HttpClient = require('../httpclient');
 const HTTPCLIENT = Symbol('EeApplication#httpclient');
 const LOGGERS = Symbol('EeApplication#loggers');
-const Log = require('../module/log');
-const Storage = require('../module/storage');
+const Log = require('../log');
+const Storage = require('../storage');
 
 class BaseApp extends EeAppCore {
   constructor (options = {}) {

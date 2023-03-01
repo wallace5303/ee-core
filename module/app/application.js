@@ -80,8 +80,6 @@ class Appliaction extends EeApp {
     await this.ready();
 
     await this.createElectronApp();
-
-    await this.catchLog();
   } 
 }
 

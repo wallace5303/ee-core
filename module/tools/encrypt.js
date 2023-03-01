@@ -7,7 +7,7 @@ const is = require('is-type-of');
 const bytenode = require('bytenode');
 const crypto = require('crypto');
 const JavaScriptObfuscator = require('javascript-obfuscator');
-const UtilsJson = require('../module/utils/json');
+const UtilsJson = require('../utils/json');
 
 class Encrypt {
   constructor() {

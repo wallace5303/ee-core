@@ -1,8 +1,16 @@
 
-const Exception = require('ee-core/module/exception');
+// const Exception = require('../../exception');
+// const Loader = require('../../loader');
+// const Log = require('../../log');
+// __dirname.indexOf("node_modules") == -1
+
+// const Exception = require('ee-core/module/exception');
+// const Loader = require('ee-core/module/loader');
+// const Log = require('ee-core/module/log');
+
+// const is = require('is-type-of');
+// const UtilsCore = require('../../core/lib/utils');
 Exception.start();
-const Loader = require('ee-core/module/loader');
-const Log = require('ee-core/module/log');
 
 class ChildApp {
   constructor() {
@@ -13,13 +21,13 @@ class ChildApp {
    * 初始化事件监听
    */
   _initEvents() {
+    process.on('message', this._handleMessage.bind(this));
     process.on('disconnect', () => {
       Log.coreLogger.info(`[ee-core] [module/message/childMessage] child process disconnected:${process.pid} !`);
     });
     process.on('exit', () => {
       Log.coreLogger.info(`[ee-core] [module/message/childMessage] child process exited:${process.pid} !`);
     });
-    process.on('message', this._handleMessage.bind(this));
   }
 
   /**
@@ -34,7 +42,10 @@ class ChildApp {
   run(msg = {}) {
     Log.coreLogger.info('[ee-core] [child-process] run');
 
-    Loader.loadJobFile(msg.jobPath, msg.params);
+    const ret = Loader.loadJobFile(msg.jobPath, msg.params);
+    // if (is.function(ret) && !is.class(ret) && !UtilsCore.isBytecodeClass(ret)) {
+    //   ret = ret(...inject);
+    // }
   }
 }
 

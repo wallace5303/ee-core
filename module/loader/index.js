@@ -50,9 +50,6 @@ module.exports = {
     }
 
     const ret = UtilsCore.loadFile(filepath);
-    if (is.function(ret) && !is.class(ret) && !UtilsCore.isBytecodeClass(ret)) {
-      ret = ret(...inject);
-    }
     return ret;
   },  
 

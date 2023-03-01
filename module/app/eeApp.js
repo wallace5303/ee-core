@@ -8,7 +8,7 @@ const Koa = require('koa');
 const koaServe = require('koa-static');
 const https = require('https');
 const BaseApp = require('./baseApp');
-const Log = require('../module/log');
+const Log = require('../log');
 
 class EeApp extends BaseApp {
   constructor(options = {}) {
@@ -51,7 +51,7 @@ class EeApp extends BaseApp {
    * 启动通信模块
    */
   async startSocket () {
-    const socket = require('../module/socket/start');
+    const socket = require('../socket/start');
     socket(this);
   }
   
