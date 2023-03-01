@@ -13,8 +13,6 @@ class ChildApp {
    * 初始化事件监听
    */
   _initEvents() {
-    Log.info('[ee-core] [child-process] init Events');
-
     process.on('disconnect', () => {
       Log.coreLogger.info(`[ee-core] [module/message/childMessage] child process disconnected:${process.pid} !`);
     });

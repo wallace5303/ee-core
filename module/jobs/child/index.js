@@ -20,9 +20,6 @@ class ChildJob extends EventEmitter {
     const jobPath = this._getFullpath(filepath);
     let options = Object.assign({
       times: 1,
-      params: {
-        jobPath
-      }
     }, opt);
 
     // 消息对象
@@ -39,7 +36,7 @@ class ChildJob extends EventEmitter {
       subProcess.child.send(msg);
     }
   
-    return subProcess;
+    return;
   }
 
   _getFullpath(filepath) {
