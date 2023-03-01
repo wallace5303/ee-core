@@ -13,7 +13,7 @@ module.exports = {
 
     // 加载ee-core的插件 和 用户插件
     const directorys = [
-      path.join(this.options.framework, 'addon'),
+      path.join(this.options.framework, 'module', 'addon'),
       path.join(this.options.baseDir, 'addon'),
     ]
     opt = Object.assign({

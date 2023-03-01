@@ -4,7 +4,7 @@ const { ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const globby = require('globby');
-const Utils = require('../../core/lib/utils');
+const Utils = require('../core/lib/utils');
 const Wrap = require('../utils/wrap');
 const Log = require('../log');
 
