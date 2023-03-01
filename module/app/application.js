@@ -1,3 +1,5 @@
+const Exception = require('../exception');
+Exception.start();
 const {app} = require('electron');
 const path = require('path');
 const debug = require('debug')('ee-core:Appliaction');
