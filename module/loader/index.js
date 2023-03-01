@@ -36,22 +36,47 @@ module.exports = {
   },
 
   /**
-   * 加载job文件
+   * 加载js文件
    *
    * @param {String} filepath - fullpath
-   * @param {Array} inject - pass rest arguments into the function when invoke
-   * @return {Object} exports
+   * @return {Any} exports
    * @since 1.0.0
    */
-  loadJobFile (filepath, ...inject) {
+  loadJsFile (filepath) {
     if (!fs.existsSync(filepath)) {
-      let warnMsg = `[ee-core] [loader] loadJobFile ${filepath} does not exist`;
-      Log.coreLogger.error(warnMsg);
+      let errMsg = `[ee-core] [loader] loadJobFile ${filepath} does not exist`;
+      Log.coreLogger.error(errMsg);
+      return;
     }
 
     const ret = UtilsCore.loadFile(filepath);
     return ret;
   },  
+
+  /**
+   * 加载并运行js文件
+   *
+   * @param {String} filepath - fullpath
+   * @param {Array} inject - pass rest arguments into the function when invoke
+   * @return {Any}
+   * @since 1.0.0
+   */
+  execJsFile (filepath, ...inject) {
+    if (!fs.existsSync(filepath)) {
+      let errMsg = `[ee-core] [loader] loadJobFile ${filepath} does not exist`;
+      Log.coreLogger.error(errMsg);
+      return;
+    }
+
+    let ret = UtilsCore.loadFile(filepath);
+    if (is.class(ret) || UtilsCore.isBytecodeClass(ret)) {
+      ret = new ret(inject);
+    } else if (is.function(ret)) {
+      ret = ret(inject);
+    }
+
+    return ret;
+  }, 
 
   /**
    * 模块的绝对路径

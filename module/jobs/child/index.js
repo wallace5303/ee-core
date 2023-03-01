@@ -20,6 +20,7 @@ class ChildJob extends EventEmitter {
     const jobPath = this._getFullpath(filepath);
     let options = Object.assign({
       times: 1,
+      params: {},
     }, opt);
 
     // 消息对象

@@ -12,7 +12,6 @@ class ForkProcess {
     // }
 
     let options = Object.assign({
-      params: {},
       processOptions: { 
         cwd: processCWD,
         env: Ps.allEnv(), 
@@ -25,7 +24,7 @@ class ForkProcess {
     this.sleeping = false;
 
     // 传递给子进程的参数
-    this.args.push(JSON.stringify(options.params));
+    //this.args.push(JSON.stringify(options.params));
 
     const appPath = path.join(__dirname, 'app.js');
     this.child = fork(appPath, this.args, options.processOptions);
