@@ -1,7 +1,7 @@
 const path = require('path');
 const Storage = require('../storage');
 const Constants = require('../const');
-const Ps = require('./ps');
+const Ps = require('../ps');
 const UtilsJson = require('./json');
 
 /**

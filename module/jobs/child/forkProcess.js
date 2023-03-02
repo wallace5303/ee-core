@@ -1,9 +1,7 @@
 const path = require('path');
 const { fork } = require('child_process');
-const serialize = require('serialize-javascript');
 const Log = require('../../log');
 const Ps = require('../../ps');
-const Channel = require('../../const/channel');
 
 class ForkProcess {
   constructor(host, opt = {}) {
@@ -21,7 +19,7 @@ class ForkProcess {
     this.sleeping = false;
 
     // 传递给子进程的参数
-    //this.args.push(JSON.stringify(options.params));
+    this.args.push(JSON.stringify(options.params));
 
     const appPath = path.join(__dirname, 'app.js');
     this.child = fork(appPath, this.args, options.processOptions);
@@ -31,51 +29,13 @@ class ForkProcess {
   }
 
   /**
-   * 进程初始化
+   * 初始化事件监听
    */
   _init() {
-    this.child.on('message', (m) => {
-      Log.coreLogger.info(`[ee-core] [jobs/child/forkProcess] from childProcess event-message: ${serialize(m)}`);
-      if (m.channel == Channel.process.showException) {
-        Log.coreLogger.error(`${m.data}`);
-      }
-    });
-
-    this.child.on('disconnect', () => {
-      Log.coreLogger.info(`[ee-core] [jobs/child/forkProcess] from childProcess event-disconnect !`);
-    });
-
-    this.child.on('close', (code, signal) => {
-      Log.coreLogger.info(`[ee-core] [jobs/child/forkProcess] from childProcess event-close code:${code}, signal:${signal}`);
-    });
-
     this.child.on('exit', (code, signal) => {
       Log.coreLogger.info(`[ee-core] [jobs/child/forkProcess] from childProcess event-exit code:${code}, signal:${signal}`);
     });
-
-    this.child.on('error', (err) => {
-      Log.coreLogger.error(`[ee-core] [jobs/child/forkProcess] from childProcess event-error: ${err} !`);
-    });
   }
-
-  /**
-   * 进程挂起
-   */
-  sleep() {
-    if (this.sleeping) return;
-    process.kill(this.pid, 'SIGSTOP');
-    this.sleeping = true;
-  }
-
-  /**
-   * 进程唤醒
-   */
-  wakeup() {
-    if (!this.sleeping) return;
-    process.kill(this.pid, 'SIGCONT');
-    this.sleeping = false;
-  }
-
 }
 
 module.exports = ForkProcess;

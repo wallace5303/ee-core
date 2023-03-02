@@ -4,11 +4,13 @@ const fs = require('fs');
 const ForkProcess = require('./forkProcess');
 const Ps = require('../../ps');
 const Loader = require('../../loader');
+const Helper = require('../../utils/helper');
 
 class ChildJob extends EventEmitter {
 
   constructor() {
     super();
+    this.jobList = new Map();
   }
 
   /**
@@ -17,14 +19,36 @@ class ChildJob extends EventEmitter {
   exec(filepath, opt = {}) {
     const jobPath = this._getFullpath(filepath);
     let options = Object.assign({
-      times: 1,
       params: {},
     }, opt);
 
-    for (let i = 1; i <= times; i++) {
-      new ForkProcess(this, options);
+    // 消息对象
+    const mid = Helper.getRandomString();
+    let msg = {
+      mid,
+      jobPath,
+      params: options.params
     }
-    
+
+    let subProcess = new ForkProcess(this, options);
+
+    // todo 是否会发生监听未完成时，接收不到消息？
+    // 发消息到子进程，
+    subProcess.child.send(msg);
+  
+    return subProcess;
+  }
+
+  /**
+   * todo 运行job
+   */  
+  run(name, filepath, opt = {}) {
+    let times = opt.times || 1;
+
+    for (let i = 1; i <= times; i++) {
+      this.exec(filepath, opt);
+    }
+  
     return;
   }
 

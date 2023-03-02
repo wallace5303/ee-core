@@ -219,3 +219,10 @@ exports.isEncrypted = function () {
 exports.isHotReload = function () {
   return process.env.HOT_RELOAD === 'true';
 }
+
+/**
+ * 进程退出
+ */
+exports.exit = function(code = 0) {
+  return process.exit(code);
+}
