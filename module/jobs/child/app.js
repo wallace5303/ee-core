@@ -22,17 +22,33 @@ Exception.start();
 
 class ChildApp {
   constructor() {
-    const args = process.argv[2];
-    this.args = JSON.parse(args);
-    this.run();
+    this._initEvents();
+  }
+
+  /**
+   * 初始化事件监听
+   */
+  _initEvents() {
+    process.on('message', this._handleMessage.bind(this));
+    process.on('exit', (code) => {
+      Log.coreLogger.info(`[ee-core] [jobs/child] received a exit from main-process, code:${code}, pid:${process.pid}`);
+    });
+  }
+
+  /**
+   * 监听消息
+   */
+  _handleMessage(m) {
+    this.run(m);
+    Log.coreLogger.info(`[ee-core] [jobs/child] received a message from main-process, message: ${JSON.stringify(m)}`);
   }
 
   /**
    * 运行脚本
    */  
-  run() {
-    let filepath = this.args.jobPath;
-    let params = this.args.jobParams;
+  run(msg = {}) {
+    let filepath = msg.jobPath;
+    let params = msg.jobParams;
 
     let mod = Loader.loadJsFile(filepath);
     if (is.class(mod) || UtilsCore.isBytecodeClass(mod)) {
@@ -41,8 +57,6 @@ class ChildApp {
     } else if (is.function(mod)) {
       mod(params);
     }
-
-    Log.coreLogger.info('[ee-core] [child-process] job run');
   }
 }
 
