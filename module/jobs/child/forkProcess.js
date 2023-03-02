@@ -32,9 +32,9 @@ class ForkProcess {
    * 初始化事件监听
    */
   _init() {
-    this.child.on('exit', (code, signal) => {
-      Log.coreLogger.info(`[ee-core] [jobs/child/forkProcess] from childProcess event-exit code:${code}, signal:${signal}`);
-    });
+    // this.child.on('exit', (code, signal) => {
+    //   Log.coreLogger.info(`[ee-core] [jobs/child/forkProcess] from childProcess event-exit code:${code}, signal:${signal}`);
+    // });
   }
 }
 

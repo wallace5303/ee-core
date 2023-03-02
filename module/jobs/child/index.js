@@ -18,10 +18,13 @@ class ChildJob extends EventEmitter {
     const jobPath = this._getFullpath(filepath);
     let options = Object.assign({
       times: 1,
-      params: {},
+      params: {
+        jobPath,
+        jobParams: {}
+      },
     }, opt);
 
-    for (let i = 1; i <= times; i++) {
+    for (let i = 1; i <= options.times; i++) {
       new ForkProcess(this, options);
     }
     

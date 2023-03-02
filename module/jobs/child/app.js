@@ -22,25 +22,17 @@ Exception.start();
 
 class ChildApp {
   constructor() {
-    this._initEvents();
+    const args = process.argv[2];
+    this.args = JSON.parse(args);
     this.run();
-  }
-
-  /**
-   * 初始化事件监听
-   */
-  _initEvents() {
-    process.on('exit', (code) => {
-      Log.coreLogger.info(`[ee-core] [message/childMessage] child process exit code:${code}, pid:${process.pid}`);
-    });
   }
 
   /**
    * 运行脚本
    */  
-  run(msg = {}) {
-    let filepath = msg.jobPath;
-    let params = msg.params;
+  run() {
+    let filepath = this.args.jobPath;
+    let params = this.args.jobParams;
 
     let mod = Loader.loadJsFile(filepath);
     if (is.class(mod) || UtilsCore.isBytecodeClass(mod)) {
