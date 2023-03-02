@@ -15,21 +15,18 @@ class ChildJob extends EventEmitter {
   /**
    * 执行一个job文件
    */  
-  exec(filepath, opt = {}) {
+  exec(filepath, params = {}, opt = {}) {
     const jobPath = this._getFullpath(filepath);
-    let options = Object.assign({
-      params: {},
-    }, opt);
 
     // 消息对象
     const mid = Helper.getRandomString();
     let msg = {
       mid,
       jobPath,
-      jobParams: options.params
+      jobParams: params
     }
 
-    let subProcess = new ForkProcess(this, options);
+    let subProcess = new ForkProcess(this, opt);
 
     // todo 是否会发生监听未完成时，接收不到消息？
     // 发消息到子进程
