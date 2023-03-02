@@ -5,17 +5,18 @@ let Loader;
 let Log;
 let UtilsCore;
 
+// 开发环境下，ee-core是soft link
 if (__dirname.indexOf("node_modules") == -1) {
   Exception = require('../../exception');
   Loader = require('../../loader');
   Log = require('../../log');
   UtilsCore = require('../../core/lib/utils');
+} else {
+  Exception = require('ee-core/module/exception');
+  Loader = require('ee-core/module/loader');
+  Log = require('ee-core/module/log');
+  UtilsCore = require('../../core/lib/utils');
 }
-
-// const Exception = require('ee-core/module/exception');
-// const Loader = require('ee-core/module/loader');
-// const Log = require('ee-core/module/log');
-// const UtilsCore = require('../../core/lib/utils');
 
 Exception.start();
 
