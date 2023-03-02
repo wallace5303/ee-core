@@ -2,8 +2,9 @@ const EventEmitter = require('events');
 const path = require('path');
 const fs = require('fs');
 const ForkProcess = require('./forkProcess');
-const Ps = require('../../utils/ps');
+const Ps = require('../../ps');
 const Loader = require('../../loader');
+const Helper = require('../../utils/helper');
 
 class ChildJob extends EventEmitter {
 
@@ -13,28 +14,39 @@ class ChildJob extends EventEmitter {
   }
 
   /**
-   * 运行任务
+   * 执行一个job文件
    */  
-  run(name, filepath, opt = {}) {
-    
+  exec(filepath, opt = {}) {
     const jobPath = this._getFullpath(filepath);
     let options = Object.assign({
-      times: 1,
       params: {},
     }, opt);
 
     // 消息对象
+    const mid = Helper.getRandomString();
     let msg = {
-      jobPath: jobPath,
+      mid,
+      jobPath,
       params: options.params
     }
-    let subProcess;
-    for (let i = 1; i <= options.times; i++) {
-      subProcess = new ForkProcess(this, options);
-      this.jobList.set(name, i);
 
-      // 发消息到子进程
-      subProcess.child.send(msg);
+    let subProcess = new ForkProcess(this, options);
+
+    // todo 是否会发生监听未完成时，接收不到消息？
+    // 发消息到子进程，
+    subProcess.child.send(msg);
+  
+    return subProcess;
+  }
+
+  /**
+   * todo 运行job
+   */  
+  run(name, filepath, opt = {}) {
+    let times = opt.times || 1;
+
+    for (let i = 1; i <= times; i++) {
+      this.exec(filepath, opt);
     }
   
     return;

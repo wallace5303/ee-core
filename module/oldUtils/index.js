@@ -4,7 +4,7 @@
 
 const path = require('path');
 const UtilsJson = require('../utils/json');
-const UtilsPs = require('../utils/ps');
+const UtilsPs = require('../ps');
 const UtilsHelper = require('../utils/helper');
 const Copy = require('../utils/copyto');
 const Storage = require('../storage');

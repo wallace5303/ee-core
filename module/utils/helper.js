@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path');
 const mkdirp = require('mkdirp');
 const convert = require('koa-convert');
 const is = require('is-type-of');

@@ -6,7 +6,7 @@ const FileSync = require('./jsondb/adapters/FileSync');
 const _ = require('lodash');
 const Constants = require('../const');
 const Helper = require('../utils/helper');
-const Ps = require('../utils/ps');
+const Ps = require('../ps');
 
 class JsondbStorage {
   constructor (name, opt = {}) {

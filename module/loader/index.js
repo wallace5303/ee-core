@@ -2,7 +2,7 @@ const is = require('is-type-of');
 const fs = require('fs');
 const path = require('path');
 const UtilsCore = require('../core/lib/utils');
-const Ps = require('../utils/ps');
+const Ps = require('../ps');
 const Log = require('../log');
 
 module.exports = {

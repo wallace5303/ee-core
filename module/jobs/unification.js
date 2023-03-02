@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const RendererJob = require('./renderer');
 const ChildJob = require('./child/pool');
-const Ps = require('../utils/ps');
+const Ps = require('../ps');
 const Loader = require('../loader');
 
 class Jobs  {

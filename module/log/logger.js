@@ -1,6 +1,6 @@
 const Loggers = require('egg-logger').EggLoggers;
 const assert = require('assert');
-const Ps = require('../utils/ps');
+const Ps = require('../ps');
 const Storage = require('../storage');
 
 module.exports = {

@@ -2,7 +2,7 @@ const path = require('path');
 const { fork } = require('child_process');
 const serialize = require('serialize-javascript');
 const Log = require('../../log');
-const Ps = require('../../utils/ps');
+const Ps = require('../../ps');
 const Channel = require('../../const/channel');
 
 class ForkProcess {

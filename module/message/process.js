@@ -1,4 +1,4 @@
-const Ps = require('../utils/ps');
+const Ps = require('../ps');
 
 const message = {
 

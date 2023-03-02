@@ -1,4 +1,4 @@
-const Ps = require('../utils/ps');
+const Ps = require('../ps');
 const EEChildMessage = Symbol('EeCore#Module#ChildMessage');
 
 const message = {

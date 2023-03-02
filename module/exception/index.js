@@ -1,5 +1,5 @@
 const Log = require('../log');
-const Ps = require('../utils/ps');
+const Ps = require('../ps');
 const Channel = require('../const/channel');
 
 /**

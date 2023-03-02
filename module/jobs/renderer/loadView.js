@@ -1,4 +1,4 @@
-const Ps = require('../../utils/ps');
+const Ps = require('../../ps');
 
 /**
   * loadView 生成BrowserWindow的html content

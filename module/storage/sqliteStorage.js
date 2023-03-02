@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const Database = require('better-sqlite3');
 const Helper = require('../utils/helper');
-const Ps = require('../utils/ps');
+const Ps = require('../ps');
 
 class SqliteStorage {
   constructor (name, opt = {}) {

@@ -9,7 +9,7 @@ const FileLoader = require('./file_loader');
 const ContextLoader = require('./context_loader');
 const Utils = require('../utils');
 const Timing = require('../utils/timing');
-const Ps = require('../../../utils/ps');
+const Ps = require('../../../ps');
 
 const REQUIRE_COUNT = Symbol('EeLoader#requireCount');
 
