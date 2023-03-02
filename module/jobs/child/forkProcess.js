@@ -1,19 +1,16 @@
 const path = require('path');
 const { fork } = require('child_process');
+const serialize = require('serialize-javascript');
 const Log = require('../../log');
 const Ps = require('../../utils/ps');
+const Channel = require('../../const/channel');
 
 class ForkProcess {
   constructor(host, opt = {}) {
-
-    let processCWD = Ps.getHomeDir();
-    // if (Ps.isDev()) {
-    //   cwd = path.join(Ps.getHomeDir());
-    // }
-
+    
     let options = Object.assign({
       processOptions: { 
-        cwd: processCWD,
+        cwd: Ps.getHomeDir(),
         env: Ps.allEnv(), 
         stdio: 'pipe' 
       }
@@ -37,8 +34,11 @@ class ForkProcess {
    * 进程初始化
    */
   _init() {
-    this.child.on('message', (data) => {
-      Log.coreLogger.info(`[ee-core] [jobs/child/forkProcess] from childProcess event-message ${data}`);
+    this.child.on('message', (m) => {
+      Log.coreLogger.info(`[ee-core] [jobs/child/forkProcess] from childProcess event-message: ${serialize(m)}`);
+      if (m.channel == Channel.process.showException) {
+        Log.coreLogger.error(`${m.data}`);
+      }
     });
 
     this.child.on('disconnect', () => {
@@ -54,7 +54,7 @@ class ForkProcess {
     });
 
     this.child.on('error', (err) => {
-      Log.coreLogger.error(`[ee-core] [jobs/child/forkProcess] from childProcess event-error :${err} !`);
+      Log.coreLogger.error(`[ee-core] [jobs/child/forkProcess] from childProcess event-error: ${err} !`);
     });
   }
 

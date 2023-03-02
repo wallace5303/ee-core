@@ -1,4 +1,6 @@
 const Log = require('../log');
+const Ps = require('../utils/ps');
+const Channel = require('../const/channel');
 
 /**
  * 捕获异常
@@ -22,6 +24,8 @@ exports.uncaughtExceptionHandler = function() {
     }
 
     Log.coreLogger.error(err);
+
+    devError(err);
   });
 }
 
@@ -59,5 +63,23 @@ exports.unhandledRejectionHandler = function() {
     }
 
     Log.coreLogger.error(err);
+
+    devError(err);
   });
+}
+
+/**
+ * 如果是子进程，发送错误到主进程控制台
+ */
+function devError (err) {
+  if (Ps.isForkedChild() && Ps.isDev()) {
+    let msgChannel = Channel.process.showException;
+    let errTips = (err && typeof err == 'object') ? err.toString() : '';
+    errTips += ' Error !!! Please See file ee-core.log or ee-error-xxx.log for details !'
+    let message = {
+      channel: msgChannel,
+      data: errTips
+    }
+    process.send(message);
+  }
 }

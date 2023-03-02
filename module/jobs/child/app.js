@@ -40,9 +40,9 @@ class ChildApp {
   /**
    * 监听消息
    */
-  _handleMessage(message) {
-    this.run(message);
-    Log.coreLogger.info(`[ee-core] [message/childMessage] Received a message ${JSON.stringify(message)} from the mainProcess`);
+  _handleMessage(m) {
+    this.run(m);
+    Log.coreLogger.info(`[ee-core] [message/childMessage] Received a message ${JSON.stringify(m)} from the mainProcess`);
   }
 
   /**
@@ -54,11 +54,9 @@ class ChildApp {
 
     let mod = Loader.loadJsFile(filepath);
     if (is.class(mod) || UtilsCore.isBytecodeClass(mod)) {
-      Log.coreLogger.info('[ee-core] [child-process] is class');
       let jobClass = new mod(params);
       jobClass.handle();
     } else if (is.function(mod)) {
-      Log.coreLogger.info('[ee-core] [child-process] is function');
       mod(params);
     }
 

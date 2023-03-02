@@ -16,7 +16,7 @@ class ChildJob extends EventEmitter {
    * 运行任务
    */  
   run(name, filepath, opt = {}) {
-
+    
     const jobPath = this._getFullpath(filepath);
     let options = Object.assign({
       times: 1,
