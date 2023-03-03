@@ -1,5 +1,4 @@
 const Exception = require('../exception');
-Exception.start();
 const {app} = require('electron');
 const path = require('path');
 const debug = require('debug')('ee-core:Appliaction');
@@ -8,6 +7,7 @@ const EeApp = require('./eeApp');
 
 class Appliaction extends EeApp {
   constructor() {
+    Exception.start();
     const { env } = process;
     let options = {
       env: 'prod',
