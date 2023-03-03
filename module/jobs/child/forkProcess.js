@@ -39,6 +39,12 @@ class ForkProcess {
       if (m.channel == Channel.process.showException) {
         Log.coreLogger.error(`${m.data}`);
       }
+
+      // 收到子进程消息，转发到 event 
+      if (m.channel == Channel.process.sendToMain) {
+        this.host.emit(m.event, m.data);
+      }
+
     });
 
     this.child.on('exit', (code, signal) => {

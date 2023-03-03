@@ -226,3 +226,16 @@ exports.isHotReload = function () {
 exports.exit = function(code = 0) {
   return process.exit(code);
 }
+
+/**
+ * 格式化message
+ */
+exports.makeMessage = function(msg = {}) {
+  let message = Object.assign({
+    channel: '',
+    event: '', 
+    data: {}
+  }, msg);
+
+  return message;
+}

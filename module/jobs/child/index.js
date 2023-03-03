@@ -10,6 +10,17 @@ class ChildJob extends EventEmitter {
 
   constructor() {
     super();
+    this.initEvents();
+  }
+
+  /**
+   * 初始化监听
+   */  
+  initEvents = () => {
+
+    // this.on('forked_message', ({data, id}) => {
+    //   this.onMessage({data, id});
+    // });
   }
 
   /**
