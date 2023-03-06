@@ -9,11 +9,14 @@ const koaServe = require('koa-static');
 const https = require('https');
 const BaseApp = require('./baseApp');
 const Log = require('../log');
+const Electron = require('../electron');
+const Conf = require('../conf');
 
 class EeApp extends BaseApp {
   constructor(options = {}) {
     super(options);
 
+    //this.electron = Electron;
     this.electron = {
       mainWindow: null,
       tray: null,
@@ -44,7 +47,7 @@ class EeApp extends BaseApp {
     }
     
     // 更新db配置
-    this.getCoreDB().setItem('config', this.config);
+    Conf.setAll(this.config);
   }
 
   /**

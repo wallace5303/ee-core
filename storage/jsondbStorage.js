@@ -91,6 +91,43 @@ class JsondbStorage {
       .value();
   
     return data;
+  }
+
+  /**
+   * 设置config对象key属性的值
+   */
+  setConfigItem (key, value) {
+    assert(_.isString(key), `key must be a string`);
+    assert(key.length != 0, `key cannot be empty`);
+    assert(!this.storageKey.hasOwnProperty(key), `${key} is not allowed`);
+
+    let cacheKey = this.storageKey.cacheConfig;
+    if (!this.db.has(cacheKey).value()) {
+      this.db.set(cacheKey, {}).write();
+    }
+
+    let keyId = cacheKey + "." + key; 
+    this.db
+      .set(keyId, value)
+      .write();
+  
+    return true;
+  }
+  
+  /**
+   * 获取config对象key属性的值
+   */
+  getConfigItem (key) {
+    assert(_.isString(key), `key must be a string`);
+    assert(key.length != 0, `key cannot be empty`);
+
+    let cacheKey = this.storageKey.cacheConfig;
+    let keyId = cacheKey + "." + key; 
+    const data = this.db
+      .get(keyId)
+      .value();
+  
+    return data;
   }   
 }
 
