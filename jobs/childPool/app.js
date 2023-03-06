@@ -12,9 +12,9 @@ if (__dirname.indexOf("node_modules") == -1) {
   Log = require('../../log');
   UtilsCore = require('../../core/lib/utils');
 } else {
-  Exception = require('ee-core/module/exception');
-  Loader = require('ee-core/module/loader');
-  Log = require('ee-core/module/log');
+  Exception = require('ee-core/exception');
+  Loader = require('ee-core/loader');
+  Log = require('ee-core/log');
   UtilsCore = require('../../core/lib/utils');
 }
 
