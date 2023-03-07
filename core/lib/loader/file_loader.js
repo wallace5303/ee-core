@@ -10,6 +10,7 @@ const deprecate = require('depd')('ee');
 const Utils = require('../utils');
 const FULLPATH = Symbol('EE_LOADER_ITEM_FULLPATH');
 const EXPORTS = Symbol('EE_LOADER_ITEM_EXPORTS');
+const Addon = require('../../../addon');
 
 const defaults = {
   directory: null,
