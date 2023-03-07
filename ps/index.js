@@ -21,6 +21,13 @@ exports.env = function() {
 exports.getEnv = this.env
 
 /**
+ * 是否生产环境
+ */
+exports.isProd = function() {
+  return (process.env.EE_SERVER_ENV === 'prod');
+}
+
+/**
  * 是否为开发环境
  */
 exports.isDev = function() {

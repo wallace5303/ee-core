@@ -1,24 +1,32 @@
-const {app, BrowserWindow, Menu, protocol} = require('electron');
-const Logger = require('./logger');
-const MainWindow = require('./mainWindow');
+const Window = require('./window');
+const EEMainWindow = Symbol('Ee#electron#mainWindow');
 
 const Electron = {
+
+  /**
+   * 获取 mainWindow
+   */
+  getMainWindow() {
+    if (!this[EEMainWindow]) {
+      this[EEMainWindow] = Window.createWindow();
+    }
+
+    return this[EEMainWindow] || null;
+  },
+
+  /**
+   * 兼容1.x版本api
+   */
+  get mainWindow() {
+    return this.getMainWindow();
+  },
 
   /**
    * extra
    */
   extra: {
     closeWindow: false,
-  },
-
-  /**
-   * logger
-   */
-  get mainWindow() {
-    return MainWindow;
-  },
-
-
+  },  
 };
 
 module.exports = Electron;

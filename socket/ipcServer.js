@@ -15,8 +15,6 @@ class IpcServer {
   }
 
   register () {
-    console.log('[ee-core] [socket/IpcServer] register channels');
-
     const self = this;
     // 遍历方法
     const files = Utils.filePatterns();

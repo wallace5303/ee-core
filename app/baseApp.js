@@ -8,7 +8,7 @@ const HTTPCLIENT = Symbol('EeApplication#httpclient');
 const LOGGERS = Symbol('EeApplication#loggers');
 const Log = require('../log');
 const Storage = require('../storage');
-const Conf = require('../conf');
+const Conf = require('../config');
 
 class BaseApp extends EeAppCore {
   constructor (options = {}) {

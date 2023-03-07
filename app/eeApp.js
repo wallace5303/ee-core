@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
 const getPort = require('get-port');
-const {app, BrowserWindow, Menu, protocol} = require('electron');
+const { app } = require('electron');
 const is = require('is-type-of');
 const Koa = require('koa');
 const koaServe = require('koa-static');
@@ -10,20 +10,15 @@ const https = require('https');
 const BaseApp = require('./baseApp');
 const Log = require('../log');
 const Electron = require('../electron');
-const Conf = require('../conf');
+const Conf = require('../config');
+const Ps = require('../ps');
 
 class EeApp extends BaseApp {
   constructor(options = {}) {
     super(options);
 
-    //this.electron = Electron;
-    this.electron = {
-      mainWindow: null,
-      tray: null,
-      extra: {
-        closeWindow: false,
-      },
-    };
+    this.electron = Electron;
+    this.mainWindow;
   }
 
   /**
@@ -89,7 +84,7 @@ class EeApp extends BaseApp {
     })
 
     app.on('before-quit', () => {
-      self.electron.extra.closeWindow = true;
+      Electron.extra.closeWindow = true;
     })
 
     if (this.config.hardGpu.enable == false) {
@@ -104,27 +99,8 @@ class EeApp extends BaseApp {
    */
   async createWindow () {
 
-    // todo
-    const protocolName = 'eefile';
-    protocol.registerFileProtocol(protocolName, (request, callback) => {
-      const url = request.url.substring(protocolName.length + 3);
-      console.log('[ee-core] [lib/eeApp] registerFileProtocol ----url: ', url);
-      callback({ path: path.normalize(decodeURIComponent(url)) })
-    });
-
-    const winOptions = this.config.windowsOption;
-    this.electron.mainWindow = new BrowserWindow(winOptions);
-    let win = this.electron.mainWindow;
-
-    // 菜单显示/隐藏
-    if (this.config.openAppMenu === 'dev-show'
-      && this.config.env == 'prod') {
-      Menu.setApplicationMenu(null);
-    } else if (this.config.openAppMenu === false) {
-      Menu.setApplicationMenu(null);
-    } else {
-      // nothing 
-    }
+    // 初始化一个主窗口
+    this.mainWindow = Electron.getMainWindow();
 
     await this.windowReady();
   
@@ -133,22 +109,17 @@ class EeApp extends BaseApp {
     await this._loderPreload();
 
     this.selectAppType();
-
-    // DevTools
-    if (!app.isPackaged && this.config.openDevTools) {
-      win.webContents.openDevTools();
-    }
   }
 
   /**
    * 还原窗口
    */
   restoreMainWindow () {
-    if (this.electron.mainWindow) {
-      if (this.electron.mainWindow.isMinimized()) {
-        this.electron.mainWindow.restore();
+    if (this.mainWindow) {
+      if (this.mainWindow.isMinimized()) {
+        this.mainWindow.restore();
       }
-      this.electron.mainWindow.show()
+      this.mainWindow.show()
     }
   }
 
@@ -175,7 +146,7 @@ class EeApp extends BaseApp {
 
     // html模式
     if (selectMode == 'html') {
-      if (this.config.env !== 'prod') {
+      if (Ps.isDev()) {
         staticDir = path.join(this.config.homeDir, 'frontend', 'dist');
       }
       this.loadLocalWeb('html', staticDir, modeInfo);
@@ -185,7 +156,7 @@ class EeApp extends BaseApp {
     // 单页应用
     const protocol = modeInfo.protocol || 'http://';
     url = protocol + modeInfo.hostname + ':' + modeInfo.port;
-    if (this.config.env !== 'prod') {
+    if (Ps.isDev()) {
       this.loadMainUrl('spa', url);
     } else {
       this.loadLocalWeb('spa');
@@ -242,7 +213,7 @@ class EeApp extends BaseApp {
     const mainServer = this.config.mainServer;
     Log.coreLogger.info('[ee-core] [main] Env: %s, Type: %s', this.config.env, type);
     Log.coreLogger.info('[ee-core] [main] App running at: %s', url);
-    this.electron.mainWindow.loadURL(url, mainServer.options);
+    this.mainWindow.loadURL(url, mainServer.options);
   }
 
   /**
@@ -262,7 +233,7 @@ class EeApp extends BaseApp {
     // 注册主窗口Contents id
     const addonsCfg = this.config.addons;
     if (addonsCfg.window.enable) {
-      const win = this.electron.mainWindow;
+      const win = this.mainWindow;
       const addonWindow = this.addon.window;
       addonWindow.registerWCid('main', win.webContents.id);
     }
