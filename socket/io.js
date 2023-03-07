@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * 该文件将废弃
+ */
+
 const IoServer = require('socket.io');
 const IoClient = require('socket.io-client');
 //const socketServer = require('./socketServer');

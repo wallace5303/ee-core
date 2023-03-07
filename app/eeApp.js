@@ -12,6 +12,7 @@ const Log = require('../log');
 const Electron = require('../electron');
 const Conf = require('../config');
 const Ps = require('../ps');
+const Socket = require('../socket')
 
 class EeApp extends BaseApp {
   constructor(options = {}) {
@@ -49,8 +50,7 @@ class EeApp extends BaseApp {
    * 启动通信模块
    */
   async startSocket () {
-    const socket = require('../socket/start');
-    socket(this);
+    Socket.startAll(this);
   }
   
   /**
