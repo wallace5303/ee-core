@@ -397,7 +397,7 @@ class EeLoader {
       }
       
       if (!fs.existsSync(filepath) && !fs.existsSync(fullpath)) {
-        this.options.logger.warn(`[ee-core] [core/lib/loader/ee_loader] resolveModule unknow filepath: ${filepath}`)
+        //this.options.logger.warn(`[ee-core] [core/lib/loader/ee_loader] resolveModule unknow filepath: ${filepath}`)
         return undefined;
       }
     }
