@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 const Log = require('../log');
+const Ps = require('../ps');
 
 /**
  * http server
@@ -19,12 +20,14 @@ class HttpServer {
     this.app = app;
     this.options = this.app.config.httpServer;
 
-    if (!this.options.enable) {
+    if (this.options.enable == false) {
       return;
     }
 
-    let port = process.env.EE_HTTP_PORT ? parseInt(process.env.EE_HTTP_PORT) : parseInt(this.getHttpPort());
-    assert(typeof port === 'number', 'http port required, and must be a number');
+    let port = Ps.getHttpPort();
+    if (!port) {
+      throw new Error('[ee-core] [socket/HttpServer] http port required, and must be a number !');
+    }
 
     this.create();
   }
@@ -33,15 +36,15 @@ class HttpServer {
    * 创建服务
    */
   create () {
-    const self = this;
+    const app = this.app;
     const httpServer = this.options;
     const isHttps = httpServer?.https?.enable ?? false;
     let sslOptions = {};
 
     if (isHttps === true) {
       httpServer.protocol = 'https://';
-      const keyFile = path.join(this.app.config.homeDir, httpServer.https.key);
-      const certFile = path.join(this.app.config.homeDir, httpServer.https.cert);
+      const keyFile = path.join(app.config.homeDir, httpServer.https.key);
+      const certFile = path.join(app.config.homeDir, httpServer.https.cert);
       assert(fs.existsSync(keyFile), 'ssl key file is required');
       assert(fs.existsSync(certFile), 'ssl cert file is required');
 
@@ -56,12 +59,12 @@ class HttpServer {
       .use(cors(corsOptions))
       .use(koaBody(httpServer.body))
       .use(async (ctx, next) => {
-        ctx.eeApp = self.app;
+        ctx.eeApp = app;
         await next();
       })
       .use(this.dispatch);
 
-    let msg = '[ee-core] [socket/httpServer] server is: ' + url;
+    let msg = '[ee-core] [socket/http] server is: ' + url;
     if (isHttps) {
       https.createServer(sslOptions, koaApp.callback()).listen(httpServer.port, (err) => {
         msg = err ? err : msg;
@@ -125,20 +128,11 @@ class HttpServer {
       const result = await fn.call(ctx.eeApp, args);
       ctx.response.body = result;
     } catch (err) {
-      ctx.eeApp.console.error('[ee-core:http:server] throw error:', err);
+      Log.coreLogger.error('[ee-core/httpServer] throw error:', err);
     }
 
     await next();
   }
-
-  /**
-   * 获取http端口
-   */  
-  getHttpPort () {
-    const cdb = this.getCoreDB();
-    const port = cdb.getItem('config').httpServer.port;
-    return parseInt(port);
-  } 
 }
 
 module.exports = HttpServer;

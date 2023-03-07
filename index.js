@@ -1,7 +1,12 @@
 /**
  * @namespace EeCore
  */
-let app;
+
+/**
+ * @member {app} EeCore#app
+ * @since 1.0.0
+ */
+const app = require('./app');
 
 /**
  * @member {Controller} EeCore#Controller
@@ -34,13 +39,7 @@ const Utils = require('./oldUtils');
 const Socket = require('./socket/io');
 
 module.exports = {
-  get Appliaction () {
-    if (app) {
-      return app;
-    }
-    app = require('./app/application');
-    return app;
-  },
+  Appliaction: app.Appliaction,
   Controller,
   Service,
   Storage,

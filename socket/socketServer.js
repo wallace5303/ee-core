@@ -1,11 +1,11 @@
 'use strict';
 
-const assert = require('assert');
 const { Server } = require('socket.io');
 const is = require('is-type-of');
-const Storage = require('../storage');
 const Constants = require('../const');
 const Log = require('../log');
+const Conf = require('../config');
+const Ps = require('../ps');
 
 /**
  * socket server
@@ -13,24 +13,25 @@ const Log = require('../log');
 class SocketServer {
   constructor (app) {
     this.app = app;
-    const options = this.app.config.socketServer;
+    const options = Conf.getValue('socketServer');
 
-    if (!options.enable) {
+    if (options.enable == false) {
       return;
     }
 
-    let port = process.env.EE_SOCKET_PORT ? parseInt(process.env.EE_SOCKET_PORT) : parseInt(this.getSocketPort());
-    assert(typeof port === 'number', 'socekt port required, and must be a number');
+    let port = Ps.getSocketPort();
+    if (!port) {
+      throw new Error('[ee-core] [socket/socketServer] socekt port required, and must be a number !');
+    }
+
     Log.coreLogger.info('[ee-core] [socket/socketServer] port is:', port);
 
-    // let opt = Object.assign({}, options);
-    // delete opt.enable;
     this.io = new Server(port, options);
     this.connec();
   }
 
   connec () {
-    const self = this;
+    const app = this.app;
     this.io.on('connection', (socket) => {
       const channel = Constants.socketIo.channel.partySoftware;
       socket.on(channel, async (message, callback) => {
@@ -43,7 +44,7 @@ class SocketServer {
           let fn = null;
           if (is.string(cmd)) {
             const actions = cmd.split('.');
-            let obj = self.app;
+            let obj = app;
             actions.forEach(key => {
               obj = obj[key];
               if (!obj) throw new Error(`class or function '${key}' not exists`);
@@ -52,24 +53,13 @@ class SocketServer {
           }
           if (!fn) throw new Error('function not exists');
 
-          const result = await fn.call(self.app, args);
+          const result = await fn.call(app, args);
           callback(result);
         } catch (err) {
           Log.coreLogger.error('[ee-core] [socket/socketServer] throw error:', err);
         }
       });
     });
-  }
-
-  getCoreDB () {
-    const coreDB = Storage.connection('system');
-    return coreDB;
-  }
-
-  getSocketPort () {
-    const cdb = this.getCoreDB();
-    const port = cdb.getItem('config').socketServer.port;
-    return port;
   }
 }
 

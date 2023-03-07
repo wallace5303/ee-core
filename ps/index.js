@@ -189,21 +189,21 @@ exports.getUserHomeDir = function () {
  * 获取主进程端口
  */
 exports.getMainPort = function () {
-  return process.env.EE_MAIN_PORT;
+  return parseInt(process.env.EE_MAIN_PORT) || 0;
 }
 
 /**
  * 获取内置socket端口
  */
 exports.getSocketPort = function () {
-  return process.env.EE_SOCKET_PORT;
+  return parseInt(process.env.EE_SOCKET_PORT) || 0;
 }
 
 /**
  * 获取内置http端口
  */
 exports.getHttpPort = function () {
-  return process.env.EE_HTTP_PORT;
+  return parseInt(process.env.EE_HTTP_PORT) || 0;
 }
 
 /**
