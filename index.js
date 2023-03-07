@@ -36,7 +36,7 @@ const Utils = require('./oldUtils');
  * @member {Socket}
  * @since 1.0.0
  */
-const Socket = require('./socket/io');
+const Socket = require('./socket');
 
 module.exports = {
   Appliaction: EE.Appliaction,
