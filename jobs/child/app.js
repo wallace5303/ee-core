@@ -3,7 +3,7 @@ const is = require('is-type-of');
 const Exception = require('ee-core/exception');
 const Loader = require('ee-core/loader');
 const Log = require('ee-core/log');
-const UtilsCore = require('../../core/lib/utils');
+const UtilsCore = require('ee-core/core/lib/utils');
 
 // 开发环境下，ee-core是soft link
 // /node_modules[\\/]electron[\\/]/.test(process.execPath)

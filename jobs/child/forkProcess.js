@@ -8,9 +8,16 @@ const Channel = require('../../const/channel');
 class ForkProcess {
   constructor(host, opt = {}) {
     
+    let cwd = Ps.getHomeDir();
+    let appPath = path.join(__dirname, 'app.js');
+    if (Ps.isPackaged()) {
+      // todo fork的cwd目录为什么要在app.asar外 ？
+      cwd = path.join(Ps.getHomeDir(), '..');
+    }
+
     let options = Object.assign({
       processOptions: { 
-        cwd: Ps.getHomeDir(),
+        cwd: cwd,
         env: Ps.allEnv(), 
         stdio: 'pipe' 
       }
@@ -23,9 +30,7 @@ class ForkProcess {
     // 传递给子进程的参数
     //this.args.push(JSON.stringify(options.params));
 
-    const appPath = path.join(__dirname, 'app.js');
     this.child = fork(appPath, this.args, options.processOptions);
-
     this.pid = this.child.pid;
     this._init();
   }
