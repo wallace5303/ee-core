@@ -7,9 +7,10 @@ const path = require('path');
 const globby = require('globby');
 const is = require('is-type-of');
 const deprecate = require('depd')('ee');
-const utils = require('../utils');
+const Utils = require('../utils');
 const FULLPATH = Symbol('EE_LOADER_ITEM_FULLPATH');
 const EXPORTS = Symbol('EE_LOADER_ITEM_EXPORTS');
+const Addon = require('../../../addon');
 
 const defaults = {
   directory: null,
@@ -125,7 +126,7 @@ class FileLoader {
   parse() {
     let files = this.options.match;
     if (!files) {
-      files = (process.env.EE_TYPESCRIPT === 'true' && utils.extensions['.ts'])
+      files = (process.env.EE_TYPESCRIPT === 'true' && Utils.extensions['.ts'])
         ? [ '**/*.(js|ts)', '!**/*.d.ts' ]
         : [ '**/*.js', '**/*.jsc'];
     } else {
@@ -164,7 +165,7 @@ class FileLoader {
         if (exports == null || (filter && filter(exports) === false)) continue;
 
         // set properties of class
-        if (is.class(exports) || utils.isBytecodeClass(exports)) {
+        if (is.class(exports) || Utils.isBytecodeClass(exports)) {
           exports.prototype.pathName = pathName;
           exports.prototype.fullPath = fullpath;
         }
@@ -217,7 +218,7 @@ class FileLoader {
         if (exports == null) continue;
   
         const properties = [addonName];
-        if (is.class(exports) || utils.isBytecodeClass(exports)) {
+        if (is.class(exports) || Utils.isBytecodeClass(exports)) {
           exports.prototype.pathName = addonName;
           exports.prototype.fullPath = fullpath;
         }
@@ -261,7 +262,7 @@ function getProperties(filepath, { caseStyle }) {
 // Get exports from filepath
 // If exports is null/undefined, it will be ignored
 function getExports(fullpath, { initializer, call, inject }, pathName) {
-  let exports = utils.loadFile(fullpath);
+  let exports = Utils.loadFile(fullpath);
 
   // process exports as you like
   if (initializer) {
@@ -275,7 +276,7 @@ function getExports(fullpath, { initializer, call, inject }, pathName) {
   // module.exports = function*() {}
   //new exports;
 
-  if (is.class(exports) || is.generatorFunction(exports) || is.asyncFunction(exports) || utils.isBytecodeClass(exports)) {
+  if (is.class(exports) || is.generatorFunction(exports) || is.asyncFunction(exports) || Utils.isBytecodeClass(exports)) {
     return exports;
   }
 

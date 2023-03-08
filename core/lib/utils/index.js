@@ -14,6 +14,12 @@ const Module = module.constructor.length > 1
   /* istanbul ignore next */
   : BuiltinModule;
 
+// Module._extensions:
+// '.js': [Function (anonymous)],
+// '.json': [Function (anonymous)],
+// '.node': [Function: func],
+// '.jsc': [Function (anonymous)]
+
 module.exports = {
   extensions: Module._extensions,
 

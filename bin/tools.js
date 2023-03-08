@@ -7,7 +7,7 @@ const encrypt = require('../tools/encrypt');
 const args = process.argv;
 // console.log('[ee-core] args:', args);
 const cmd = args[2];
-console.log('[ee-core] cmd:', cmd);
+console.log('[ee-core] [bin/tools] cmd:', cmd);
 
 if (cmd == 'rd') {
   replaceDist.run();

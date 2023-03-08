@@ -2,8 +2,8 @@
 
 const path = require('path');
 const is = require('is-type-of');
-const utility = require('utility');
-const utils = require('../../utils');
+const UtilsFn = require('../../utils/function');
+const Utils = require('../../utils');
 const FULLPATH = require('../file_loader').FULLPATH;
 
 module.exports = {
@@ -26,10 +26,10 @@ module.exports = {
         // }
         // ```
         
-        if (is.function(obj) && !is.generatorFunction(obj) && !is.class(obj) && !is.asyncFunction(obj) && !utils.isBytecodeClass(obj)) {
+        if (is.function(obj) && !is.generatorFunction(obj) && !is.class(obj) && !is.asyncFunction(obj) && !Utils.isBytecodeClass(obj)) {
           obj = obj(this.app);
         }
-        if (is.class(obj) || utils.isBytecodeClass(obj)) {
+        if (is.class(obj) || Utils.isBytecodeClass(obj)) {
           obj.prototype.pathName = opt.pathName;
           obj.prototype.fullPath = opt.path;
           return wrapClass(obj);
@@ -47,7 +47,7 @@ module.exports = {
     const controllerBase = opt.directory;
 
     this.loadToApp(controllerBase, 'controller', opt);
-    this.options.logger.info('[ee-core:loader] Controller loaded: %s', controllerBase);
+    this.options.logger.info('[ee-core] [core/.../controller] loaded: %s', controllerBase);
     this.timing.end('Load Controller');
   },
 
@@ -86,7 +86,7 @@ function wrapClass(Controller) {
       //   args = [ this ];
       // }
       //args = [ this ];
-      return utils.callFn(controller[key], args, controller);
+      return Utils.callFn(controller[key], args, controller);
     };
   }
 }
@@ -97,7 +97,7 @@ function wrapObject(obj, path, prefix) {
   const ret = {};
   for (const key of keys) {
     if (is.function(obj[key])) {
-      const names = utility.getParamNames(obj[key]);
+      const names = UtilsFn.getParamNames(obj[key]);
       if (names[0] === 'next') {
         throw new Error(`controller \`${prefix || ''}${key}\` should not use next as argument from file ${path}`);
       }
@@ -114,7 +114,7 @@ function wrapObject(obj, path, prefix) {
       // if (!this.app.config.controller || !this.app.config.controller.supportParams) {
       //   args = [ this ];
       // }
-      return await utils.callFn(func, args, this);
+      return await Utils.callFn(func, args, this);
     };
     for (const key in func) {
       objectControllerMiddleware[key] = func[key];
@@ -122,3 +122,4 @@ function wrapObject(obj, path, prefix) {
     return objectControllerMiddleware;
   }
 }
+

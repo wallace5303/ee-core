@@ -1,5 +1,3 @@
-'use strict';
-
 const assert = require('assert');
 const fs = require('fs');
 const KoaApplication = require('koa');
@@ -33,7 +31,7 @@ class EeCore extends KoaApplication {
 
     this.timing = new Timing();
 
-    this.console = new EggConsoleLogger();
+    this.console = new EggConsoleLogger({level: 'INFO'});
 
     /**
      * @member {Object} EeCore#options

@@ -1,4 +1,3 @@
-'use strict';
 const path = require('path');
 
 /**
@@ -134,6 +133,7 @@ module.exports = appInfo => {
    * @property {Boolean} enablePerformanceTimer - using performance.now() timer instead of Date.now() for more more precise milliseconds, defaults to false. e.g.: logger will set 1.456ms instead of 1ms.
    */
   config.logger = {
+    type: 'application',
     dir: path.join(appInfo.root, 'logs'),
     encoding: 'utf8',
     env: appInfo.env,
@@ -150,6 +150,13 @@ module.exports = appInfo => {
     allowDebugAtProd: false,
     enablePerformanceTimer: false,
   };
+
+  /**
+   * customLogger options
+   * @member Config#customLogger
+   * 
+   */  
+  config.customLogger = {}
 
   /**
    * The option for httpclient
@@ -173,7 +180,6 @@ module.exports = appInfo => {
     enableDNSCache: false,
     dnsCacheLookupInterval: 10000,
     dnsCacheMaxLength: 1000,
-
     request: {
       timeout: 5000,
     },
@@ -215,7 +221,7 @@ module.exports = appInfo => {
       cert: ''
     },
     protocol: 'http://',
-    host: '127.0.0.1',
+    host: 'localhost',
     port: 7071, // 默认端口（如果端口被使用，则随机获取一个）
     cors: {
       origin: "*"
@@ -232,7 +238,7 @@ module.exports = appInfo => {
   /* 主进程加载的地址 */
   config.mainServer = {
     protocol: 'http://',
-    host: '127.0.0.1',
+    host: 'localhost',
     port: 7072, // 默认端口（如果端口被使用，则随机获取一个）
     options: {},
     ssl: {

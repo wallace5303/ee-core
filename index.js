@@ -1,47 +1,45 @@
-'use strict';
-
 /**
  * @namespace EeCore
  */
 
 /**
- * @member {Appliaction} EeCore#Appliaction
+ * @member {app} EeCore#app
  * @since 1.0.0
  */
-const Appliaction = require('./lib/application');
+const EE = require('./ee');
 
 /**
  * @member {Controller} EeCore#Controller
  * @since 1.0.0
  */
-const Controller = require('./core/lib/utils/base_context_class');
+const Controller = require('./controller');
 
 /**
  * @member {Service} EeCore#Service
  * @since 1.0.0
  */
-const Service = require('./core/lib/utils/base_context_class');
+const Service = require('./service');
 
 /**
  * @member {Storage}
  * @since 1.0.0
  */
-const Storage = require('./lib/storage/index');
+const Storage = require('./storage');
 
 /**
  * @member {Utils}
  * @since 1.0.0
  */
-const Utils = require('./utils/index');
+const Utils = require('./oldUtils');
 
 /**
  * @member {Socket}
  * @since 1.0.0
  */
-const Socket = require('./lib/socket/io');
+const Socket = require('./socket');
 
 module.exports = {
-  Appliaction,
+  Appliaction: EE.Appliaction,
   Controller,
   Service,
   Storage,

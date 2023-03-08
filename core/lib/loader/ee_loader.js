@@ -7,9 +7,9 @@ const is = require('is-type-of');
 const debug = require('debug')('ee-core:EeLoader');
 const FileLoader = require('./file_loader');
 const ContextLoader = require('./context_loader');
-const utility = require('utility');
-const utils = require('../utils');
+const Utils = require('../utils');
 const Timing = require('../utils/timing');
+const Ps = require('../../../ps');
 
 const REQUIRE_COUNT = Symbol('EeLoader#requireCount');
 
@@ -83,25 +83,8 @@ class EeLoader {
   getServerEnv() {
     let serverEnv = this.options.env;
 
-    const envPath = path.join(this.options.baseDir, 'config/env');
-    if (!serverEnv && fs.existsSync(envPath)) {
-      serverEnv = fs.readFileSync(envPath, 'utf8').trim();
-    }
-
     if (!serverEnv) {
-      serverEnv = process.env.EE_SERVER_ENV;
-    }
-
-    if (!serverEnv) {
-      if (process.env.NODE_ENV === 'test') {
-        serverEnv = 'unittest';
-      } else if (process.env.NODE_ENV === 'production') {
-        serverEnv = 'prod';
-      } else {
-        serverEnv = 'local';
-      }
-    } else {
-      serverEnv = serverEnv.trim();
+      throw new Error('[core] [lib] [loader] getServerEnv serverEnv can not be empty!');
     }
 
     return serverEnv;
@@ -199,7 +182,7 @@ class EeLoader {
        * The directory whether is homeDir or appUserData depend on env.
        * @member {String} AppInfo#root
        */
-      root: env === 'local' || env === 'unittest' ? this.getHomedir() : this.options.appUserData,
+      root: Ps.getRootDir(),
 
       /**
        * electron application data dir
@@ -272,7 +255,7 @@ class EeLoader {
     if (inject.length === 0) inject = [ this.app ];
 
     let ret = this.requireFile(filepath);
-    if (is.function(ret) && !is.class(ret) && !utils.isBytecodeClass(ret)) {
+    if (is.function(ret) && !is.class(ret) && !Utils.isBytecodeClass(ret)) {
       ret = ret(...inject);
     }
     return ret;
@@ -284,9 +267,9 @@ class EeLoader {
    * @private
    */
   requireFile(filepath) {
-    const timingKey = `Require(${this[REQUIRE_COUNT]++}) ${utils.getResolvedFilename(filepath, this.options.baseDir)}`;
+    const timingKey = `Require(${this[REQUIRE_COUNT]++}) ${Utils.getResolvedFilename(filepath, this.options.baseDir)}`;
     this.timing.start(timingKey);
-    const ret = utils.loadFile(filepath);
+    const ret = Utils.loadFile(filepath);
     this.timing.end(timingKey);
     return ret;
   }
@@ -312,15 +295,6 @@ class EeLoader {
     }
 
     const dirs = this.dirs = [];
-
-    if (this.orderPlugins) {
-      for (const plugin of this.orderPlugins) {
-        dirs.push({
-          path: plugin.path,
-          type: 'plugin',
-        });
-      }
-    }
 
     // framework or Ee path
     for (const EePath of this.EePaths) {
@@ -404,36 +378,40 @@ class EeLoader {
 
   getTypeFiles(filename) {
     const files = [ `${filename}.default` ];
-    if (this.serverScope) files.push(`${filename}.${this.serverScope}`);
-    if (this.serverEnv === 'default') return files;
-
     files.push(`${filename}.${this.serverEnv}`);
-    if (this.serverScope) files.push(`${filename}.${this.serverScope}_${this.serverEnv}`);
+
     return files;
   }
 
   resolveModule(filepath) {
-    let fullPath;
+    let fullpath;
     try {
-      fullPath = require.resolve(filepath);
+      fullpath = require.resolve(filepath);
     } catch (e) {
-      let jscFile = filepath + '.jsc';
-      if (fs.existsSync(jscFile)) {
-        return jscFile;
+
+      // 特殊后缀处理
+      if (filepath && (filepath.endsWith('.defalut') || filepath.endsWith('.prod'))) {
+        fullpath = filepath + '.jsc';
+      } else if (filepath && filepath.endsWith('.js')) {
+        fullpath = filepath + 'c';
       }
-      return undefined;
+      
+      if (!fs.existsSync(filepath) && !fs.existsSync(fullpath)) {
+        //this.options.logger.warn(`[ee-core] [core/lib/loader/ee_loader] resolveModule unknow filepath: ${filepath}`)
+        return undefined;
+      }
     }
 
-    if (process.env.Ee_TYPESCRIPT !== 'true' && fullPath.endsWith('.ts')) {
-      return undefined;
-    }
-
-    return fullPath;
+    return fullpath;
   }
 
   getPkg() {
     const filePath = path.join(this.options.homeDir, 'package.json');
-    const json = utility.readJSONSync(filePath);
+    if (!fs.existsSync(filePath)) {
+      throw new Error(filePath + ' is not found');
+    }
+    const json = JSON.parse(fs.readFileSync(filePath));
+
     return json;
   }  
 }

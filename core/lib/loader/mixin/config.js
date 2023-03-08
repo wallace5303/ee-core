@@ -24,14 +24,7 @@ module.exports = {
 
     // Load Application config first
     const appConfig = this._preloadAppConfig();
-    //console.log('----------------------- appConfig:', appConfig);
 
-    //   plugin config.default
-    //     framework config.default
-    //       app config.default
-    //         plugin config.{env}
-    //           framework config.{env}
-    //             app config.{env}
     for (const filename of this.getTypeFiles('config')) {
       for (const unit of this.getLoadUnits()) {
         const isApp = unit.type === 'app';
@@ -64,6 +57,8 @@ module.exports = {
       'config.default',
       `config.${this.serverEnv}`,
     ];
+
+
     const target = {};
     for (const filename of names) {
       const config = this._loadConfig(this.options.baseDir, filename, undefined, 'app');
@@ -78,9 +73,9 @@ module.exports = {
     let filepath = this.resolveModule(path.join(dirpath, 'config', filename));
 
     // let config.js compatible
-    if (filename === 'config.default' && !filepath) {
-      filepath = this.resolveModule(path.join(dirpath, 'config/config'));
-    }
+    // if (filename === 'config.default' && !filepath) {
+    //   filepath = this.resolveModule(path.join(dirpath, 'config/config'));
+    // }
   
     const config = this.loadFile(filepath, this.appInfo, extraInject);
 
@@ -107,7 +102,7 @@ module.exports = {
       this._setConfigMeta(envConfig, '<process.env.EE_APP_CONFIG>');
       return envConfig;
     } catch (err) {
-      this.options.logger.warn('[ee-loader] process.env.EE_APP_CONFIG is not invalid JSON: %s', envConfigStr);
+      this.options.logger.warn('[ee-core] [core/.../config] process.env.EE_APP_CONFIG is not invalid JSON: %s', envConfigStr);
     }
   },
 
