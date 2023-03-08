@@ -1,5 +1,5 @@
 const path = require('path');
-const eis = require('electron-is');
+const eis = require('../utils/is');
 
 /**
  * 当前进程的所有env

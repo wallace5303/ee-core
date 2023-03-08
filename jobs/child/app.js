@@ -1,22 +1,16 @@
 
 const is = require('is-type-of');
-let Exception;
-let Loader;
-let Log;
-let UtilsCore;
+const Exception = require('ee-core/exception');
+const Loader = require('ee-core/loader');
+const Log = require('ee-core/log');
+const UtilsCore = require('../../core/lib/utils');
 
 // 开发环境下，ee-core是soft link
-if (__dirname.indexOf("node_modules") == -1) {
-  Exception = require('../../exception');
-  Loader = require('../../loader');
-  Log = require('../../log');
-  UtilsCore = require('../../core/lib/utils');
-} else {
-  Exception = require('ee-core/exception');
-  Loader = require('ee-core/loader');
-  Log = require('ee-core/log');
-  UtilsCore = require('../../core/lib/utils');
-}
+// /node_modules[\\/]electron[\\/]/.test(process.execPath)
+// const Exception = require('../../exception');
+// const Loader = require('../../loader');
+// const Log = require('../../log');
+// const UtilsCore = require('../../core/lib/utils');
 
 Exception.start();
 
