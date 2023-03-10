@@ -89,7 +89,7 @@ exports.processType = function() {
 };
 
 /**
- * 获取数据存储路径
+ * 获取home路径
  */
 exports.getHomeDir = function () {
   return process.env.EE_HOME;
@@ -162,13 +162,6 @@ exports.getExtraResourcesDir = function() {
  */
 exports.getAppUserDataDir = function() {
   return process.env.EE_APP_USER_DATA;
-}
-
-/**
- * 获取数据存储路径
- */
-exports.getHomeDir = function () {
-  return process.env.EE_HOME;
 }
 
 /**
