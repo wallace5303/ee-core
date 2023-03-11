@@ -3,7 +3,7 @@ const HttpsAgent = require('agentkeepalive').HttpsAgent;
 const urllib = require('urllib');
 const ms = require('humanize-ms');
 const { FrameworkBaseError } = require('egg-errors');
-const Storage = require('../storage');
+const Conf = require('../config');
 const Log = require('../log');
 
 class HttpClientError extends FrameworkBaseError {
@@ -16,8 +16,7 @@ class HttpClient extends urllib.HttpClient2 {
   constructor(options = {}) {
 
     if (Object.keys(options).length == 0) {
-      const sysConfig = this._getCoreDB().getItem('config');
-      options = sysConfig.httpclient;
+      options = Conf.getValue('httpclient');
     }
 
     const config = Object.assign({

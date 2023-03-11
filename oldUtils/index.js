@@ -7,8 +7,8 @@ const UtilsJson = require('../utils/json');
 const UtilsPs = require('../ps');
 const UtilsHelper = require('../utils/helper');
 const Copy = require('../utils/copyto');
-const Storage = require('../storage');
-const Constants = require('../const');
+const Conf = require('../config');
+const Channel = require('../const/channel');
 
 /**
  * other module
@@ -27,19 +27,10 @@ exports.getPackage = function() {
 };
 
 /**
- * 获取 coredb
- */
-exports.getCoreDB = function() {
-  const coreDB = Storage.connection('system');
-  return coreDB;
-}
-
-/**
  * 获取 ee配置
  */
 exports.getEeConfig = function() {
-  const cdb = this.getCoreDB();
-  const config = cdb.getItem('config');
+  const config = Conf.all();
 
   return config;
 }
@@ -48,8 +39,7 @@ exports.getEeConfig = function() {
  * 获取 app version
  */
 exports.getAppVersion = function() {
-  const cdb = this.getCoreDB();
-  const v = cdb.getItem('config').appVersion;
+  const v = Conf.all().appVersion;
   return v;
 }
 
@@ -57,8 +47,7 @@ exports.getAppVersion = function() {
  * 获取 插件配置
  */
 exports.getAddonConfig = function() {
-  const cdb = this.getCoreDB();
-  const cfg = cdb.getItem('config').addons;
+  const cfg = Conf.all().addons;
   return cfg;
 }
 
@@ -66,8 +55,7 @@ exports.getAddonConfig = function() {
  * 获取 mainServer配置
  */
 exports.getMainServerConfig = function() {
-  const cdb = this.getCoreDB();
-  const cfg = cdb.getItem('config').mainServer;
+  const cfg = Conf.all().mainServer;
   return cfg;
 }
 
@@ -75,8 +63,7 @@ exports.getMainServerConfig = function() {
  * 获取 httpServer配置
  */
 exports.getHttpServerConfig = function() {
-  const cdb = this.getCoreDB();
-  const cfg = cdb.getItem('config').httpServer;
+  const cfg = Conf.all().httpServer;
   return cfg;
 }
 
@@ -84,8 +71,7 @@ exports.getHttpServerConfig = function() {
  * 获取 socketServer配置
  */
 exports.getSocketServerConfig = function() {
-  const cdb = this.getCoreDB();
-  const cfg = cdb.getItem('config').socketServer;
+  const cfg = Conf.all().socketServer;
   return cfg;
 }
 
@@ -93,8 +79,7 @@ exports.getSocketServerConfig = function() {
  * 获取 socketio port
  */
 exports.getSocketPort = function() {
-  const cdb = this.getCoreDB();
-  const port = cdb.getItem('config').socketServer.port;
+  const port = Conf.all().socketServer.port;
   return parseInt(port);
 }
 
@@ -102,5 +87,5 @@ exports.getSocketPort = function() {
  * 获取 socket channel
  */
 exports.getSocketChannel = function() {
-  return Constants.socketIo.channel;
+  return Channel.socketIo.partySoftware;
 }

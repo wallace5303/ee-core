@@ -7,7 +7,6 @@ const HttpClient = require('../httpclient');
 const HTTPCLIENT = Symbol('EeApplication#httpclient');
 const LOGGERS = Symbol('EeApplication#loggers');
 const Log = require('../log');
-const Storage = require('../storage');
 const Conf = require('../config');
 
 class BaseApp extends EeAppCore {
@@ -74,15 +73,6 @@ class BaseApp extends EeAppCore {
    */
   get coreLogger() {
     return this.getLogger('coreLogger');
-  }
-
-  /**
-   * @class core存储模块
-   * @since 1.0.0
-   */
-  getCoreDB () {
-    const db = Storage.connection('system');
-    return db;
   }
   
   /**

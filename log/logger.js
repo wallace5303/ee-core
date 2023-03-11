@@ -1,7 +1,7 @@
 const Loggers = require('egg-logger').EggLoggers;
 const assert = require('assert');
 const Ps = require('../ps');
-const Storage = require('../storage');
+const Conf = require('../config');
 
 module.exports = {
 
@@ -33,7 +33,7 @@ module.exports = {
         },
         customLogger: {}
       }
-      const sysConfig = this._getCoreDB().getItem('config');
+      const sysConfig = Conf.all();
       opt = Object.assign(defaultConfig, {
         logger: sysConfig.logger,
         customLogger: sysConfig.customLogger || {}
@@ -50,12 +50,4 @@ module.exports = {
 
     return loggers;
   },
-
-  /**
-   * 获取 coredb
-   */
-  _getCoreDB() {
-    const coreDB = Storage.connection('system');
-    return coreDB;
-  }
 };
