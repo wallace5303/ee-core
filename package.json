@@ -1,6 +1,6 @@
 {
   "name": "ee-core",
-  "version": "2.0.2-bate.1",
+  "version": "2.0.2",
   "description": "ee core",
   "main": "index.js",
   "scripts": {

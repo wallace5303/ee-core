@@ -14,7 +14,7 @@ const Addon = {
     }
 
     if (!this[EEAddon].has(name)) {
-      this[EEAddon][name] = obj;
+      this[EEAddon].set(name, obj);
     }
   },
 
@@ -22,7 +22,7 @@ const Addon = {
    * 获取插件对象
    */  
   get(name) {
-    let addon = this[EEAddon].has(name) ? this[EEAddon][name]: null;
+    let addon = this[EEAddon].has(name) ? this[EEAddon].get(name): null;
     return addon;
   },  
 }  
