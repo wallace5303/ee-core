@@ -39,7 +39,7 @@ const Utils = require('./oldUtils');
 const Socket = require('./socket');
 
 module.exports = {
-  Appliaction: EE.Appliaction,
+  Application: EE.Application,
   Controller,
   Service,
   Storage,
