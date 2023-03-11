@@ -5,7 +5,7 @@ const EE = {
   /**
    * 兼容1.x版本api
    */
-  get Appliaction() {
+  get Application() {
     const appClass = require('./application');
     return appClass;
   },
