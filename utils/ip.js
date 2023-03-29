@@ -11,40 +11,6 @@ class IpNotFoundError extends Error {
 	}
 }
 
-function createPublicIp(publicIpv4, publicIpv6) {
-	return function publicIp(options) { // eslint-disable-line func-names
-		const ipv4Promise = publicIpv4(options);
-		const ipv6Promise = publicIpv6(options);
-
-		const promise = (async () => {
-			try {
-				const ipv6 = await ipv6Promise;
-				ipv4Promise.cancel();
-				return ipv6;
-			} catch (ipv6Error) {
-				if (!(ipv6Error instanceof IpNotFoundError)) {
-          ipv6Error.message = `[ee-core] [utils/ip] ipv6Error: ${ipv6Error.message}`;
-					throw ipv6Error;
-				}
-
-				try {
-					return await ipv4Promise;
-				} catch (ipv4Error) {
-          ipv4Error.message = `[ee-core] [utils/ip] ipv4Error: ${ipv4Error.message}`;
-					throw ipv4Error;
-				}
-			}
-		})();
-
-		promise.cancel = () => {
-			ipv4Promise.cancel();
-			ipv6Promise.cancel();
-		};
-
-		return promise;
-	};
-}
-
 const defaults = {
 	timeout: 5000,
 	onlyHttps: false,
@@ -71,30 +37,30 @@ const dnsServers = [
 			type: 'AAAA',
 		},
 	},
-	{
-		v4: {
-			servers: [
-				'216.239.32.10',
-				'216.239.34.10',
-				'216.239.36.10',
-				'216.239.38.10',
-			],
-			name: 'o-o.myaddr.l.google.com',
-			type: 'TXT',
-			transform: ip => ip.replace(/"/g, ''),
-		},
-		v6: {
-			servers: [
-				'2001:4860:4802:32::a',
-				'2001:4860:4802:34::a',
-				'2001:4860:4802:36::a',
-				'2001:4860:4802:38::a',
-			],
-			name: 'o-o.myaddr.l.google.com',
-			type: 'TXT',
-			transform: ip => ip.replace(/"/g, ''),
-		},
-	},
+	// {
+	// 	v4: {
+	// 		servers: [
+	// 			'216.239.32.10',
+	// 			'216.239.34.10',
+	// 			'216.239.36.10',
+	// 			'216.239.38.10',
+	// 		],
+	// 		name: 'o-o.myaddr.l.google.com',
+	// 		type: 'TXT',
+	// 		transform: ip => ip.replace(/"/g, ''),
+	// 	},
+	// 	v6: {
+	// 		servers: [
+	// 			'2001:4860:4802:32::a',
+	// 			'2001:4860:4802:34::a',
+	// 			'2001:4860:4802:36::a',
+	// 			'2001:4860:4802:38::a',
+	// 		],
+	// 		name: 'o-o.myaddr.l.google.com',
+	// 		type: 'TXT',
+	// 		transform: ip => ip.replace(/"/g, ''),
+	// 	},
+	// },
 ];
 
 const type = {
@@ -120,7 +86,7 @@ const type = {
 
 const queryDns = (version, options) => {
 	const data = type[version];
-
+  console.log('ssss11111:');
 	const socket = dns({
 		retries: 0,
 		maxQueries: 1,
@@ -129,18 +95,20 @@ const queryDns = (version, options) => {
 	});
 
 	const socketQuery = promisify(socket.query.bind(socket));
-
+  console.log('22222:');
 	const promise = (async () => {
 		let lastError;
 
 		for (const dnsServerInfo of data.dnsServers) {
 			const {servers, question} = dnsServerInfo;
+      console.log('3333:', dnsServerInfo);
 			for (const server of servers) {
 				if (socket.destroyed) {
+          console.log('4444:');
 					return;
 				}
-
-				try {
+        console.log('5555:');
+				// try {
 					const {name, type, transform} = question;
 
 					// eslint-disable-next-line no-await-in-loop
@@ -153,21 +121,20 @@ const queryDns = (version, options) => {
 							},
 						},
 					} = dnsResponse;
-
+          console.log('6666:', dnsResponse);
 					const response = (typeof data === 'string' ? data : data.toString()).trim();
+          const ip = transform ? transform(response) : response;
 
-					const ip = transform ? transform(response) : response;
-          console.log('queryDns :', ip);
+					//const ip = version === 'v6' ? transform(response) : response;
 					const method = version === 'v6' ? isIPv6 : isIPv4;
 
 					if (ip && method(ip)) {
 						socket.destroy();
 						return ip;
 					}
-				} catch (error) {
-					lastError = error;
-          console.log('queryDns lastError:', lastError);
-				}
+				// } catch (error) {
+				// 	lastError = error;
+				// }
 			}
 		}
 
@@ -258,8 +225,6 @@ const queryAll = (version, options) => {
 	return promise;
 };
 
-const publicIp = createPublicIp(publicIpv4, publicIpv6);
-
 /**
  * 查询 public ipv4
  */  
@@ -289,15 +254,51 @@ function publicIpv6(options) {
     ...options,
   };
 
-  if (!options.onlyHttps) {
-    return queryAll('v6', options);
-  }
+  // if (!options.onlyHttps) {
+  //   return queryAll('v6', options);
+  // }
 
-  if (options.onlyHttps) {
-    return queryHttps('v6', options);
-  }
+  // if (options.onlyHttps) {
+  //   return queryHttps('v6', options);
+  // }
 
   return queryDns('v6', options);
+}
+
+const publicIp = createPublicIp(publicIpv4, publicIpv6);
+function createPublicIp(publicIpv4, publicIpv6) {
+	return function publicIp(options) { // eslint-disable-line func-names
+		const ipv4Promise = publicIpv4(options);
+		const ipv6Promise = publicIpv6(options);
+
+		const promise = (async () => {
+      const ipv6 = await ipv6Promise;
+      ipv4Promise.cancel();
+      return ipv6;
+			try {
+				const ipv6 = await ipv6Promise;
+				ipv4Promise.cancel();
+				return ipv6;
+			} catch (ipv6Error) {
+				if (!(ipv6Error instanceof IpNotFoundError)) {
+					throw ipv6Error;
+				}
+
+				try {
+					return await ipv4Promise;
+				} catch (ipv4Error) {
+					throw ipv4Error;
+				}
+			}
+		})();
+
+		promise.cancel = () => {
+			ipv4Promise.cancel();
+			ipv6Promise.cancel();
+		};
+
+		return promise;
+	};
 }
 
 const IP = {
