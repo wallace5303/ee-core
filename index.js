@@ -30,7 +30,7 @@ const Storage = require('./storage');
  * @member {Utils}
  * @since 1.0.0
  */
-const Utils = require('./oldUtils');
+const Utils = require('./old-utils');
 
 /**
  * @member {Socket}

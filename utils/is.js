@@ -139,7 +139,16 @@ const IS = {
   _osxRelease () {
     const actual = release().split('.')
     return `10.${actual[0] - 4}.${actual[1]}`
-  }
+  },
+
+  // valid value
+  validValue(value) {
+    return (
+      value !== undefined &&
+      value !== null &&
+      value !== ''
+    );
+  },
 }
 
 module.exports = IS;

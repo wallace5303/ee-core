@@ -127,7 +127,7 @@ module.exports = {
     const ret = UtilsCore.loadFile(fullpath);
 
     return ret;
-  },  
+  },   
 
   /**
    * 加载jobs模块(子进程中使用)
@@ -140,7 +140,27 @@ module.exports = {
     const ret = this.requireModule(filepath, 'jobs');
 
     return ret;
-  }, 
+  },
+  
+  /**
+   * 获取electron目录下文件的绝对路径
+   * @param {String} filepath - fullpath
+   */
+  getFullpath(filepath) {
+    let fullpath;
+    const isAbsolute = path.isAbsolute(filepath);
+    if (!isAbsolute) {
+      filepath = path.join(Ps.getBaseDir(), filepath);
+    }
+
+    fullpath = this.resolveModule(filepath);
+    if (!fs.existsSync(fullpath)) {
+      throw new Error(`[ee-core] [loader] getFullpath filepath ${fullpath} not exists`);
+    }
+
+    return fullpath;
+  }
+  
 }
 
 

@@ -1,8 +1,5 @@
 const EventEmitter = require('events');
-const path = require('path');
-const fs = require('fs');
 const ForkProcess = require('./forkProcess');
-const Ps = require('../../ps');
 const Loader = require('../../loader');
 const Helper = require('../../utils/helper');
 
@@ -27,7 +24,7 @@ class ChildJob extends EventEmitter {
    * 执行一个job文件
    */  
   exec(filepath, params = {}, opt = {}) {
-    const jobPath = this._getFullpath(filepath);
+    const jobPath = Loader.getFullpath(filepath);
 
     // 消息对象
     const mid = Helper.getRandomString();
@@ -57,20 +54,6 @@ class ChildJob extends EventEmitter {
     }
   
     return;
-  }
-
-  _getFullpath(filepath) {
-    const isAbsolute = path.isAbsolute(filepath);
-    if (!isAbsolute) {
-      filepath = path.join(Ps.getBaseDir(), filepath);
-    }
-
-    const fullpath = Loader.resolveModule(filepath);
-    if (!fs.existsSync(fullpath)) {
-      throw new Error(`[ee-core] [jobs/child] file ${fullpath} not exists`);
-    }
-
-    return fullpath;
   }
 
 }

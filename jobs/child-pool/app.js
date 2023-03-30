@@ -3,7 +3,7 @@ const is = require('is-type-of');
 const Exception = require('ee-core/exception');
 const Loader = require('ee-core/loader');
 const Log = require('ee-core/log');
-const UtilsCore = require('../../core/lib/utils');
+const UtilsCore = require('ee-core/core/lib/utils');
 
 // 开发环境下，ee-core是soft link
 // /node_modules[\\/]electron[\\/]/.test(process.execPath)
@@ -24,11 +24,8 @@ class ChildApp {
    */
   _initEvents() {
     process.on('message', this._handleMessage.bind(this));
-    process.on('disconnect', () => {
-      Log.coreLogger.info(`[ee-core] [jobs/child] child process disconnected, pid:${process.pid}`);
-    });
     process.on('exit', (code) => {
-      Log.coreLogger.info(`[ee-core] [jobs/child] child process exit code:${code}, pid:${process.pid}`);
+      Log.coreLogger.info(`[ee-core] [jobs/child] received a exit from main-process, code:${code}, pid:${process.pid}`);
     });
   }
 
@@ -37,7 +34,7 @@ class ChildApp {
    */
   _handleMessage(m) {
     this.run(m);
-    Log.coreLogger.info(`[ee-core] [jobs/child] Received a message ${JSON.stringify(m)} from the mainProcess`);
+    Log.coreLogger.info(`[ee-core] [jobs/child] received a message from main-process, message: ${JSON.stringify(m)}`);
   }
 
   /**
@@ -45,7 +42,7 @@ class ChildApp {
    */  
   run(msg = {}) {
     let filepath = msg.jobPath;
-    let params = msg.params;
+    let params = msg.jobParams;
 
     let mod = Loader.loadJsFile(filepath);
     if (is.class(mod) || UtilsCore.isBytecodeClass(mod)) {
@@ -54,8 +51,6 @@ class ChildApp {
     } else if (is.function(mod)) {
       mod(params);
     }
-
-    Log.coreLogger.info('[ee-core] [child-process] job run');
   }
 }
 
