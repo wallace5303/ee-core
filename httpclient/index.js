@@ -50,14 +50,6 @@ class HttpClient extends urllib.HttpClient2 {
     this.config = config;
   }
 
-  /**
-   * 获取 coredb
-   */
-  _getCoreDB() {
-    const coreDB = Storage.connection('system');
-    return coreDB;
-  }  
-
   request(url, args, callback) {
     if (typeof args === 'function') {
       callback = args;

@@ -28,10 +28,10 @@ class ChildPoolJob extends EventEmitter {
   /**
    * 创建一个池子
    */  
-  create(number = 3) {
-    let pids = [];
+  async create(number = 3) {
+    
     // 最大限制
-    let currentNumber = this.childs.length;
+    let currentNumber = this.children.length;
     if (number + currentNumber > this.max) {
       number = this.max - currentNumber;
     }
@@ -42,9 +42,10 @@ class ChildPoolJob extends EventEmitter {
     for (let i = 1; i <= number; i++) {
       subProcess = new ForkProcess(this, options);
       this._childCreated(subProcess);
-      pids.push(subProcess.pid);
     }
   
+    let pids = Object.keys(this.children);
+
     return pids;
   }
 
@@ -54,8 +55,8 @@ class ChildPoolJob extends EventEmitter {
   _childCreated(subProcess) {
     let pid = subProcess.pid;
     this.children[pid] = subProcess;
-    const length = Object.keys(this.children).length;
-    console.log('length:', length);
+    // const length = Object.keys(this.children).length;
+    // console.log('length:', length);
 
     // this.LB.add({
     //   id: subProcess.pid,
@@ -91,6 +92,13 @@ class ChildPoolJob extends EventEmitter {
 
     return subProcess;
   }
+
+  /**
+   * 异步执行一个job文件
+   */
+  async execPromise(filepath, params = {}, opt = {}) {
+    return this.exec(filepath, params = {}, opt = {});
+  }  
 
   /**
    * 获取绑定的进程对象

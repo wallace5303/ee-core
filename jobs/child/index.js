@@ -44,16 +44,10 @@ class ChildJob extends EventEmitter {
   }
 
   /**
-   * todo 运行job
-   */  
-  run(name, filepath, opt = {}) {
-    let times = opt.times || 1;
-
-    for (let i = 1; i <= times; i++) {
-      this.exec(filepath, opt);
-    }
-  
-    return;
+   * 异步执行一个job文件
+   */
+  async execPromise(filepath, params = {}, opt = {}) {
+    return this.exec(filepath, params = {}, opt = {});
   }
 
 }

@@ -119,7 +119,8 @@ class EeApp extends BaseApp {
       if (this.mainWindow.isMinimized()) {
         this.mainWindow.restore();
       }
-      this.mainWindow.show()
+      this.mainWindow.show();
+      this.mainWindow.focus();
     }
   }
 
