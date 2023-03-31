@@ -4,6 +4,7 @@ const LoadBalancer = require('../load-balancer');
 const Loader = require('../../loader');
 const Helper = require('../../utils/helper');
 const UtilsIs = require('../../utils/is');
+const Log = require('../../log');
 
 class ChildPoolJob extends EventEmitter {
 
@@ -15,6 +16,7 @@ class ChildPoolJob extends EventEmitter {
     this.children = {};
     this.childrenArr = [];
     this.childIndex = 0;
+    this.min = 3;
     this.max = 6;
     this.strategy = 'polling';
     this.weights = new Array(this.max).fill().map((v, i) => {
@@ -27,7 +29,7 @@ class ChildPoolJob extends EventEmitter {
    * 创建一个池子
    */  
   create(number = 3) {
-
+    let pids = [];
     // 最大限制
     let currentNumber = this.childs.length;
     if (number + currentNumber > this.max) {
@@ -40,9 +42,10 @@ class ChildPoolJob extends EventEmitter {
     for (let i = 1; i <= number; i++) {
       subProcess = new ForkProcess(this, options);
       this._childCreated(subProcess);
+      pids.push(subProcess.pid);
     }
   
-    return;
+    return pids;
   }
 
   /**
@@ -82,23 +85,27 @@ class ChildPoolJob extends EventEmitter {
     if (boundPid) {
       subProcess = this.children[boundPid];
     } else {
-      const length = Object.keys(this.children).length;
-      if (length < this.max) {
+      // 小于最小值，则创建
+      const currentPids = Object.keys(this.children);
+      const processNumber = currentPids.length;
+      if (processNumber < this.min) {
+        const addNumber = this.min - processNumber;
+        this.create(addNumber);
+      }
+      // 从池子中获取一个
+      //let lbPid = this.LB.pickOne().id;
+      let onePid = currentPids[0];
+      subProcess = this.children[onePid];
 
-      } else {
-      // get a process from the pool based on load balancing strategy
-        forked = this.forkedMap[this.LB.pickOne().id];
-      }
-      if (id !== 'default') {
-        this.pidMap.set(id, forked.pid);
-      }
-      if (this.pidMap.keys.length === 1000) {
-        console.warn('ChildProcessPool: The count of pidMap is over than 1000, suggest to use unique id!');
+      // 进程绑定ID，保留一个默认值
+      if (boundId && boundId !== 'default') {
+        this.pidMap.set(boundId, subProcess.pid);
       }
     }
 
     if (!subProcess) {
-      throw new Error(`get a process from ChildPoolJob failed! the process pid: ${boundPid}.`);
+      Log.coreLogger.error(`[ee-core] [jobs/child-pool] No child-process are available !`);
+      return;
     }
 
     // 发消息到子进程
