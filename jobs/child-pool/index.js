@@ -10,7 +10,7 @@ class ChildPoolJob extends EventEmitter {
 
   constructor() {
     super();
-    this.pidMap = new Map();
+    this.boundMap = new Map();
     this.connectionsMap={};
     this.connectionsTimer = null;
     this.children = {};
@@ -80,32 +80,10 @@ class ChildPoolJob extends EventEmitter {
     }
 
     let subProcess;
-    // 进程绑定ID，该进程只处理此ID类型的任务。
-    const boundPid = this.pidMap.get(boundId);
-    if (boundPid) {
-      subProcess = this.children[boundPid];
+    if (boundId) {
+      subProcess = this.getBoundChild(boundId);
     } else {
-      // 小于最小值，则创建
-      const currentPids = Object.keys(this.children);
-      const processNumber = currentPids.length;
-      if (processNumber < this.min) {
-        const addNumber = this.min - processNumber;
-        this.create(addNumber);
-      }
-      // 从池子中获取一个
-      //let lbPid = this.LB.pickOne().id;
-      let onePid = currentPids[0];
-      subProcess = this.children[onePid];
-
-      // 进程绑定ID，保留一个默认值
-      if (boundId && boundId !== 'default') {
-        this.pidMap.set(boundId, subProcess.pid);
-      }
-    }
-
-    if (!subProcess) {
-      Log.coreLogger.error(`[ee-core] [jobs/child-pool] No child-process are available !`);
-      return;
+      subProcess = this.getChild();
     }
 
     // 发消息到子进程
@@ -113,6 +91,79 @@ class ChildPoolJob extends EventEmitter {
 
     return subProcess;
   }
+
+  /**
+   * 获取绑定的进程对象
+   */  
+  getBoundChild(boundId) {
+    let proc;
+    const boundPid = this.boundMap.get(boundId);
+    if (boundPid) {
+      proc = this.children[boundPid];
+      return proc;
+    }
+
+    // 获取进程并绑定
+    proc = this.getChild();
+    this.boundMap.set(boundId, proc.pid);
+
+    return proc;
+  }
+
+  /**
+   * 获取一个子进程对象
+   */  
+  getChild() {
+    let subProcess;
+    const currentPids = Object.keys(this.children);
+
+    // 没有则创建
+    if (currentPids.length == 0) {
+      let subIds = this.create(1);
+      subProcess = this.children[subIds[0]];
+    } else {
+      // todo 从池子中获取一个
+      //let lbPid = this.LB.pickOne().id;      
+      const latestPids = Object.keys(this.children);
+      let onePid = latestPids[0];
+      subProcess = this.children[onePid];
+    }
+    
+    if (!subProcess) {
+      let errorMessage = `[ee-core] [jobs/child-pool] Failed to obtain the child process !`
+      throw new Error(errorMessage);
+    }
+
+    return subProcess;
+  }
+
+  /**
+   * 获取子进程对象 （一个或多个）
+   */  
+  // getChildren(number = 1) {
+  //   const subProcesses = {};
+    
+  //   const currentPids = Object.keys(this.children);
+  //   const processNumber = currentPids.length;
+
+  //   // 小于最小值，则创建
+  //   if (processNumber < this.min) {
+  //     const addNumber = this.min - processNumber;
+  //     this.create(addNumber);
+  //   }
+  //   // 从池子中获取一个
+  //   const latestPids = Object.keys(this.children);
+  //   //let lbPid = this.LB.pickOne().id;
+  //   let onePid = latestPids[0];
+  //   subProcess = this.children[onePid];
+
+  //   // 进程绑定ID，保留一个默认值
+  //   // if (boundId && boundId !== 'default') {
+  //   //   this.pidMap.set(boundId, subProcess.pid);
+  //   // }   
+    
+    
+  // }
 
 }
 
