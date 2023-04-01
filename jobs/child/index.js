@@ -27,9 +27,7 @@ class ChildJob extends EventEmitter {
    */  
   exec(filepath, params = {}, opt = {}) {
     this.jobPath = Loader.getFullpath(filepath);
-
     const proc = this.createProcess(opt);
-
     this.send(params);
   
     return proc;
@@ -41,10 +39,9 @@ class ChildJob extends EventEmitter {
   send(params = {}) {
     // 消息对象
     const mid = Helper.getRandomString();
-    const jobPath = this.jobPath;
     let msg = {
       mid,
-      jobPath,
+      jobPath: this.jobPath,
       jobParams: params
     }
 
