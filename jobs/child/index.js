@@ -7,6 +7,8 @@ class ChildJob extends EventEmitter {
 
   constructor() {
     super();
+    this.jobProcess = null;
+    this.jobPath = null;
     this.initEvents();
   }
 
@@ -24,27 +26,44 @@ class ChildJob extends EventEmitter {
    * 执行一个job文件
    */  
   exec(filepath, params = {}, opt = {}) {
-    const jobPath = Loader.getFullpath(filepath);
+    this.jobPath = Loader.getFullpath(filepath);
 
+    const proc = this.createProcess(opt);
+
+    this.send(params);
+  
+    return proc;
+  }
+
+  /**
+   * 发送消息
+   */
+  send(params = {}) {
     // 消息对象
     const mid = Helper.getRandomString();
+    const jobPath = this.jobPath;
     let msg = {
       mid,
       jobPath,
       jobParams: params
     }
 
-    let subProcess = new ForkProcess(this, opt);
-
     // todo 是否会发生监听未完成时，接收不到消息？
     // 发消息到子进程
-    subProcess.child.send(msg);
-  
-    return subProcess;
+    this.jobProcess.child.send(msg);
   }
 
   /**
-   * 异步执行一个job文件
+   * 创建子进程
+   */  
+  createProcess(opt = {}) {
+    this.jobProcess = new ForkProcess(this, opt);
+  
+    return this.jobProcess;
+  }
+
+  /**
+   * 异步执行一个job文件 todo this指向
    */
   async execPromise(filepath, params = {}, opt = {}) {
     return this.exec(filepath, params = {}, opt = {});

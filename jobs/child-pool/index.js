@@ -1,10 +1,10 @@
 const EventEmitter = require('events');
-const ForkProcess = require('./forkProcess');
 const LoadBalancer = require('../load-balancer');
 const Loader = require('../../loader');
 const Helper = require('../../utils/helper');
 const UtilsIs = require('../../utils/is');
 const Log = require('../../log');
+const Child = require('../child');
 
 class ChildPoolJob extends EventEmitter {
 
@@ -97,7 +97,7 @@ class ChildPoolJob extends EventEmitter {
    * 异步执行一个job文件
    */
   async execPromise(filepath, params = {}, opt = {}) {
-    return this.exec(filepath, params = {}, opt = {});
+    return this.exec(filepath, params, opt);
   }  
 
   /**

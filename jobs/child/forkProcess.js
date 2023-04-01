@@ -16,6 +16,7 @@ class ForkProcess {
     }
 
     let options = Object.assign({
+      processArgs: [],
       processOptions: { 
         cwd: cwd,
         env: Ps.allEnv(), 
@@ -24,7 +25,7 @@ class ForkProcess {
     }, opt);
 
     this.host = host;
-    this.args = [];
+    this.args = options.processArgs;
     this.sleeping = false;
 
     // 传递给子进程的参数
