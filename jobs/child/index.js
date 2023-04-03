@@ -2,23 +2,26 @@ const EventEmitter = require('events');
 const ForkProcess = require('./forkProcess');
 const Loader = require('../../loader');
 const Helper = require('../../utils/helper');
+const Channel = require('../../const/channel');
 
 class ChildJob extends EventEmitter {
 
   constructor() {
     super();
     this.jobs = {};
-    this.initEvents();
+    this._initEvents();
   }
 
   /**
    * 初始化监听
    */  
-  initEvents = () => {
-
-    // this.on('forked_message', ({data, id}) => {
-    //   this.onMessage({data, id});
-    // });
+  _initEvents = () => {
+    this.on(Channel.events.childJobExit, (data) => {
+      delete this.jobs[data.pid];
+    });
+    this.on(Channel.events.childJobError, (data) => {
+      delete this.jobs[data.pid];
+    });
   }
 
   /**

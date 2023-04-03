@@ -5,5 +5,9 @@ module.exports = {
   },
   socketIo: {
     partySoftware: 'c1',
-  },  
+  },
+  events: {
+    childJobExit: 'ee#ChildJob#exit',
+    childJobError: 'ee#ChildJob#error',
+  }
 };

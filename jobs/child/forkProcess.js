@@ -40,6 +40,7 @@ class ForkProcess {
    * 进程初始化
    */
   _init() {
+    this._handleMessage.bind(this)
     this.child.on('message', (m) => {
       Log.coreLogger.info(`[ee-core] [jobs/child] received a message from child-process, message: ${serialize(m)}`);
       if (m.channel == Channel.process.showException) {
@@ -54,10 +55,18 @@ class ForkProcess {
     });
 
     this.child.on('exit', (code, signal) => {
+      let data = {
+        pid: this.pid
+      }
+      this.host.emit(Channel.events.childJobExit, data);
       Log.coreLogger.info(`[ee-core] [jobs/child] received a exit from child-process, code:${code}, signal:${signal}`);
     });
 
     this.child.on('error', (err) => {
+      let data = {
+        pid: this.pid
+      }
+      this.host.emit(Channel.events.childJobError, data);
       Log.coreLogger.error(`[ee-core] [jobs/child] received a error from child-process, error: ${err} !`);
     });
   }
