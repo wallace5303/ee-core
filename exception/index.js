@@ -1,6 +1,7 @@
 const Log = require('../log');
 const Ps = require('../ps');
 const Channel = require('../const/channel');
+const Conf = require('../config');
 
 /**
  * 捕获异常
@@ -25,7 +26,9 @@ exports.uncaughtExceptionHandler = function() {
 
     Log.coreLogger.error(err);
 
-    devError(err);
+    _devError(err);
+
+    _exit();
   });
 }
 
@@ -64,14 +67,16 @@ exports.unhandledRejectionHandler = function() {
 
     Log.coreLogger.error(err);
 
-    devError(err);
+    _devError(err);
+
+    _exit();
   });
 }
 
 /**
  * 如果是子进程，发送错误到主进程控制台
  */
-function devError (err) {
+function _devError (err) {
   if (Ps.isForkedChild() && Ps.isDev()) {
     let msgChannel = Channel.process.showException;
     let errTips = (err && typeof err == 'object') ? err.toString() : '';
@@ -81,5 +86,25 @@ function devError (err) {
       data: errTips
     }
     process.send(message);
+  }
+}
+
+/**
+ * 捕获异常后是否退出
+ */
+function _exit () {
+  let cfg = Conf.getValue('exception');
+  if (!cfg) {
+    return;
+  }
+
+  if (Ps.isMain() && cfg.mainExit == true) {
+    process.exit();
+  } else if (Ps.isForkedChild() && cfg.childExit == true) {
+    process.exit();
+  } else if (Ps.isRenderer() && cfg.rendererExit == true) {
+    process.exit();
+  } else {
+    // other
   }
 }

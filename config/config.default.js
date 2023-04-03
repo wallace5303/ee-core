@@ -282,5 +282,14 @@ module.exports = appInfo => {
     }
   }; 
 
+  /**
+   * 异常捕获
+   */
+  config.exception = {
+    mainExit: false,
+    childExit: true,
+    rendererExit: true,
+  };
+
   return config;
 };
