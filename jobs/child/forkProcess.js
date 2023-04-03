@@ -50,8 +50,7 @@ class ForkProcess {
 
       // 收到子进程消息，转发到 event 
       if (m.channel == Channel.process.sendToMain) {
-        let receiver = m.eventReceiver;
-        this._eventEmit(receiver);
+        this._eventEmit(m);
       }
     });
 
@@ -75,13 +74,13 @@ class ForkProcess {
   /**
    * event emit
    */
-  _eventEmit(receiver) {
-    switch (receiver) {
+  _eventEmit(m) {
+    switch (m.eventReceiver) {
       case Channel.receiver.forkProcess:
-        this.host.emit(m.event, m.data);
+        this.emitter.emit(m.event, m.data);
         break;
       case Channel.receiver.childJob:
-        this.emitter.emit(m.event, m.data);
+        this.host.emit(m.event, m.data);
         break;    
       default:
         this.host.emit(m.event, m.data);
