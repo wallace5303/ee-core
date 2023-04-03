@@ -7,8 +7,7 @@ class ChildJob extends EventEmitter {
 
   constructor() {
     super();
-    this.jobProcess = null;
-    this.jobPath = null;
+    this.jobs = {};
     this.initEvents();
   }
 
@@ -36,11 +35,12 @@ class ChildJob extends EventEmitter {
   /**
    * 发送消息
    */
-  send(params = {}) {
+  send(pid, params = {}) {
     // 消息对象
     const mid = Helper.getRandomString();
     let msg = {
       mid,
+      cmd: 'run',
       jobPath: this.jobPath,
       jobParams: params
     }
@@ -55,7 +55,7 @@ class ChildJob extends EventEmitter {
    */  
   createProcess(opt = {}) {
     this.jobProcess = new ForkProcess(this, opt);
-  
+    
     return this.jobProcess;
   }
 
@@ -63,7 +63,7 @@ class ChildJob extends EventEmitter {
    * 异步执行一个job文件 todo this指向
    */
   async execPromise(filepath, params = {}, opt = {}) {
-    return this.exec(filepath, params = {}, opt = {});
+    return this.exec(filepath, params, opt);
   }
 
 }

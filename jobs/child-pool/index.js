@@ -4,7 +4,7 @@ const Loader = require('../../loader');
 const Helper = require('../../utils/helper');
 const UtilsIs = require('../../utils/is');
 const Log = require('../../log');
-const Child = require('../child');
+const ChildJob = require('../child');
 
 class ChildPoolJob extends EventEmitter {
 
@@ -38,9 +38,11 @@ class ChildPoolJob extends EventEmitter {
 
     // 预留
     let options = {};
-    let subProcess;
+    let cJob = new ChildJob();
+    let subJob;
     for (let i = 1; i <= number; i++) {
-      subProcess = new ForkProcess(this, options);
+      subJob = new ForkProcess(this, options);
+      subJob = cJob.createProcess();
       this._childCreated(subProcess);
     }
   
@@ -68,7 +70,7 @@ class ChildPoolJob extends EventEmitter {
   /**
    * 执行一个job文件
    */  
-  exec(filepath, params = {}, opt = {}) {
+  run(filepath, params = {}, opt = {}) {
     const jobPath = Loader.getFullpath(filepath);
     const boundId = opt.boundId || null;
 
@@ -96,8 +98,8 @@ class ChildPoolJob extends EventEmitter {
   /**
    * 异步执行一个job文件
    */
-  async execPromise(filepath, params = {}, opt = {}) {
-    return this.exec(filepath, params, opt);
+  async runPromise(filepath, params = {}, opt = {}) {
+    return this.run(filepath, params, opt);
   }  
 
   /**
