@@ -37,10 +37,9 @@ class ForkProcess {
   }
 
   /**
-   * 进程初始化
+   * 初始化事件监听
    */
   _init() {
-    this._handleMessage.bind(this)
     this.child.on('message', (m) => {
       Log.coreLogger.info(`[ee-core] [jobs/child] received a message from child-process, message: ${serialize(m)}`);
       if (m.channel == Channel.process.showException) {

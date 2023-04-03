@@ -13,6 +13,7 @@ const UtilsCore = require('ee-core/core/lib/utils');
 // const UtilsCore = require('../../core/lib/utils');
 
 Exception.start();
+const commands = ['run'];
 
 class ChildApp {
   constructor() {
@@ -33,7 +34,15 @@ class ChildApp {
    * 监听消息
    */
   _handleMessage(m) {
-    this.run(m);
+    if (commands.indexOf(m.cmd) == -1) {
+      return
+    }
+    switch (m.cmd) {
+      case 'run':
+        this.run(m);
+        break;
+      default:
+    }
     Log.coreLogger.info(`[ee-core] [jobs/child] received a message from main-process, message: ${JSON.stringify(m)}`);
   }
 

@@ -99,12 +99,22 @@ function _exit () {
   }
 
   if (Ps.isMain() && cfg.mainExit == true) {
-    process.exit();
+    _delayExit();
   } else if (Ps.isForkedChild() && cfg.childExit == true) {
-    process.exit();
+    _delayExit();
   } else if (Ps.isRenderer() && cfg.rendererExit == true) {
-    process.exit();
+    _delayExit();
   } else {
     // other
   }
+}
+
+/**
+ * 捕获异常后是否退出
+ */
+function _delayExit() {
+  // 等待日志等异步写入完成
+  setTimeout(() => {
+    process.exit();
+  }, 1500)
 }
