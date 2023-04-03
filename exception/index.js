@@ -1,7 +1,7 @@
 const Log = require('../log');
 const Ps = require('../ps');
-const Channel = require('../const/channel');
 const Conf = require('../config');
+const Message = require('../message');
 
 /**
  * 捕获异常
@@ -78,14 +78,7 @@ exports.unhandledRejectionHandler = function() {
  */
 function _devError (err) {
   if (Ps.isForkedChild() && Ps.isDev()) {
-    let msgChannel = Channel.process.showException;
-    let errTips = (err && typeof err == 'object') ? err.toString() : '';
-    errTips += ' Error !!! Please See file ee-core.log or ee-error-xxx.log for details !'
-    let message = {
-      channel: msgChannel,
-      data: errTips
-    }
-    process.send(message);
+    Message.childMessage.sendErrorToTerminal(err);
   }
 }
 

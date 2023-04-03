@@ -1,4 +1,5 @@
 const path = require('path');
+const EventEmitter = require('events');
 const { fork } = require('child_process');
 const serialize = require('serialize-javascript');
 const Log = require('../../log');
@@ -24,6 +25,7 @@ class ForkProcess {
       }
     }, opt);
 
+    this.emitter = new EventEmitter();
     this.host = host;
     this.args = options.processArgs;
     this.sleeping = false;
@@ -48,9 +50,9 @@ class ForkProcess {
 
       // 收到子进程消息，转发到 event 
       if (m.channel == Channel.process.sendToMain) {
-        this.host.emit(m.event, m.data);
+        let receiver = m.eventReceiver;
+        this._eventEmit(receiver);
       }
-
     });
 
     this.child.on('exit', (code, signal) => {
@@ -70,6 +72,23 @@ class ForkProcess {
     });
   }
 
+  /**
+   * event emit
+   */
+  _eventEmit(receiver) {
+    switch (receiver) {
+      case Channel.receiver.forkProcess:
+        this.host.emit(m.event, m.data);
+        break;
+      case Channel.receiver.childJob:
+        this.emitter.emit(m.event, m.data);
+        break;    
+      default:
+        this.host.emit(m.event, m.data);
+        this.emitter.emit(m.event, m.data);
+        break;
+    }
+  }  
 }
 
 module.exports = ForkProcess;

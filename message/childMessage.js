@@ -8,9 +8,11 @@ class ChildMessage {
   /**
    * 向主进程发消息
    */
-  sendToMain(eventName, params = {}) {
+  sendToMain(eventName, params = {}, receiver) {
+    let eventReceiver = receiver || Channel.receiver.forkProcess;
     let message = {
       channel: Channel.process.sendToMain,
+      eventReceiver,
       event: eventName,
       data: params,
     }
@@ -23,6 +25,19 @@ class ChildMessage {
    */
   exit(code = 0) {
     return process.exit(code);
+  }
+
+  /**
+   * 发送错误到控制台
+   */
+  sendErrorToTerminal(err) {
+    let errTips = (err && typeof err == 'object') ? err.toString() : '';
+    errTips += ' Error !!! Please See file ee-core.log or ee-error-xxx.log for details !'
+    let message = {
+      channel: Channel.process.showException,
+      data: errTips
+    }
+    process.send(message);
   }
 }
 

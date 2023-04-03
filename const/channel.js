@@ -9,5 +9,10 @@ module.exports = {
   events: {
     childJobExit: 'ee#ChildJob#exit',
     childJobError: 'ee#ChildJob#error',
+  },
+  receiver: {
+    childJob: 'job',
+    forkProcess: 'task',
+    all: 'all'
   }
 };
