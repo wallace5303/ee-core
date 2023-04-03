@@ -25,38 +25,59 @@ class ChildJob extends EventEmitter {
    * 执行一个job文件
    */  
   exec(filepath, params = {}, opt = {}) {
-    this.jobPath = Loader.getFullpath(filepath);
+    const jobPath = Loader.getFullpath(filepath);
     const proc = this.createProcess(opt);
-    this.send(params);
+    const command = 'run';
+    this.sendToChild(proc.pid, command, jobPath, params);
   
     return proc;
   }
 
   /**
-   * 发送消息
+   * 发送消息到子进程的app入口
    */
-  send(pid, params = {}) {
+  sendToChild(pid, cmd, jobPath = '', params = {}) {
     // 消息对象
     const mid = Helper.getRandomString();
     let msg = {
       mid,
-      cmd: 'run',
-      jobPath: this.jobPath,
+      cmd,
+      jobPath,
       jobParams: params
     }
 
     // todo 是否会发生监听未完成时，接收不到消息？
     // 发消息到子进程
-    this.jobProcess.child.send(msg);
+    const subProcess = this.jobs[pid];
+    subProcess.child.send(msg);
   }
+
+  /**
+   * 发送消息
+   */
+  // send(pid, cmd, jobPath = '', params = {}) {
+  //   // 消息对象
+  //   const mid = Helper.getRandomString();
+  //   let msg = {
+  //     mid,
+  //     cmd: 'run',
+  //     jobPath: this.jobPath,
+  //     jobParams: params
+  //   }
+
+  //   // todo 是否会发生监听未完成时，接收不到消息？
+  //   // 发消息到子进程
+  //   this.jobProcess.child.send(msg);
+  // }
 
   /**
    * 创建子进程
    */  
   createProcess(opt = {}) {
-    this.jobProcess = new ForkProcess(this, opt);
-    
-    return this.jobProcess;
+    const proc = new ForkProcess(this, opt);
+    this.jobs[proc.pid] = proc;
+
+    return proc;
   }
 
   /**
