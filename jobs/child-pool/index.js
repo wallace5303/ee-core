@@ -85,9 +85,8 @@ class ChildPoolJob extends EventEmitter {
   /**
    * 执行一个job文件
    */  
-  run(filepath, params = {}, opt = {}) {
+  run(filepath, params = {}) {
     const jobPath = Loader.getFullpath(filepath);
-    const boundId = opt.boundId || null;
 
     // 消息对象
     const mid = Helper.getRandomString();
@@ -97,12 +96,7 @@ class ChildPoolJob extends EventEmitter {
       jobParams: params
     }
 
-    let childProcess;
-    if (boundId) {
-      childProcess = this.getBoundChild(boundId);
-    } else {
-      childProcess = this.getChild();
-    }
+    const childProcess = this.getChild();
 
     // 发消息到子进程
     childProcess.child.send(msg);

@@ -5,6 +5,7 @@ const serialize = require('serialize-javascript');
 const Log = require('../../log');
 const Ps = require('../../ps');
 const Channel = require('../../const/channel');
+const Helper = require('../../utils/helper');
 
 class ForkProcess {
   constructor(host, opt = {}) {
@@ -87,7 +88,25 @@ class ForkProcess {
         this.emitter.emit(m.event, m.data);
         break;
     }
-  }  
+  }
+  
+  /**
+   * 分发任务
+   */
+  dispatch(cmd, jobPath = '', params = {}) {
+    // 消息对象
+    const mid = Helper.getRandomString();
+    let msg = {
+      mid,
+      cmd,
+      jobPath,
+      jobParams: params
+    }
+
+    // todo 是否会发生监听未完成时，接收不到消息？
+    // 发消息到子进程
+    this.child.send(msg);
+  }
 }
 
 module.exports = ForkProcess;
