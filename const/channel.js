@@ -7,8 +7,8 @@ module.exports = {
     partySoftware: 'c1',
   },
   events: {
-    childJobExit: 'ee#ChildJob#exit',
-    childJobError: 'ee#ChildJob#error',
+    childProcessExit: 'ee#childProcess#exit',
+    childProcessError: 'ee#childProcess#error',
   },
   receiver: {
     childJob: 'job',

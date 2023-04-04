@@ -58,7 +58,7 @@ class ForkProcess {
       let data = {
         pid: this.pid
       }
-      this.host.emit(Channel.events.childJobExit, data);
+      this.host.emit(Channel.events.childProcessExit, data);
       Log.coreLogger.info(`[ee-core] [jobs/child] received a exit from child-process, code:${code}, signal:${signal}`);
     });
 
@@ -66,7 +66,7 @@ class ForkProcess {
       let data = {
         pid: this.pid
       }
-      this.host.emit(Channel.events.childJobError, data);
+      this.host.emit(Channel.events.childProcessError, data);
       Log.coreLogger.error(`[ee-core] [jobs/child] received a error from child-process, error: ${err} !`);
     });
   }

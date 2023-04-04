@@ -5,6 +5,7 @@ const Helper = require('../../utils/helper');
 const UtilsIs = require('../../utils/is');
 const Log = require('../../log');
 const ForkProcess = require('../child/forkProcess');
+const Channel = require('../../const/channel');
 
 class ChildPoolJob extends EventEmitter {
 
@@ -14,8 +15,8 @@ class ChildPoolJob extends EventEmitter {
     this.connectionsMap={};
     this.connectionsTimer = null;
     this.children = {};
-    this.childrenArr = [];
-    this.childIndex = 0;
+    // this.childrenArr = [];
+    // this.childIndex = 0;
     this.min = 3;
     this.max = 6;
     this.strategy = 'polling';
@@ -23,7 +24,20 @@ class ChildPoolJob extends EventEmitter {
       //(UtilsIs.validValue(weights[i]) ? weights[i] : 1)
       return 1;
     });
+    this._initEvents();
   }
+
+  /**
+   * 初始化监听
+   */  
+  _initEvents = () => {
+    this.on(Channel.events.childProcessExit, (data) => {
+      delete this.children[data.pid];
+    });
+    this.on(Channel.events.childProcessError, (data) => {
+      delete this.children[data.pid];
+    });
+  }  
 
   /**
    * 创建一个池子
@@ -38,12 +52,9 @@ class ChildPoolJob extends EventEmitter {
 
     // 预留
     let options = {};
-    let cJob = new ChildJob();
-    let subJob;
     for (let i = 1; i <= number; i++) {
-      subJob = new ForkProcess(this, options);
-      subJob = cJob.createProcess();
-      this._childCreated(subProcess);
+      let task = new ForkProcess(this, options);
+      this._childCreated(task);
     }
   
     let pids = Object.keys(this.children);
