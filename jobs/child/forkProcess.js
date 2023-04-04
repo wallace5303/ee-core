@@ -18,7 +18,7 @@ class ForkProcess {
     }
 
     let options = Object.assign({
-      processArgs: [],
+      processArgs: {},
       processOptions: { 
         cwd: cwd,
         env: Ps.allEnv(), 
@@ -28,11 +28,11 @@ class ForkProcess {
 
     this.emitter = new EventEmitter();
     this.host = host;
-    this.args = options.processArgs;
+    this.args = [];
     this.sleeping = false;
 
     // 传递给子进程的参数
-    //this.args.push(JSON.stringify(options.params));
+    this.args.push(JSON.stringify(options.processArgs));
 
     this.child = fork(appPath, this.args, options.processOptions);
     this.pid = this.child.pid;
@@ -60,7 +60,7 @@ class ForkProcess {
         pid: this.pid
       }
       this.host.emit(Channel.events.childProcessExit, data);
-      Log.coreLogger.info(`[ee-core] [jobs/child] received a exit from child-process, code:${code}, signal:${signal}`);
+      Log.coreLogger.info(`[ee-core] [jobs/child] received a exit from child-process, code:${code}, signal:${signal}, pid:${this.pid}`);
     });
 
     this.child.on('error', (err) => {
@@ -68,7 +68,7 @@ class ForkProcess {
         pid: this.pid
       }
       this.host.emit(Channel.events.childProcessError, data);
-      Log.coreLogger.error(`[ee-core] [jobs/child] received a error from child-process, error: ${err} !`);
+      Log.coreLogger.error(`[ee-core] [jobs/child] received a error from child-process, error: ${err}, pid:${this.pid}`);
     });
   }
 

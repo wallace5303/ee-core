@@ -114,3 +114,16 @@ exports.callFn = async function (fn, args, ctx) {
 exports.middleware = function (fn) {
   return is.generatorFunction(fn) ? convert(fn) : fn;
 }
+
+/**
+ * 序列化对象
+ */
+exports.stringify = function(obj, ignore = []) {
+  const result = {};
+  Object.keys(obj).forEach(key => {
+      if (!ignore.includes(key)) {
+      result[key] = obj[key];
+      }
+  });
+  return JSON.stringify(result);
+}

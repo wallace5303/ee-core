@@ -52,8 +52,12 @@ class ChildPoolJob extends EventEmitter {
       number = this.max - currentNumber;
     }
 
-    // 预留
-    let options = {};
+    // args
+    let options = Object.assign({
+      processArgs: {
+        type: 'childPoolJob'
+      }
+    }, {});
     for (let i = 1; i <= number; i++) {
       let task = new ForkProcess(this, options);
       this._childCreated(task);
@@ -150,6 +154,14 @@ class ChildPoolJob extends EventEmitter {
 
     return proc;
   }
+
+  /**
+   * 获取当前pids
+   */  
+  getPids() {
+    let pids = Object.keys(this.children);
+    return pids;
+  }   
 
   /**
    * 获取子进程对象 （一个或多个）

@@ -39,7 +39,12 @@ class ChildJob extends EventEmitter {
    * 创建子进程
    */  
   createProcess(opt = {}) {
-    const proc = new ForkProcess(this, opt);
+    let options = Object.assign({
+      processArgs: {
+        type: 'childJob'
+      }
+    }, opt);
+    const proc = new ForkProcess(this, options);
     if (!proc) {
       let errorMessage = `[ee-core] [jobs/child] Failed to obtain the child process !`
       throw new Error(errorMessage);
@@ -48,6 +53,14 @@ class ChildJob extends EventEmitter {
 
     return proc;
   }
+
+  /**
+   * 获取当前pids
+   */  
+  getPids() {
+    let pids = Object.keys(this.jobs);
+    return pids;
+  }  
 
   /**
    * 异步执行一个job文件 todo this指向

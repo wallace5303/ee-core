@@ -1,5 +1,6 @@
 const path = require('path');
 const eis = require('../utils/is');
+const Log = require('../log');
 
 /**
  * 当前进程的所有env
@@ -238,4 +239,20 @@ exports.makeMessage = function(msg = {}) {
   }, msg);
 
   return message;
+}
+
+/**
+ * 退出ChildJob进程
+ */
+exports.exitChildJob = function(code = 0) {
+  try {
+    let args = JSON.parse(process.argv[2]);
+    if (args.type == 'childJob') {
+      //Log.coreLogger.info('------------ exit ChildJob ');
+      process.exit(code);
+    }
+  } catch (e) {
+    //Log.coreLogger.error('------------ error exit ChildJob ');
+    process.exit(code);
+  }
 }
