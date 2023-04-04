@@ -268,7 +268,7 @@ class EeApp extends BaseApp {
   }
 
   /**
-   * 捕获异常
+   * 捕获异常（废弃）
    */
   async catchLog () {
     process.on('uncaughtException', function(err) {

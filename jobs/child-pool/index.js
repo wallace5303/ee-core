@@ -1,9 +1,6 @@
 const EventEmitter = require('events');
 const LoadBalancer = require('../load-balancer');
 const Loader = require('../../loader');
-const Helper = require('../../utils/helper');
-const UtilsIs = require('../../utils/is');
-const Log = require('../../log');
 const ForkProcess = require('../child/forkProcess');
 const Channel = require('../../const/channel');
 
@@ -43,8 +40,9 @@ class ChildPoolJob extends EventEmitter {
    * 创建一个池子
    */  
   async create(number = 3) {
-    
-    // 最大限制
+    if (number < 0 || number > this.max) {
+      throw new Error(`[ee-core] [jobs/child-pool] The number is invalid !`);
+    }
     let currentNumber = this.children.length;
     if (currentNumber > this.max) {
       throw new Error(`[ee-core] [jobs/child-pool] The number of current processes number: ${currentNumber} is greater than the maximum: ${this.max} !`);
@@ -87,19 +85,8 @@ class ChildPoolJob extends EventEmitter {
    */  
   run(filepath, params = {}) {
     const jobPath = Loader.getFullpath(filepath);
-
-    // 消息对象
-    const mid = Helper.getRandomString();
-    const msg = {
-      mid,
-      jobPath,
-      jobParams: params
-    }
-
     const childProcess = this.getChild();
-
-    // 发消息到子进程
-    childProcess.child.send(msg);
+    childProcess.dispatch('run', jobPath, params);
 
     return childProcess;
   }
