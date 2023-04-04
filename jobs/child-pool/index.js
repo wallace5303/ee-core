@@ -4,7 +4,7 @@ const Loader = require('../../loader');
 const Helper = require('../../utils/helper');
 const UtilsIs = require('../../utils/is');
 const Log = require('../../log');
-const ChildJob = require('../child');
+const ForkProcess = require('../child/forkProcess');
 
 class ChildPoolJob extends EventEmitter {
 
