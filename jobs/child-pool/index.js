@@ -46,6 +46,10 @@ class ChildPoolJob extends EventEmitter {
     
     // 最大限制
     let currentNumber = this.children.length;
+    if (currentNumber > this.max) {
+      throw new Error(`[ee-core] [jobs/child-pool] The number of current processes number: ${currentNumber} is greater than the maximum: ${this.max} !`);
+    }
+
     if (number + currentNumber > this.max) {
       number = this.max - currentNumber;
     }
@@ -65,14 +69,14 @@ class ChildPoolJob extends EventEmitter {
   /**
    * 子进程创建后处理
    */  
-  _childCreated(subProcess) {
-    let pid = subProcess.pid;
-    this.children[pid] = subProcess;
+  _childCreated(childProcess) {
+    let pid = childProcess.pid;
+    this.children[pid] = childProcess;
     // const length = Object.keys(this.children).length;
     // console.log('length:', length);
 
     // this.LB.add({
-    //   id: subProcess.pid,
+    //   id: childProcess.pid,
     //   weight: this.weights[length - 1],
     // });
     // this.lifecycle.watch([pid]);
@@ -93,17 +97,17 @@ class ChildPoolJob extends EventEmitter {
       jobParams: params
     }
 
-    let subProcess;
+    let childProcess;
     if (boundId) {
-      subProcess = this.getBoundChild(boundId);
+      childProcess = this.getBoundChild(boundId);
     } else {
-      subProcess = this.getChild();
+      childProcess = this.getChild();
     }
 
     // 发消息到子进程
-    subProcess.child.send(msg);
+    childProcess.child.send(msg);
 
-    return subProcess;
+    return childProcess;
   }
 
   /**
@@ -132,37 +136,45 @@ class ChildPoolJob extends EventEmitter {
   }
 
   /**
+   * 通过pid获取一个子进程对象
+   */  
+  getChildByPid(pid) {
+    let proc = this.children[pid] || null;
+    return proc;
+  }
+
+  /**
    * 获取一个子进程对象
    */  
   getChild() {
-    let subProcess;
+    let proc;
     const currentPids = Object.keys(this.children);
 
     // 没有则创建
     if (currentPids.length == 0) {
       let subIds = this.create(1);
-      subProcess = this.children[subIds[0]];
+      proc = this.children[subIds[0]];
     } else {
       // todo 从池子中获取一个
       //let lbPid = this.LB.pickOne().id;      
       const latestPids = Object.keys(this.children);
       let onePid = latestPids[0];
-      subProcess = this.children[onePid];
+      proc = this.children[onePid];
     }
     
-    if (!subProcess) {
+    if (!proc) {
       let errorMessage = `[ee-core] [jobs/child-pool] Failed to obtain the child process !`
       throw new Error(errorMessage);
     }
 
-    return subProcess;
+    return proc;
   }
 
   /**
    * 获取子进程对象 （一个或多个）
    */  
   // getChildren(number = 1) {
-  //   const subProcesses = {};
+  //   const childProcesses = {};
     
   //   const currentPids = Object.keys(this.children);
   //   const processNumber = currentPids.length;
@@ -176,11 +188,11 @@ class ChildPoolJob extends EventEmitter {
   //   const latestPids = Object.keys(this.children);
   //   //let lbPid = this.LB.pickOne().id;
   //   let onePid = latestPids[0];
-  //   subProcess = this.children[onePid];
+  //   childProcess = this.children[onePid];
 
   //   // 进程绑定ID，保留一个默认值
   //   // if (boundId && boundId !== 'default') {
-  //   //   this.pidMap.set(boundId, subProcess.pid);
+  //   //   this.pidMap.set(boundId, childProcess.pid);
   //   // }   
     
     
