@@ -248,11 +248,38 @@ exports.exitChildJob = function(code = 0) {
   try {
     let args = JSON.parse(process.argv[2]);
     if (args.type == 'childJob') {
-      //Log.coreLogger.info('------------ exit ChildJob ');
       process.exit(code);
     }
   } catch (e) {
-    //Log.coreLogger.error('------------ error exit ChildJob ');
     process.exit(code);
+  }
+}
+
+
+/**
+ * 任务类型 ChildJob
+ */
+exports.isChildJob = function() {
+  try {
+    let args = JSON.parse(process.argv[2]);
+    if (args.type == 'childJob') {
+      return true;
+    }
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * 任务类型 ChildPoolJob
+ */
+exports.isChildPoolJob = function() {
+  try {
+    let args = JSON.parse(process.argv[2]);
+    if (args.type == 'childPoolJob') {
+      return true;
+    }
+  } catch (e) {
+    return false;
   }
 }
