@@ -3,11 +3,16 @@ const LoadBalancer = require('../load-balancer');
 const Loader = require('../../loader');
 const ForkProcess = require('../child/forkProcess');
 const Channel = require('../../const/channel');
+const Helper = require('../../utils/helper');
 
 class ChildPoolJob extends EventEmitter {
 
-  constructor() {
+  constructor(opt = {}) {
     super();
+    let options = Object.assign({
+      weights: [],
+    }, opt);
+
     this.boundMap = new Map();
     this.connectionsMap={};
     this.connectionsTimer = null;
@@ -18,9 +23,14 @@ class ChildPoolJob extends EventEmitter {
     this.max = 6;
     this.strategy = 'polling';
     this.weights = new Array(this.max).fill().map((v, i) => {
-      //(UtilsIs.validValue(weights[i]) ? weights[i] : 1)
-      return 1;
+      (Helper.validValue(options.weights[i]) ? options.weights[i] : 1)
     });
+
+    let lbOpt = {
+      algorithm: LoadBalancer.Algorithm.polling,
+      targets: [],
+    }
+    this.LB = new LoadBalancer(lbOpt);
     this._initEvents();
   }
 
@@ -74,13 +84,15 @@ class ChildPoolJob extends EventEmitter {
   _childCreated(childProcess) {
     let pid = childProcess.pid;
     this.children[pid] = childProcess;
-    // const length = Object.keys(this.children).length;
-    // console.log('length:', length);
 
-    // this.LB.add({
-    //   id: childProcess.pid,
-    //   weight: this.weights[length - 1],
-    // });
+    const length = Object.keys(this.children).length;
+    let lbTask = {
+      id: pid,
+      weight: this.weights[length - 1],
+    }
+    this.LB.add(lbTask);
+
+    console.log('----------- createPId:', pid);
     // this.lifecycle.watch([pid]);
   }
 
@@ -141,9 +153,11 @@ class ChildPoolJob extends EventEmitter {
       proc = this.children[subIds[0]];
     } else {
       // todo 从池子中获取一个
-      //let lbPid = this.LB.pickOne().id;      
-      const latestPids = Object.keys(this.children);
-      let onePid = latestPids[0];
+      let onePid = this.LB.pickOne().id;
+      
+      console.log('----------- onePid:', onePid);
+      // const latestPids = Object.keys(this.children);
+      // let onePid = latestPids[0];
       proc = this.children[onePid];
     }
     
@@ -164,31 +178,20 @@ class ChildPoolJob extends EventEmitter {
   }   
 
   /**
-   * 获取子进程对象 （一个或多个）
-   */  
-  // getChildren(number = 1) {
-  //   const childProcesses = {};
-    
-  //   const currentPids = Object.keys(this.children);
-  //   const processNumber = currentPids.length;
+    * onForkedDisconnect [triggered when a process instance disconnect]
+    * @param  {[String]} pid [process pid]
+    */
+  // onForkedDisconnect = (pid) => {
+  //   const length = this.forked.length;
 
-  //   // 小于最小值，则创建
-  //   if (processNumber < this.min) {
-  //     const addNumber = this.min - processNumber;
-  //     this.create(addNumber);
-  //   }
-  //   // 从池子中获取一个
-  //   const latestPids = Object.keys(this.children);
-  //   //let lbPid = this.LB.pickOne().id;
-  //   let onePid = latestPids[0];
-  //   childProcess = this.children[onePid];
-
-  //   // 进程绑定ID，保留一个默认值
-  //   // if (boundId && boundId !== 'default') {
-  //   //   this.pidMap.set(boundId, childProcess.pid);
-  //   // }   
-    
-    
+  //   removeForkedFromPool(this.forked, pid, this.pidMap);
+  //   this.forkedMap = convertForkedToMap(this.forked);
+  //   this.LB.del({
+  //     id: pid,
+  //     weight: this.weights[length - 1],
+  //   });
+  //   this.lifecycle.unwatch([pid]);
+  //   EventCenter.emit('process-manager:unlisten', [pid]);
   // }
 
 }

@@ -127,3 +127,14 @@ exports.stringify = function(obj, ignore = []) {
   });
   return JSON.stringify(result);
 }
+
+/**
+ * 是否有效值
+ */
+exports.validValue = function(value) {
+  return (
+    value !== undefined &&
+    value !== null &&
+    value !== ''
+  );
+}
