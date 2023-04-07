@@ -112,7 +112,7 @@ class ForkProcess {
    * kill
    */
   kill(timeout = 1000) {
-    this.child.kill('SIGTERM');
+    this.child.kill('SIGINT');
     setTimeout(() => {
       if (this.child.killed) return;
       this.child.kill('SIGKILL');
@@ -120,20 +120,20 @@ class ForkProcess {
   }
 
   /**
-   * sleep
+   * sleep (仅Unix平台)
    */
   sleep() {
     if (this.sleeping) return;
-    this.child.kill('SIGSTOP');
+    process.kill(this.pid, 'SIGSTOP');
     this.sleeping = true;
   }
   
   /**
-   * wakeup
+   * wakeup (仅Unix平台)
    */
   wakeup() {
     if (!this.sleeping) return;
-    this.child.kill('SIGCONT');
+    process.kill(this.pid, 'SIGCONT');
     this.sleeping = false;
   }
 }
