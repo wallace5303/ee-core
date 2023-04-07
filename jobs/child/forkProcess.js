@@ -107,6 +107,35 @@ class ForkProcess {
     // 发消息到子进程
     this.child.send(msg);
   }
+
+  /**
+   * kill
+   */
+  kill(timeout = 1000) {
+    this.child.kill('SIGTERM');
+    setTimeout(() => {
+      if (this.child.killed) return;
+      this.child.kill('SIGKILL');
+    }, timeout)
+  }
+
+  /**
+   * sleep
+   */
+  sleep() {
+    if (this.sleeping) return;
+    this.child.kill('SIGSTOP');
+    this.sleeping = true;
+  }
+  
+  /**
+   * wakeup
+   */
+  wakeup() {
+    if (!this.sleeping) return;
+    this.child.kill('SIGCONT');
+    this.sleeping = false;
+  }
 }
 
 module.exports = ForkProcess;

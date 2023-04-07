@@ -92,7 +92,7 @@ class ChildPoolJob extends EventEmitter {
     }
     this.LB.add(lbTask);
 
-    console.log('----------- createPId:', pid);
+    // console.log('----------- createPId:', pid);
     // this.lifecycle.watch([pid]);
   }
 
@@ -152,13 +152,14 @@ class ChildPoolJob extends EventEmitter {
       let subIds = this.create(1);
       proc = this.children[subIds[0]];
     } else {
-      // todo 从池子中获取一个
+      // 从池子中获取一个
       let onePid = this.LB.pickOne().id;
-      
-      console.log('----------- onePid:', onePid);
+      proc = this.children[onePid];
+
+      //console.log('----------- onePid:', onePid);
+      // old
       // const latestPids = Object.keys(this.children);
       // let onePid = latestPids[0];
-      proc = this.children[onePid];
     }
     
     if (!proc) {

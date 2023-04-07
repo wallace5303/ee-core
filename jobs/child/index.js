@@ -14,7 +14,7 @@ class ChildJob extends EventEmitter {
   /**
    * 初始化监听
    */  
-  _initEvents = () => {
+  _initEvents() {
     this.on(Channel.events.childProcessExit, (data) => {
       delete this.jobs[data.pid];
     });

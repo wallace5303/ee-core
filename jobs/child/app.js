@@ -25,7 +25,7 @@ class ChildApp {
    */
   _initEvents() {
     process.on('message', this._handleMessage.bind(this));
-    process.on('exit', (code) => {
+    process.once('exit', (code) => {
       Log.coreLogger.info(`[ee-core] [jobs/child] received a exit from main-process, code:${code}, pid:${process.pid}`);
     });
   }
