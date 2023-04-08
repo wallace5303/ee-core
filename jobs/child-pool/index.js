@@ -14,16 +14,13 @@ class ChildPoolJob extends EventEmitter {
     }, opt);
 
     this.boundMap = new Map();
-    this.connectionsMap={};
-    this.connectionsTimer = null;
     this.children = {};
-    // this.childrenArr = [];
-    // this.childIndex = 0;
     this.min = 3;
     this.max = 6;
     this.strategy = 'polling';
     this.weights = new Array(this.max).fill().map((v, i) => {
-      (Helper.validValue(options.weights[i]) ? options.weights[i] : 1)
+      let w = Helper.validValue(options.weights[i]) ? options.weights[i] : 1
+      return w;
     });
 
     let lbOpt = {
@@ -37,14 +34,27 @@ class ChildPoolJob extends EventEmitter {
   /**
    * 初始化监听
    */  
-  _initEvents = () => {
+  _initEvents() {
     this.on(Channel.events.childProcessExit, (data) => {
-      delete this.children[data.pid];
+      this._removeChild(data.pid);
     });
     this.on(Channel.events.childProcessError, (data) => {
-      delete this.children[data.pid];
+      this._removeChild(data.pid);
     });
-  }  
+  }
+
+  /**
+   * 移除对象
+   */  
+  _removeChild(pid) {
+    const length = Object.keys(this.children).length;
+    const lbOpt = {
+      id: pid,
+      weight: this.weights[length - 1],
+    }
+    this.LB.del(lbOpt);
+    delete this.children[pid];
+  }
 
   /**
    * 创建一个池子
@@ -91,9 +101,6 @@ class ChildPoolJob extends EventEmitter {
       weight: this.weights[length - 1],
     }
     this.LB.add(lbTask);
-
-    // console.log('----------- createPId:', pid);
-    // this.lifecycle.watch([pid]);
   }
 
   /**
@@ -110,8 +117,8 @@ class ChildPoolJob extends EventEmitter {
   /**
    * 异步执行一个job文件
    */
-  async runPromise(filepath, params = {}, opt = {}) {
-    return this.run(filepath, params, opt);
+  async runPromise(filepath, params = {}) {
+    return this.run(filepath, params);
   }  
 
   /**
@@ -155,11 +162,6 @@ class ChildPoolJob extends EventEmitter {
       // 从池子中获取一个
       let onePid = this.LB.pickOne().id;
       proc = this.children[onePid];
-
-      //console.log('----------- onePid:', onePid);
-      // old
-      // const latestPids = Object.keys(this.children);
-      // let onePid = latestPids[0];
     }
     
     if (!proc) {
@@ -179,22 +181,25 @@ class ChildPoolJob extends EventEmitter {
   }   
 
   /**
-    * onForkedDisconnect [triggered when a process instance disconnect]
-    * @param  {[String]} pid [process pid]
-    */
-  // onForkedDisconnect = (pid) => {
-  //   const length = this.forked.length;
-
-  //   removeForkedFromPool(this.forked, pid, this.pidMap);
-  //   this.forkedMap = convertForkedToMap(this.forked);
-  //   this.LB.del({
-  //     id: pid,
-  //     weight: this.weights[length - 1],
-  //   });
-  //   this.lifecycle.unwatch([pid]);
-  //   EventCenter.emit('process-manager:unlisten', [pid]);
-  // }
-
+   * kill all 
+   * @param type {String} - 'sequence' | 'parallel'
+   */
+  killAll(type = 'parallel') {
+    let i = 1;
+    Object.keys(this.children).forEach(key => {
+      let proc = this.children[key];
+      if (proc) {
+        if (type == 'sequence') {
+          setTimeout(()=>{
+            proc.kill();
+          }, i * 1000)
+          i++;
+        } else {
+          proc.kill();
+        }
+      }
+    });
+  }
 }
 
 module.exports = ChildPoolJob;
