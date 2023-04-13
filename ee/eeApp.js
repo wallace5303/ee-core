@@ -1,7 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
-const getPort = require('get-port');
 const { app } = require('electron');
 const is = require('is-type-of');
 const Koa = require('koa');
@@ -12,7 +11,8 @@ const Log = require('../log');
 const Electron = require('../electron');
 const Conf = require('../config');
 const Ps = require('../ps');
-const Socket = require('../socket')
+const Socket = require('../socket');
+const GetPort = require('../utils/get-port');
 
 class EeApp extends BaseApp {
   constructor(options = {}) {
@@ -26,18 +26,18 @@ class EeApp extends BaseApp {
    * 生成端口
    */
   async createPorts () {
-    const mainPort = await getPort({port: this.config.mainServer.port});
+    const mainPort = await GetPort({port: this.config.mainServer.port});
     process.env.EE_MAIN_PORT = mainPort;
     this.config.mainServer.port = mainPort;
 
     if (this.config.socketServer.enable) {
-      const socketPort = await getPort({port: this.config.socketServer.port});
+      const socketPort = await GetPort({port: this.config.socketServer.port});
       process.env.EE_SOCKET_PORT = socketPort;
       this.config.socketServer.port = socketPort;
     }
     
     if (this.config.httpServer.enable) {
-      const httpPort = await getPort({port: this.config.httpServer.port});
+      const httpPort = await GetPort({port: this.config.httpServer.port});
       process.env.EE_HTTP_PORT = httpPort;
       this.config.httpServer.port = httpPort;
     }
