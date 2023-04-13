@@ -1,10 +1,10 @@
 const Agent = require('agentkeepalive');
 const HttpsAgent = require('agentkeepalive').HttpsAgent;
 const urllib = require('urllib');
-const ms = require('humanize-ms');
 const { FrameworkBaseError } = require('egg-errors');
 const Conf = require('../config');
 const Log = require('../log');
+const Time = require('../utils/time');
 
 class HttpClientError extends FrameworkBaseError {
   get module() {
@@ -108,7 +108,7 @@ function normalizeConfig(httpConfig) {
     config.httpsAgent.keepAlive = config.keepAlive;
   }
   if (config.timeout) {
-    config.timeout = ms(config.timeout);
+    config.timeout = Time.ms(config.timeout);
     config.httpAgent.timeout = config.timeout;
     config.httpsAgent.timeout = config.timeout;
   }
@@ -118,7 +118,7 @@ function normalizeConfig(httpConfig) {
     delete config.freeSocketKeepAliveTimeout;
   }
   if (config.freeSocketTimeout) {
-    config.freeSocketTimeout = ms(config.freeSocketTimeout);
+    config.freeSocketTimeout = Time.ms(config.freeSocketTimeout);
     config.httpAgent.freeSocketTimeout = config.freeSocketTimeout;
     config.httpsAgent.freeSocketTimeout = config.freeSocketTimeout;
   } else {
@@ -154,7 +154,7 @@ function normalizeConfig(httpConfig) {
   }
 
   if (typeof config.request.timeout === 'string') {
-    config.request.timeout = ms(config.request.timeout);
+    config.request.timeout = Time.ms(config.request.timeout);
   }
 }
 
