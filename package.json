@@ -14,7 +14,6 @@
   "dependencies": {
     "agentkeepalive": "^4.2.0",
     "bytenode": "^1.3.6",
-    "co": "^4.6.0",
     "debug": "^4.3.3",
     "depd": "^2.0.0",
     "egg-errors": "^2.3.0",

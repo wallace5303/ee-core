@@ -5,7 +5,7 @@ const convert = require('koa-convert');
 const is = require('is-type-of');
 const path = require('path');
 const fs = require('fs');
-const co = require('co');
+const co = require('../../../utils/co');
 const BuiltinModule = require('module');
 
 // Guard against poorly mocked module constructors.

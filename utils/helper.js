@@ -2,7 +2,7 @@ const fs = require('fs');
 const mkdirp = require('mkdirp');
 const convert = require('koa-convert');
 const is = require('is-type-of');
-const co = require('co');
+const co = require('./co');
 
 /**
  * fnDebounce
