@@ -16,3 +16,7 @@ if (cmd == 'rd') {
 if (cmd == 'encrypt') {
   encrypt.run();
 }
+
+if (cmd == 'clean') {
+  encrypt.clean();
+}

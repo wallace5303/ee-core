@@ -7,6 +7,7 @@ const is = require('is-type-of');
 const bytenode = require('bytenode');
 const crypto = require('crypto');
 const JavaScriptObfuscator = require('javascript-obfuscator');
+const globby = require('globby');
 const UtilsJson = require('../utils/json');
 
 class Encrypt {
@@ -16,11 +17,14 @@ class Encrypt {
     this.encryptCodeDir = path.join(this.basePath, 'public');
     this.config = this.loadConfig('encrypt.js');
     this.filesExt = this.config.fileExt || ['.js'];
-    this.type = this.config.type || 'bytecode';
+    this.type = this.config.type || 'confusion';
     this.bOpt = this.config.bytecodeOptions || {};
     this.cOpt = this.config.confusionOptions || {};
+    this.cleanFiles = this.config.cleanFiles || ['electron'];
 
     const directory = this.config.directory || ['electron'];
+    this.patterns = this.config.files || null;
+    this.specificFiles = [ 'electron/preload/bridge.js' ];
     this.tmpFile = ''; // todo
     this.mapFile = ''; // todo
 
@@ -34,49 +38,80 @@ class Encrypt {
       }
     }
 
-    // 检查存在的目录
     for (let i = 0; i < directory.length; i++) {
       let codeDirPath = path.join(this.basePath, directory[i]);
       if (fs.existsSync(codeDirPath)) {
         this.dirs.push(directory[i]);
       }
     }
-    console.log('[ee-core] [tools/encrypt] dirs:', this.dirs);
+
+    this.codefiles = this._initCodeFiles();
+    //console.log('[ee-core] [tools/encrypt] codefiles:', this.codefiles);
   }
 
   /**
-   * 备份 electron 目录代码
+   * 初始化需要加密的文件列表
    */
-  backup () {
+  _initCodeFiles() {
+    if (!this.patterns) return;
+
+    const files = globby.sync(this.patterns, { cwd: this.basePath });
+    return files;
+  }
+
+  /**
+   * 备份代码
+   */
+  backup() {
+    // clean
+    this.cleanCode();
+
     console.log('[ee-core] [tools/encrypt] backup start');
-
-    for (let i = 0; i < this.dirs.length; i++) {
-      // check code dir
-      let codeDirPath = path.join(this.basePath, this.dirs[i]);
-      if (!fs.existsSync(codeDirPath)) {
-        console.log('[ee-core] [tools/encrypt] ERROR: backup %s is not exist', codeDirPath);
-        return
+    if (this.patterns) {
+      this.codefiles.forEach((filepath) => {
+        let source = path.join(this.basePath, filepath);
+        if (fs.existsSync(source)) {
+          let target = path.join(this.encryptCodeDir, filepath);
+          fsPro.copySync(source, target);
+        }
+      })
+    } else {
+      for (let i = 0; i < this.dirs.length; i++) {
+        // check code dir
+        let codeDirPath = path.join(this.basePath, this.dirs[i]);
+        if (!fs.existsSync(codeDirPath)) {
+          console.log('[ee-core] [tools/encrypt] ERROR: backup %s is not exist', codeDirPath);
+          return
+        }
+  
+        // copy
+        let targetDir = path.join(this.encryptCodeDir, this.dirs[i]);
+        console.log('[ee-core] [tools/encrypt] backup target Dir:', targetDir);
+        if (!fs.existsSync(targetDir)) {
+          this.mkdir(targetDir);
+          this.chmodPath(targetDir, '777');
+        }
+  
+        fsPro.copySync(codeDirPath, targetDir);
       }
-
-      let targetDir = path.join(this.encryptCodeDir, this.dirs[i]);
-
-      // remove old
-      this.rmBackup(targetDir);
-
-      // copy
-      console.log('[ee-core] [tools/encrypt] backup target Dir:', targetDir);
-      if (!fs.existsSync(targetDir)) {
-        this.mkdir(targetDir);
-        this.chmodPath(targetDir, '777');
-      }
-
-      fsPro.copySync(codeDirPath, targetDir);
     }
+
     console.log('[ee-core] [tools/encrypt] backup end');
     return true;
   }
   
-  prepare () {
+  /**
+   * 清除加密代码
+   */
+  cleanCode() {
+    this.cleanFiles.forEach((file) => {
+      let tmpFile = path.join(this.encryptCodeDir, file);
+      this.rmBackup(tmpFile);
+      console.log('[ee-core] [tools/encrypt] clean up tmp files:', tmpFile);
+    })
+  }
+
+  prepare() {
     if (this.type == 'bytecode') {
       let filename = this.config.mangle || this.config.mangle.file || null;
       if (filename) {
@@ -96,11 +131,26 @@ class Encrypt {
   /**
    * 加密代码
    */
-  encrypt () {
+  encrypt() {
     console.log('[ee-core] [tools/encrypt] start ciphering');
-    for (let i = 0; i < this.dirs.length; i++) {
-      let codeDirPath = path.join(this.encryptCodeDir, this.dirs[i]);
-      this.loop(codeDirPath);
+    if (this.patterns) {
+      for (const file of this.codefiles) {
+        const fullpath = path.join(this.encryptCodeDir, file);
+        if (!fs.statSync(fullpath).isFile()) continue;
+
+        // 特殊文件处理
+        if (this.specificFiles.includes(file)) {
+          this.generate(fullpath, 'confusion');
+          continue;
+        }
+
+        this.generate(fullpath);
+      }  
+    } else {
+      for (let i = 0; i < this.dirs.length; i++) {
+        let codeDirPath = path.join(this.encryptCodeDir, this.dirs[i]);
+        this.loop(codeDirPath);
+      }
     }
 
     console.log('[ee-core] [tools/encrypt] end ciphering');
@@ -109,7 +159,7 @@ class Encrypt {
   /**
    * 递归
    */
-  loop (dirPath) {
+  loop(dirPath) {
     let files = [];
     if (fs.existsSync(dirPath)) {
       files = fs.readdirSync(dirPath);
@@ -130,10 +180,13 @@ class Encrypt {
   /**
    * 生成文件
    */  
-  generate (curPath) {
-    if (this.type == 'bytecode') {
+  generate(curPath, type) {
+    let encryptType = type ? type : this.type;
+    console.log(`[ee-core] [tools/encrypt] file: ${curPath} (${encryptType})`);
+
+    if (encryptType == 'bytecode') {
       this.generateBytecodeFile(curPath);
-    } else if (this.type == 'confusion') {
+    } else if (encryptType == 'confusion') {
       this.generateJSConfuseFile(curPath);
     } else {
       this.generateJSConfuseFile(curPath);
@@ -144,7 +197,7 @@ class Encrypt {
   /**
    * 使用 javascript-obfuscator 生成压缩/混淆文件
    */  
-  generateJSConfuseFile (file) {
+  generateJSConfuseFile(file) {
     let opt = Object.assign({
       compact: true,
       stringArray: true,
@@ -159,7 +212,7 @@ class Encrypt {
   /**
    * 生成字节码文件
    */
-  generateBytecodeFile (curPath) {
+  generateBytecodeFile(curPath) {
     if (path.extname(curPath) !== '.js') {
       return
     }
@@ -181,10 +234,9 @@ class Encrypt {
   /**
    * 移除备份
    */
-  rmBackup (dir) {
-    if (fs.existsSync(dir)) {
-      console.log('[ee-core] [tools/encrypt] clean old directory:', dir);
-      fsPro.removeSync(dir);
+  rmBackup(file) {
+    if (fs.existsSync(file)) {
+      fsPro.removeSync(file);
     }
     return;
   }
@@ -192,7 +244,7 @@ class Encrypt {
   /**
    * 检查文件是否存在
    */
-  fileExist (filePath) {
+  fileExist(filePath) {
     try {
       return fs.statSync(filePath).isFile();
     } catch (err) {
@@ -200,7 +252,7 @@ class Encrypt {
     }
   };
 
-  mkdir (dirpath, dirname) {
+  mkdir(dirpath, dirname) {
     // 判断是否是第一次调用
     if (typeof dirname === 'undefined') {
       if (fs.existsSync(dirpath)) {
@@ -222,7 +274,7 @@ class Encrypt {
     }
   };
 
-  chmodPath (path, mode) {
+  chmodPath(path, mode) {
     let files = [];
     if (fs.existsSync(path)) {
       files = fs.readdirSync(path);
@@ -238,7 +290,7 @@ class Encrypt {
     }
   };
 
-  loadConfig (prop) {
+  loadConfig(prop) {
     const filepath = path.join(this.basePath, 'electron', 'config', prop);
     if (!fs.existsSync(filepath)) {
       return {};
@@ -254,7 +306,7 @@ class Encrypt {
     return ret || {};
   };
 
-  md5 (file) {
+  md5(file) {
     const buffer = fs.readFileSync(file);
     const hash = crypto.createHash('md5');
     hash.update(buffer, 'utf8');
@@ -270,6 +322,12 @@ const run = () => {
   e.encrypt();
 }
 
+const clean = () => {
+  const e = new Encrypt();
+  e.cleanCode();
+}
+
 module.exports = {
-  run
+  run,
+  clean,
 };
