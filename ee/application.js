@@ -2,8 +2,9 @@ const Exception = require('../exception');
 const {app} = require('electron');
 const path = require('path');
 const debug = require('debug')('ee-core:Appliaction');
-const fs = require('fs');
 const EeApp = require('./eeApp');
+const Utils = require('../utils');
+const Ps = require('../ps');
 
 class Appliaction extends EeApp {
   constructor() {
@@ -43,10 +44,10 @@ class Appliaction extends EeApp {
       options.execDir = path.dirname(app.getPath('exe'));
     }
 
+    // Todo app.getAppPath() ??? process.cwd()
     // Use encryption, base directory is public/electron
-    const encryptDir = path.join(app.getAppPath(), 'public', 'electron');
-    if (options.env == 'prod' && fs.existsSync(encryptDir)) {
-      options.baseDir = encryptDir;
+    if (options.env == 'prod' && Utils.isEncrypt(app.getAppPath())) {
+      options.baseDir = Ps.getEncryptDir(app.getAppPath());
       options.isEncrypted = true;
     }
 

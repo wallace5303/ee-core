@@ -1,3 +1,4 @@
+const Utils = require('../utils');
 const EEApplication = Symbol('Ee#Application');
 
 const EE = {
@@ -24,7 +25,14 @@ const EE = {
    */  
   get app() {
     return this[EEApplication] || null;
-  },  
+  },
+
+  /**
+   * 是否加密
+   */  
+  isEncrypt(basePath) {
+    return Utils.isEncrypt(basePath);
+  },
 }  
 
 module.exports = EE;

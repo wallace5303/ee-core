@@ -2,6 +2,7 @@
 
 const os = require("os");
 const path = require('path');
+const fs = require('fs');
 const Ps = require('../ps');
 const UtilsJson = require('./json');
 
@@ -57,5 +58,15 @@ exports.isMAC = function(macAddress) {
   return macRegex.test(macAddress);
 }
 
+/**
+ * is encrypt
+ */
+exports.isEncrypt = function(basePath) {
+  const encryptDir = Ps.getEncryptDir(basePath);
+  if (fs.existsSync(encryptDir)) {
+    return true;
+  }
+  return false;
+}
 
 

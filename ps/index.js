@@ -1,6 +1,5 @@
 const path = require('path');
 const eis = require('../utils/is');
-const Log = require('../log');
 
 /**
  * 当前进程的所有env
@@ -109,6 +108,15 @@ exports.getStorageDir = function () {
  */
 exports.getLogDir = function () {
   const dir = path.join(this.getRootDir(), 'logs');
+  return dir;
+}
+
+/**
+ * 获取加密文件路径
+ */
+exports.getEncryptDir = function (basePath) {
+  const base = basePath || process.cwd();
+  const dir = path.join(base, 'public', 'electron');
   return dir;
 }
 
