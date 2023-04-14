@@ -147,10 +147,12 @@ class Encrypt {
         this.generate(fullpath);
       }  
     } else {
+      console.log('[ee-core] [tools/encrypt] !!!!!! please use the new encryption method !!!!!!');
       for (let i = 0; i < this.dirs.length; i++) {
         let codeDirPath = path.join(this.encryptCodeDir, this.dirs[i]);
         this.loop(codeDirPath);
       }
+      console.log('[ee-core] [tools/encrypt] !!!!!! please use the new encryption method !!!!!!');
     }
 
     console.log('[ee-core] [tools/encrypt] end ciphering');
