@@ -1,7 +1,10 @@
 const Loggers = require('egg-logger').EggLoggers;
 const assert = require('assert');
+const dayjs = require('dayjs');
+const path = require('path');
 const Ps = require('../ps');
 const Conf = require('../config');
+let LogDate = 0;
 
 module.exports = {
 
@@ -30,6 +33,7 @@ module.exports = {
           coreLogger: {},
           allowDebugAtProd: false,
           enablePerformanceTimer: false,
+          rotator: 'none',
         },
         customLogger: {}
       }
@@ -42,12 +46,41 @@ module.exports = {
       opt.logger = config.logger;
       opt.customLogger = config.customLogger;
     }
-    //console.log('log---------', config);
+    // console.log('log---------', opt);
 
     assert(Object.keys(opt).length != 0, `logger config is null`);
 
+    let rotateType = opt.logger.rotator;
+    if (rotateType == 'day') {
+      this._rotateByDay(opt);
+    }
+
+    //Conf.setValue('logger', opt.logger);
+
+    // console.log('after log opt ---------', opt);
     const loggers = new Loggers(opt);
 
     return loggers;
   },
+
+  /**
+   * 按天分割
+   */
+  _rotateByDay(logOpt) {
+    let now = parseInt(dayjs().format('YYYYMMDD'));
+    if (LogDate != now) {
+      LogDate = now;
+      let appLogName = logOpt.logger.appLogName;
+      let coreLogName = logOpt.logger.coreLogName;
+      let errorLogName = logOpt.logger.errorLogName;
+      let appLogExtname = path.extname(appLogName);
+      let coreLogExtname = path.extname(coreLogName);
+      let errorLogExtname = path.extname(errorLogName);
+      logOpt.logger.appLogName = path.basename(appLogName, appLogExtname) + '-' + now + appLogExtname;
+      logOpt.logger.coreLogName = path.basename(coreLogName, coreLogExtname) + '-' + now + coreLogExtname;
+      logOpt.logger.errorLogName = path.basename(errorLogName, errorLogExtname) + '-' + now + errorLogExtname;
+      console.log('[_rotateByDay] 22222222 now :', now);
+      //return {newAppLogName, newCoreLogName, newErrorLogName};
+    }
+  },  
 };

@@ -149,6 +149,7 @@ module.exports = appInfo => {
     coreLogger: {},
     allowDebugAtProd: false,
     enablePerformanceTimer: false,
+    rotator: 'none',
   };
 
   /**

@@ -1,20 +1,37 @@
+const dayjs = require('dayjs');
 const Logger = require('./logger');
 const EELoggers = Symbol('EeApplication#EELoggers');
+let LogDate = 0;
 
 const Log = {
   /**
    * 创建日志实例
    */
-  create (config) {
+  create(config) {
+    this._delCache();
     const eeLog = Logger.create(config);
 
     return eeLog;
   },
 
   /**
+   * 重置对象cache
+   */
+  _delCache() {
+    let now = parseInt(dayjs().format('YYYYMMDD'));
+    
+    if (LogDate != now) {
+      console.log('[_delCache] 1111111111 now:', now);
+      LogDate = now;
+      this[EELoggers] = null;
+    }
+  },
+
+  /**
    * logger
    */
   get logger() {
+    this._delCache();
     if (!this[EELoggers]) {
       this[EELoggers] = Logger.create();
     }
@@ -26,6 +43,7 @@ const Log = {
    * coreLogger
    */
   get coreLogger () {
+    this._delCache();
     if (!this[EELoggers]) {
       this[EELoggers] = Logger.create();
     }
