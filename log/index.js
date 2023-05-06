@@ -15,13 +15,11 @@ const Log = {
   },
 
   /**
-   * 重置对象cache
+   * delete cache
    */
   _delCache() {
     let now = parseInt(dayjs().format('YYYYMMDD'));
-    
     if (LogDate != now) {
-      console.log('[_delCache] 1111111111 now:', now);
       LogDate = now;
       this[EELoggers] = null;
     }

@@ -55,9 +55,6 @@ module.exports = {
       this._rotateByDay(opt);
     }
 
-    //Conf.setValue('logger', opt.logger);
-
-    // console.log('after log opt ---------', opt);
     const loggers = new Loggers(opt);
 
     return loggers;
@@ -79,8 +76,6 @@ module.exports = {
       logOpt.logger.appLogName = path.basename(appLogName, appLogExtname) + '-' + now + appLogExtname;
       logOpt.logger.coreLogName = path.basename(coreLogName, coreLogExtname) + '-' + now + coreLogExtname;
       logOpt.logger.errorLogName = path.basename(errorLogName, errorLogExtname) + '-' + now + errorLogExtname;
-      console.log('[_rotateByDay] 22222222 now :', now);
-      //return {newAppLogName, newCoreLogName, newErrorLogName};
     }
   },  
 };
