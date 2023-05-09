@@ -1,11 +1,9 @@
 {
   "name": "ee-core",
-  "version": "2.1.1-beta.1",
+  "version": "2.1.1-beta.5",
   "description": "ee core",
   "main": "index.js",
   "scripts": {
-    "publish-beta": "npm publish --tag beta",
-    "publish": "npm publish",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
