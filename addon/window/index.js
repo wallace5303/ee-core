@@ -74,7 +74,12 @@ class WinAddon {
    * @function 
    * @since 1.0.0
    */
-  registerWCid (name, id) {
+  registerWCid(name, id) {
+
+    if (this.windowContentsIdMap.hasOwnProperty(name)) {
+      throw new Error(`[addon] [window] Name: ${name} already exists!`);
+    }
+
     this.windowContentsIdMap[name] = id;
   }
 
@@ -84,7 +89,7 @@ class WinAddon {
    * @function 
    * @since 1.0.0
    */
-   removeWCid (name) {
+   removeWCid(name) {
     delete this.windowContentsIdMap[name];
   }  
 }
