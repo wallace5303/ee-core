@@ -18,6 +18,12 @@ class WinAddon {
    * @since 1.0.0
    */
   create(name, opt) {
+
+    // todo 判断name是否唯一
+    // if (this.windowContentsIdMap.hasOwnProperty(name)) {
+    //   throw new Error(`[addon] [window] Name: ${name} already exists!`);
+    // }
+
     const options = Object.assign({
       x: 10,
       y: 10,
@@ -75,11 +81,6 @@ class WinAddon {
    * @since 1.0.0
    */
   registerWCid(name, id) {
-
-    if (this.windowContentsIdMap.hasOwnProperty(name)) {
-      throw new Error(`[addon] [window] Name: ${name} already exists!`);
-    }
-
     this.windowContentsIdMap[name] = id;
   }
 
