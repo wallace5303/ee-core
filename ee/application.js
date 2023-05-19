@@ -5,6 +5,7 @@ const debug = require('debug')('ee-core:Appliaction');
 const EeApp = require('./eeApp');
 const Utils = require('../utils');
 const Ps = require('../ps');
+const EE = require('./index');
 
 class Appliaction extends EeApp {
   constructor() {
@@ -69,6 +70,9 @@ class Appliaction extends EeApp {
     env.EE_SOCKET_PORT = null;
     env.EE_HTTP_PORT = null;
     debug('options:%j', options)
+
+    // 设置全局this
+    EE.CoreApp = this;
 
     super(options);
     this.initialize();

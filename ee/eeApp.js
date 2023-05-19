@@ -255,28 +255,6 @@ class EeApp extends BaseApp {
   }
 
   /**
-   * 序列化参数
-   */ 
-  stringify(obj, ignore) {
-    const result = {};
-    Object.keys(obj).forEach(key => {
-      if (!ignore.includes(key)) {
-        result[key] = obj[key];
-      }
-    });
-    return JSON.stringify(result);
-  }
-
-  /**
-   * 捕获异常（废弃）
-   */
-  async catchLog () {
-    process.on('uncaughtException', function(err) {
-      Log.coreLogger.error(err);
-    });
-  }
-
-  /**
    * electron app已经准备好，主窗口还未创建
    */
   async electronAppReady () {
