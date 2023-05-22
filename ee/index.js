@@ -2,6 +2,9 @@ const Utils = require('../utils');
 const EEApplication = Symbol('Ee#Application');
 const BuiltInApp = Symbol('Ee#BuiltInApp');
 
+/**
+ * EE
+ */
 const EE = {
 
   /**
@@ -29,7 +32,7 @@ const EE = {
   },
 
   /**
-   * 设置全局this到eeApp
+   * 设置全局this到CoreApp (eeApp)
    */  
   set CoreApp(obj) {
     if (!this[BuiltInApp]) {
@@ -38,7 +41,7 @@ const EE = {
   },
 
   /**
-   * 获取eeApp
+   * 获取 CoreApp (eeApp)
    */  
   get CoreApp() {
     return this[BuiltInApp] || null;

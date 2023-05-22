@@ -1,13 +1,25 @@
-const {app, BrowserWindow, Menu} = require('electron');
-const Conf = require('../config');
-const Ps = require('../ps');
+const { app, BrowserWindow, Menu } = require('electron');
+const Conf = require('../../config');
+const Ps = require('../../ps');
+const EEMainWindow = Symbol('Ee#electron#mainWindow');
 
 const Window = {
 
   /**
+   * 获取 mainWindow
+   */
+  getMainWindow() {
+    if (!this[EEMainWindow]) {
+      this[EEMainWindow] = this.createMainWindow();
+    }
+
+    return this[EEMainWindow] || null;
+  },
+
+  /**
    * 创建应用主窗口
    */
-  createWindow () {
+  createMainWindow() {
 
     // todo
     // const protocolName = 'eefile';
@@ -18,7 +30,8 @@ const Window = {
     // });
 
     const config = Conf.all();
-    let win = new BrowserWindow(config.windowsOption);
+    const win = new BrowserWindow(config.windowsOption);
+    this[EEMainWindow] = win;
 
     // 菜单显示/隐藏
     if (config.openAppMenu === 'dev-show' && Ps.isProd()) {
@@ -37,9 +50,20 @@ const Window = {
     }
 
     return win;
+  },
+
+  /**
+   * 还原窗口
+   */
+  restoreMainWindow() {
+    if (this[EEMainWindow]) {
+      if (this[EEMainWindow].isMinimized()) {
+        this[EEMainWindow].restore();
+      }
+      this[EEMainWindow].show();
+      this[EEMainWindow].focus();
+    }
   }
-
-
 };
 
 module.exports = Window;

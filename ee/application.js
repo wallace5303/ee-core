@@ -71,10 +71,11 @@ class Appliaction extends EeApp {
     env.EE_HTTP_PORT = null;
     debug('options:%j', options)
 
+    super(options);
+
     // 设置全局this
     EE.CoreApp = this;
 
-    super(options);
     this.initialize();
   }
 

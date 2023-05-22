@@ -1,14 +1,15 @@
 const path = require('path');
 const fs = require('fs');
 const assert = require('assert');
-const { app } = require('electron');
 const is = require('is-type-of');
 const Koa = require('koa');
 const koaServe = require('koa-static');
 const https = require('https');
 const BaseApp = require('./baseApp');
 const Log = require('../log');
-const Electron = require('../electron');
+const CoreElectron = require('../electron');
+const CoreElectronApp = require('../electron/app');
+const CoreElectronWindow = require('../electron/window');
 const Conf = require('../config');
 const Ps = require('../ps');
 const Socket = require('../socket');
@@ -18,14 +19,15 @@ class EeApp extends BaseApp {
   constructor(options = {}) {
     super(options);
 
-    this.electron = Electron;
+    // 兼容旧的api
+    this.electron = CoreElectron;
     this.mainWindow;
   }
 
   /**
    * 生成端口
    */
-  async createPorts () {
+  async createPorts() {
     const mainPort = await GetPort({port: this.config.mainServer.port});
     process.env.EE_MAIN_PORT = mainPort;
     this.config.mainServer.port = mainPort;
@@ -49,47 +51,15 @@ class EeApp extends BaseApp {
   /**
    * 启动通信模块
    */
-  async startSocket () {
+  async startSocket() {
     Socket.startAll(this);
   }
   
   /**
    * 创建electron应用
    */
-  async createElectronApp () {
-    const self = this;
-
-    const gotTheLock = app.requestSingleInstanceLock();
-    if (!gotTheLock) {
-      await this.appQuit();
-      return;
-    }
-
-    app.on('second-instance', (event) => {
-      self.restoreMainWindow();
-    })
-  
-    app.whenReady().then(() => {
-      self.createWindow();
-      app.on('activate', () => {
-        self.restoreMainWindow();
-      })
-    })
-    
-    app.on('window-all-closed', () => {
-      if (process.platform !== 'darwin') {
-        Log.coreLogger.info('[ee-core] [lib/eeApp] window-all-closed quit');
-        self.appQuit();
-      }
-    })
-
-    app.on('before-quit', () => {
-      Electron.extra.closeWindow = true;
-    })
-
-    if (this.config.hardGpu.enable == false) {
-      app.disableHardwareAcceleration();
-    }
+  async createElectronApp() {
+    CoreElectronApp.create();
 
     await this.electronAppReady();
   }
@@ -97,10 +67,10 @@ class EeApp extends BaseApp {
   /**
    * 创建应用主窗口
    */
-  async createWindow () {
+  async createWindow() {
 
     // 初始化一个主窗口
-    this.mainWindow = Electron.getMainWindow();
+    this.mainWindow = CoreElectronWindow.getMainWindow();
 
     await this.windowReady();
   
@@ -112,22 +82,9 @@ class EeApp extends BaseApp {
   }
 
   /**
-   * 还原窗口
-   */
-  restoreMainWindow () {
-    if (this.mainWindow) {
-      if (this.mainWindow.isMinimized()) {
-        this.mainWindow.restore();
-      }
-      this.mainWindow.show();
-      this.mainWindow.focus();
-    }
-  }
-
-  /**
    * 应用类型 （远程、html、单页应用）
    */
-  selectAppType () {
+  selectAppType() {
     let type = '';
     let url = '';
 
@@ -167,7 +124,7 @@ class EeApp extends BaseApp {
   /**
    * 加载本地前端资源
    */
-  loadLocalWeb (mode, staticDir, hostInfo) {
+  loadLocalWeb(mode, staticDir, hostInfo) {
     const self = this;
     if (!staticDir) {
       staticDir = path.join(this.config.homeDir, 'public', 'dist')
@@ -210,7 +167,7 @@ class EeApp extends BaseApp {
   /**
    * 主页面
    */
-  loadMainUrl (type, url) {
+  loadMainUrl(type, url) {
     const mainServer = this.config.mainServer;
     Log.coreLogger.info('[ee-core] [main] Env: %s, Type: %s', this.config.env, type);
     Log.coreLogger.info('[ee-core] [main] App running at: %s', url);
@@ -220,15 +177,15 @@ class EeApp extends BaseApp {
   /**
    * electron app退出
    */  
-  async appQuit () {
+  async appQuit() {
     await this.beforeClose();
-    app.quit();
+    CoreElectronApp.quit();
   }
 
   /**
    * 加载插件
    */
-  async _loderAddons () {
+  async _loderAddons() {
     this.loader.loadAddons();
 
     // 注册主窗口Contents id
@@ -243,7 +200,7 @@ class EeApp extends BaseApp {
   /**
    * 预加载模块
    */
-  async _loderPreload () {
+  async _loderPreload() {
     let filepath = this.loader.resolveModule(path.join(this.config.baseDir, 'preload', 'index'));
     if (!filepath) return; 
     const fileObj = this.loader.loadFile(filepath);
@@ -257,21 +214,21 @@ class EeApp extends BaseApp {
   /**
    * electron app已经准备好，主窗口还未创建
    */
-  async electronAppReady () {
+  async electronAppReady() {
     // do some things
   }
 
   /**
    * 主应用窗口已经创建
    */
-  async windowReady () {
+  async windowReady() {
     // do some things
   }
 
   /**
    * app关闭之前
    */  
-  async beforeClose () {
+  async beforeClose() {
     // do some things
   }  
 }
