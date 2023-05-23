@@ -7,6 +7,10 @@ const Addon = {
    */  
   all() {
     const { CoreApp } = EE;
+    if (!CoreApp) {
+      throw new Error('An unknown error or Addons cannot be used by the jobs!');
+    }
+
     const instances = CoreApp.addon || null;
     if (!instances) {
       throw new Error('Addons not exists or do not call directly at the top!');

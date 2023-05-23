@@ -7,6 +7,10 @@ const Services = {
    */  
   all() {
     const { CoreApp } = EE;
+    if (!CoreApp) {
+      throw new Error('An unknown error or Services cannot be used by the jobs!');
+    }
+
     const instances = CoreApp.service || null;
     if (!instances) {
       throw new Error('Services not exists or do not call directly at the top!');
