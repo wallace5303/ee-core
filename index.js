@@ -18,7 +18,7 @@ const Controller = require('./controller/baseContextClass');
  * @member {Service} EeCore#Service
  * @since 1.0.0
  */
-const Service = require('./service/baseContextClass');
+const Service = require('./services/baseContextClass');
 
 /**
  * @member {Storage}

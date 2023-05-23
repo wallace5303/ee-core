@@ -1,6 +1,6 @@
 const EE = require('../ee');
 
-const Service = {
+const Services = {
 
   /**
    * 获取 all addon instances
@@ -26,15 +26,6 @@ const Service = {
     return instance;
   },
 
-  // get Services() {
-  //   const { CoreApp } = EE;
-  //   const instances = CoreApp.service || null;
-  //   if (!instances) {
-  //     throw new Error('Services not exists, do not export properties directly at the top!');
-  //   };
-
-  //   return instances;
-  // },  
 };
 
-module.exports = Service;
+module.exports = Services;

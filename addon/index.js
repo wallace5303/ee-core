@@ -26,14 +26,6 @@ const Addon = {
     return instance;
   },
  
-  // get Addons() {
-  //   const { CoreApp } = EE;
-  //   const instances = CoreApp.addon || null;
-  //   if (!instances) {
-  //     throw new Error('Addons not exists, do not export properties directly at the top!');
-  //   };
-  //   return instances;
-  // },
 };
 
 module.exports = Addon;
