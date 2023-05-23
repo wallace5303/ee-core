@@ -59,7 +59,10 @@ class EeApp extends BaseApp {
    * 创建electron应用
    */
   async createElectronApp() {
-    CoreElectronApp.create();
+    const newApp = CoreElectronApp.create();
+    if (!newApp) {
+      return
+    }
 
     await this.electronAppReady();
   }

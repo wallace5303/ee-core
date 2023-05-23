@@ -1,34 +1,40 @@
-'use strict';
+const EE = require('../ee');
 
-/**
- * BaseContextClass is a base class that can be extended,
- * it's instantiated in context level,
- * {@link Helper}, {@link Service} is extending it.
- */
-class BaseContextClass {
+const Service = {
 
   /**
-   * @class
-   * @param {Context} ctx - context instance
-   * @since 1.0.0
-   */
-  constructor(ctx) {
-    /**
-     * @member {Application} BaseContextClass#app
-     * @since 1.0.0
-     */
-    this.app = ctx;
-    /**
-     * @member {Config} BaseContextClass#config
-     * @since 1.0.0
-     */
-    this.config = ctx.config;
-    /**
-     * @member {Service} BaseContextClass#service
-     * @since 1.0.0
-     */
-    this.service = ctx.service;
-  }
-}
+   * 获取 all addon instances
+   */  
+  all() {
+    const { CoreApp } = EE;
+    const instances = CoreApp.service || null;
+    if (!instances) {
+      throw new Error('Services not exists or do not call directly at the top!');
+    };
+    return instances;
+  },
 
-module.exports = BaseContextClass;
+  /**
+   * 获取 addon instance
+   */  
+  get(name) {
+    const instances = this.all();
+    const instance = instances[name] || null;
+    if (!instance) {
+      throw new Error(`Service class '${name}' not exists or do not call directly at the top!`);
+    };
+    return instance;
+  },
+
+  // get Services() {
+  //   const { CoreApp } = EE;
+  //   const instances = CoreApp.service || null;
+  //   if (!instances) {
+  //     throw new Error('Services not exists, do not export properties directly at the top!');
+  //   };
+
+  //   return instances;
+  // },  
+};
+
+module.exports = Service;

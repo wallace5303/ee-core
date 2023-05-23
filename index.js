@@ -12,13 +12,13 @@ const EE = require('./ee');
  * @member {Controller} EeCore#Controller
  * @since 1.0.0
  */
-const Controller = require('./controller');
+const Controller = require('./controller/baseContextClass');
 
 /**
  * @member {Service} EeCore#Service
  * @since 1.0.0
  */
-const Service = require('./service');
+const Service = require('./service/baseContextClass');
 
 /**
  * @member {Storage}

@@ -1,8 +1,9 @@
 const { app } = require('electron');
 const Window = require('../window');
-const EE = require('../../ee/');
+const EE = require('../../ee');
 const Log = require('../../log');
 const Electron = require('../index');
+const UtilsIs = require('../../utils/is');
 
 /**
  * CoreElectronApp (框架封装的electron app对象)
@@ -33,7 +34,7 @@ const CoreElectronApp = {
     })
     
     app.on('window-all-closed', () => {
-      if (process.platform !== 'darwin') {
+      if (!UtilsIs.macOS) {
         Log.coreLogger.info('[ee-core] [lib/eeApp] window-all-closed quit');
         CoreApp.appQuit();
       }

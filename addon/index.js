@@ -1,30 +1,39 @@
-const EEAddon = Symbol('Ee#Addon');
+const EE = require('../ee');
 
-/**
- * todo 插件模块
- */ 
 const Addon = {
 
   /**
-   * 设置插件对象
+   * 获取 all addon instances
    */  
-  setAddonObject(name, obj) {
-    if (!this[EEAddon]) {
-      this[EEAddon] = new Map();
-    }
-
-    if (!this[EEAddon].has(name)) {
-      this[EEAddon].set(name, obj);
-    }
+  all() {
+    const { CoreApp } = EE;
+    const instances = CoreApp.addon || null;
+    if (!instances) {
+      throw new Error('Addons not exists or do not call directly at the top!');
+    };
+    return instances;
   },
 
   /**
-   * 获取插件对象
+   * 获取 addon instance
    */  
   get(name) {
-    let addon = this[EEAddon].has(name) ? this[EEAddon].get(name): null;
-    return addon;
-  },  
-}  
+    const instances = this.all();
+    const instance = instances[name] || null;
+    if (!instance) {
+      throw new Error(`Addon class '${name}' not exists or do not call directly at the top!`);
+    };
+    return instance;
+  },
+ 
+  // get Addons() {
+  //   const { CoreApp } = EE;
+  //   const instances = CoreApp.addon || null;
+  //   if (!instances) {
+  //     throw new Error('Addons not exists, do not export properties directly at the top!');
+  //   };
+  //   return instances;
+  // },
+};
 
 module.exports = Addon;
