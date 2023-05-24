@@ -18,7 +18,7 @@ class ElectronEgg {
    * create ElectronEgg app
    */  
   _create() {
-    if (Ps.verifyMode(this.mode)) {
+    if (!Ps.verifyMode(this.mode)) {
       throw new Error(`The mode supports only (framework | module) !`);
     }
     process.env.EE_MODE = this.mode;

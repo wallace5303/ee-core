@@ -172,9 +172,13 @@ class EeApp extends BaseApp {
    */
   loadMainUrl(type, url) {
     const mainServer = this.config.mainServer;
-    Log.coreLogger.info('[ee-core] [main] Env: %s, Type: %s', this.config.env, type);
-    Log.coreLogger.info('[ee-core] [main] App running at: %s', url);
-    this.mainWindow.loadURL(url, mainServer.options);
+    Log.coreLogger.info('[ee-core] Env: %s, Type: %s', this.config.env, type);
+    Log.coreLogger.info('[ee-core] App running at: %s', url);
+    this.mainWindow.loadURL(url, mainServer.options)
+    .then()
+    .catch((err)=>{
+      Log.coreLogger.error(`[ee-core] Please check the ${url} are running OR modify config file !`);
+    });
   }
 
   /**
