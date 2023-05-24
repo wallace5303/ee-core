@@ -25,7 +25,7 @@ class EeLoader {
    */
   constructor(options) {
     this.options = options;
-    assert(fs.existsSync(this.options.baseDir), `${this.options.baseDir} not exists`);
+    // assert(fs.existsSync(this.options.baseDir), `${this.options.baseDir} not exists`);
     assert(this.options.app, 'options.app is required');
     assert(this.options.logger, 'options.logger is required');
 

@@ -21,8 +21,8 @@ class EeCore extends KoaApplication {
     options.type = options.type || 'application';
 
     assert(typeof options.baseDir === 'string', 'options.baseDir required, and must be a string');
-    assert(fs.existsSync(options.baseDir), `Directory ${options.baseDir} not exists`);
-    assert(fs.statSync(options.baseDir).isDirectory(), `Directory ${options.baseDir} is not a directory`);
+    // assert(fs.existsSync(options.baseDir), `Directory ${options.baseDir} not exists`);
+    // assert(fs.statSync(options.baseDir).isDirectory(), `Directory ${options.baseDir} is not a directory`);
 
     super();
 
