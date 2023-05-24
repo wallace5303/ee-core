@@ -1,5 +1,5 @@
 const Exception = require('../exception');
-const {app} = require('electron');
+const { app } = require('electron');
 const path = require('path');
 const debug = require('debug')('ee-core:Appliaction');
 const EeApp = require('./eeApp');
@@ -53,7 +53,7 @@ class Appliaction extends EeApp {
     }
 
     // normalize env
-    env.NODE_ENV = options.env;
+    //env.NODE_ENV = options.env;
     env.EE_HOME = options.homeDir;
     env.EE_BASE_DIR = options.baseDir;
     env.EE_SERVER_ENV = options.env;

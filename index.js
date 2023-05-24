@@ -3,6 +3,12 @@
  */
 
 /**
+ * @member {ElectronEgg} EeCore#Index
+ * @since 1.0.0
+ */
+const ElectronEgg = require('./main');
+
+/**
  * @member {app} EeCore#app
  * @since 1.0.0
  */
@@ -39,6 +45,7 @@ const Utils = require('./old-utils');
 const Socket = require('./socket');
 
 module.exports = {
+  ElectronEgg,
   Application: EE.Application,
   Controller,
   Service,

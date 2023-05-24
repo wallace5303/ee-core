@@ -2,6 +2,23 @@ const path = require('path');
 const eis = require('../utils/is');
 
 /**
+ * 当前模式 - framework | module
+ */
+exports.mode = function() {
+  return process.env.EE_MODE;
+}
+
+/**
+ * 校验模式
+ */
+exports.verifyMode = function(mode) {
+  if (['framework', 'module'].includes(mode)) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * 当前进程的所有env
  */
 exports.allEnv = function() {
