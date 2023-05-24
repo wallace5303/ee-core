@@ -23,6 +23,13 @@ class ElectronEgg {
     }
     process.env.EE_MODE = this.mode;
 
+    // module mode
+    if (Ps.isModuleMode()) {
+      const { Application } = EE;
+      new Application();
+      return;
+    }
+
     let baseDir = path.join(app.getAppPath(), 'electron');
     if (Utils.isEncrypt(app.getAppPath())) {
       baseDir = Ps.getEncryptDir(app.getAppPath());

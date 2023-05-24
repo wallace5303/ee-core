@@ -28,9 +28,11 @@ class EeApp extends BaseApp {
    * 生成端口
    */
   async createPorts() {
-    const mainPort = await GetPort({port: this.config.mainServer.port});
-    process.env.EE_MAIN_PORT = mainPort;
-    this.config.mainServer.port = mainPort;
+    if (Ps.isFrameworkMode()) {
+      const mainPort = await GetPort({port: this.config.mainServer.port});
+      process.env.EE_MAIN_PORT = mainPort;
+      this.config.mainServer.port = mainPort;
+    }
 
     if (this.config.socketServer.enable) {
       const socketPort = await GetPort({port: this.config.socketServer.port});
@@ -59,6 +61,7 @@ class EeApp extends BaseApp {
    * 创建electron应用
    */
   async createElectronApp() {
+    if (!Ps.isFrameworkMode()) return;
     const newApp = CoreElectronApp.create();
     if (!newApp) {
       return
@@ -197,7 +200,7 @@ class EeApp extends BaseApp {
 
     // 注册主窗口Contents id
     const addonsCfg = this.config.addons;
-    if (addonsCfg.window.enable) {
+    if (addonsCfg.window.enable && Ps.isFrameworkMode()) {
       const win = this.mainWindow;
       const addonWindow = this.addon.window;
       addonWindow.registerWCid('main', win.webContents.id);
@@ -216,6 +219,17 @@ class EeApp extends BaseApp {
     } else if (is.asyncFunction(fileObj)) {
       await fileObj();
     }
+  }
+
+  /**
+   * module模式初始化
+   */
+  async InitModuleMode() {
+    if (!Ps.isModuleMode()) return;
+
+    await this._loderAddons();
+
+    await this._loderPreload();
   }
 
   /**

@@ -19,6 +19,20 @@ exports.verifyMode = function(mode) {
 }
 
 /**
+ * 是否为框架模式
+ */
+exports.isFrameworkMode = function() {
+  return (process.env.EE_MODE === 'framework');
+}
+
+/**
+ * 是否为模块模式
+ */
+exports.isModuleMode = function() {
+  return (process.env.EE_MODE === 'module');
+}
+
+/**
  * 当前进程的所有env
  */
 exports.allEnv = function() {
