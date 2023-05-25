@@ -11,6 +11,10 @@ class Appliaction extends EeApp {
   constructor() {
     Exception.start();
     const { env } = process;
+
+    // initialize mode
+    Ps.initMode();
+
     let options = {
       env: 'prod',
       serverScope: '',

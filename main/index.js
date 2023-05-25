@@ -21,7 +21,7 @@ class ElectronEgg {
     if (!Ps.verifyMode(this.mode)) {
       throw new Error(`The mode supports only (framework | module) !`);
     }
-    process.env.EE_MODE = this.mode;
+    Ps.initMode(this.mode);
 
     // module mode
     if (Ps.isModuleMode()) {

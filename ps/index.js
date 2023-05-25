@@ -2,6 +2,14 @@ const path = require('path');
 const eis = require('../utils/is');
 
 /**
+ * 初始化模式
+ */
+exports.initMode = function(mode) {
+  // process.env.EE_MODE === undefined
+  return process.env.EE_MODE = mode ? mode : 'framework';
+}
+
+/**
  * 当前模式 - framework | module
  */
 exports.mode = function() {
