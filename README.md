@@ -1,63 +1,63 @@
-###  介绍
-electron-egg框架核心功能由 **ee-core** 驱动。目前包含 **100+** api，极大的增强了框架能力。
+###  introduction
 
-同样的，您可以将ee-core作为 **模块** 使用，详情见 [第三方使用](https://www.kaka996.com/pages/1dbe35/)
+You can use ee core as a **module**, see more: [introduction](https://www.kaka996.com/pages/1dbe35/)
+[中文文档](https://www.kaka996.com/pages/1dbe35/)
 
-###  模块列表
+###  module list
 
 #### addon
-插件模块。
+plug-in module
 
 #### bin
-命令行模块。
+Command line module.
 
 #### config
-可以 获取/设置 system.json库中的数据。
+Configuration Module
 
 #### const
-定义框架中使用的通用常量。
+Define the universal constants used in the framework.
 
 #### controller
-控制器模块的基础类。
+Controller module
 
 #### ee
-框架EE模块，提供app对象。
+EE module
 
 #### electron
-框架封装的electron功能，将在此模块提供API。
+The electric function encapsulated by the framework will provide APIs in this module.
 
 #### exception
-捕获异常模块。
+Capture exception modules.
 
 #### httpclient
-http客户端。
+HTTP client.
 
 #### jobs
-任务模块。
+Jobs module.
 
 #### loader
-加载器模块。
+loader module
 
 #### log
-日志模块。
+log module
 
 #### message
-消息模块。在主进程和子进程之间发送消息。
+Message module. Sending messages between the main process and child processes.
 
 #### ps
-进程工具类模块。
+Process tool class module.
 
 #### services
-服务层模块。
+services module
 
 #### socket
-提供socket通信功能。
+Provide socket communication function.
 
 #### storage
-存储模块。提供json数据库、sqlite数据库。
+Storage module. Provide JSON database and sqlite database.
 
 #### tools
-脚本模块。加密、移动资源。
+Script module. Encrypt and move resources.
 
 #### utils
-工具库模块。
+Tool library module.
