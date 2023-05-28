@@ -1,7 +1,10 @@
 ###  introduction
 
-You can use ee core as a **module**, see more: [introduction](https://www.kaka996.com/pages/1dbe35/)
-[中文文档](https://www.kaka996.com/pages/1dbe35/)
+You can use ee-core as a **module**
+
+[introduction](https://www.kaka996.com/pages/85c531/)
+
+[中文文档](https://www.kaka996.com/pages/85c531/)
 
 ###  module list
 
