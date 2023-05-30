@@ -23,11 +23,17 @@ const Services = {
    */  
   get(name) {
     const instances = this.all();
-    const instance = instances[name] || null;
-    if (!instance) {
+
+    const actions = name.split('.');
+    let obj = instances;
+    actions.forEach(key => {
+      obj = obj[key];
+    });
+
+    if (!obj) {
       throw new Error(`Service class '${name}' not exists or do not call directly at the top!`);
     };
-    return instance;
+    return obj;
   },
 
 };

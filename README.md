@@ -1,6 +1,6 @@
 ###  introduction
 
-You can use ee-core as a **module**
+Powerful electron third party module, offering **100+ API** 
 
 [introduction](https://www.kaka996.com/pages/85c531/)
 
