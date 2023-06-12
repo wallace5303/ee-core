@@ -198,6 +198,30 @@ module.exports = appInfo => {
     },
   };
 
+  /**
+   * 应用模式配置
+   */
+  config.developmentMode = {
+    default: 'vue',
+    mode: {
+      vue: {
+        protocol: 'http://',
+        hostname: 'localhost',
+        port: 8080
+      },
+      react: {
+        protocol: 'http://',
+        hostname: 'localhost',
+        port: 3000
+      },
+      html: {
+        protocol: 'http://',
+        hostname: 'localhost',
+        indexPage: 'index.html'
+      },
+    }
+  };
+
   /* 内置socket服务 */
   config.socketServer = {
     enable: false, // 是否启用
@@ -238,7 +262,8 @@ module.exports = appInfo => {
 
   /* 主进程加载的地址 */
   config.mainServer = {
-    protocol: 'http://',
+    protocol: 'http://', // http:// | https:// | file://
+    indexPath: '/public/dist/index.html',
     host: 'localhost',
     port: 7072, // 默认端口（如果端口被使用，则随机获取一个）
     options: {},

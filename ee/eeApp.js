@@ -118,9 +118,16 @@ class EeApp extends BaseApp {
     }
 
     // 单页应用
-    const protocol = modeInfo.protocol || 'http://';
-    url = protocol + modeInfo.hostname + ':' + modeInfo.port;
+    // 开发环境
     if (Ps.isDev()) {
+      url = modeInfo.protocol + modeInfo.hostname + ':' + modeInfo.port;
+      this.loadMainUrl('spa', url);
+      return;
+    } 
+    // 生产环境
+    const mainServer = this.config.mainServer;
+    if (mainServer.protocol == 'file://') {
+      url = path.join(this.config.homeDir, mainServer.indexPath);
       this.loadMainUrl('spa', url);
     } else {
       this.loadLocalWeb('spa');
