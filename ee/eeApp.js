@@ -28,7 +28,7 @@ class EeApp extends BaseApp {
    * 生成端口
    */
   async createPorts() {
-    if (Ps.isFrameworkMode()) {
+    if (Ps.isFrameworkMode() && Conf.isWebProtocol(this.config.mainServer)) {
       const mainPort = await GetPort({port: this.config.mainServer.port});
       process.env.EE_MAIN_PORT = mainPort;
       this.config.mainServer.port = mainPort;
@@ -126,7 +126,7 @@ class EeApp extends BaseApp {
     } 
     // 生产环境
     const mainServer = this.config.mainServer;
-    if (mainServer.protocol == 'file://') {
+    if (Conf.isFileProtocol(mainServer)) {
       url = path.join(this.config.homeDir, mainServer.indexPath);
       this.loadMainUrl('spa', url);
     } else {

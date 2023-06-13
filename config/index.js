@@ -49,6 +49,26 @@ const Cfg = {
   
     return v;
   },  
+
+  /**
+   * isFileProtocol
+   */
+  isFileProtocol(config) {
+    if (config.protocol == 'file://') {
+      return true;
+    }
+    return false;
+  },
+
+  /**
+   * isWebProtocol
+   */
+  isWebProtocol(config) {
+    if (['http://', 'https://'].includes(config.protocol)) {
+      return true;
+    }
+    return false;
+  },   
 };
 
 module.exports = Cfg;
