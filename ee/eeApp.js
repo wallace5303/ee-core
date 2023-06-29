@@ -128,7 +128,7 @@ class EeApp extends BaseApp {
     const mainServer = this.config.mainServer;
     if (Conf.isFileProtocol(mainServer)) {
       url = path.join(this.config.homeDir, mainServer.indexPath);
-      this.loadMainUrl('spa', url);
+      this.loadMainUrl('spa', url, 'file');
     } else {
       this.loadLocalWeb('spa');
     }
@@ -138,7 +138,6 @@ class EeApp extends BaseApp {
    * 加载本地前端资源
    */
   loadLocalWeb(mode, staticDir, hostInfo) {
-    const self = this;
     if (!staticDir) {
       staticDir = path.join(this.config.homeDir, 'public', 'dist')
     }
@@ -168,27 +167,36 @@ class EeApp extends BaseApp {
           Log.coreLogger.info('[ee-core] [lib/eeApp] createServer error: ', err);
           return
         }
-        self.loadMainUrl(mode, url);
+        this.loadMainUrl(mode, url);
       });
     } else {
       koaApp.listen(mainServer.port, () => {
-        self.loadMainUrl(mode, url);
+        this.loadMainUrl(mode, url);
       });
     }
   }
 
   /**
-   * 主页面
+   * 主服务
+   * @params load <string> value: "url" 、 "file"
    */
-  loadMainUrl(type, url) {
+  loadMainUrl(type, url, load  =  'url') {
     const mainServer = this.config.mainServer;
     Log.coreLogger.info('[ee-core] Env: %s, Type: %s', this.config.env, type);
     Log.coreLogger.info('[ee-core] App running at: %s', url);
-    this.mainWindow.loadURL(url, mainServer.options)
-    .then()
-    .catch((err)=>{
-      Log.coreLogger.error(`[ee-core] Please check the ${url} are running OR modify config file !`);
-    });
+    if (load ==  'file')  {
+      this.mainWindow.loadFile(url, mainServer.options)
+      .then()
+      .catch((err)=>{
+        Log.coreLogger.error(`[ee-core] Please check the ${url} !`);
+      });
+    } else {
+      this.mainWindow.loadURL(url, mainServer.options)
+      .then()
+      .catch((err)=>{
+        Log.coreLogger.error(`[ee-core] Please check the ${url} !`);
+      });
+    }
   }
 
   /**
