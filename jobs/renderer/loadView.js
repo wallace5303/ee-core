@@ -1,3 +1,4 @@
+//require('bytenode');
 const Ps = require('../../ps');
 
 /**

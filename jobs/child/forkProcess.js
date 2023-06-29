@@ -17,6 +17,7 @@ class ForkProcess {
       cwd = path.join(Ps.getHomeDir(), '..');
     }
 
+    // TODO Object.assign 只能单层对象结构，多层的对象会直接覆盖
     let options = Object.assign({
       processArgs: {},
       processOptions: { 

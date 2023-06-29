@@ -1,7 +1,7 @@
-//require('bytenode');
 const { BrowserWindow } = require('electron');
 const fs = require('fs');
 const LoadView = require('./loadView');
+const Loader = require('../../loader');
 
 class RendererJob {
 
@@ -12,6 +12,7 @@ class RendererJob {
     * @param  {Object} options - options to create BrowserWindow
     */
   constructor(name, filepath, opt = {}) {
+    // TODO Object.assign 只能单层对象结构，多层的对象会直接覆盖
     let options = Object.assign({
       show: false,
       webPreferences: {
@@ -25,7 +26,7 @@ class RendererJob {
     this.subWin = new BrowserWindow(options);
 
     this.jobReady = false;
-    this.exec = filepath;
+    this.exec = Loader.getFullpath(filepath);;
     this.name = name;
     this.listeners = [];
     this.callbacks = [];
