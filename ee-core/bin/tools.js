@@ -1,27 +1,8 @@
 #!/usr/bin/env node
 
-const replaceDist = require('../tools/replaceDist');
-const encrypt = require('../tools/encrypt');
-//const iconGen = require('../tools/iconGen');
+const chalk = require('chalk');
 
-// argv
-const args = process.argv;
-// console.log('[ee-core] args:', args);
-const cmd = args[2];
-console.log('[ee-core] [bin/tools] cmd:', cmd);
+let tip = chalk.bgYellow('Warning') + ' please use ' + chalk.blue('ee-bin') + ', See: ';
+tip += chalk.underline('https://www.kaka996.com/pages/85c531/');
 
-if (cmd == 'rd') {
-  replaceDist.run();
-}
-
-if (cmd == 'encrypt') {
-  encrypt.run();
-}
-
-if (cmd == 'clean') {
-  encrypt.clean();
-}
-
-// if (cmd == 'icon') {
-//   iconGen.run();
-// }
+console.log(tip);
