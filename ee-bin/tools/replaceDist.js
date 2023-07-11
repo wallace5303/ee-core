@@ -13,18 +13,12 @@ const fsPro = require('fs-extra');
   /**
    * 执行
    */  
-  run() {
+  run(options = {}) {
     console.log('[ee-core] [tools/rd] 开始移动资源');
     const homeDir = process.cwd();
 
     // argv
-    let distDir = '';
-    for (let i = 0; i < process.argv.length; i++) {
-      let tmpArgv = process.argv[i]
-      if (tmpArgv.indexOf('--dist_dir=') !== -1) {
-        distDir = tmpArgv.substring(11)
-      }
-    }
+    const distDir = options.distDir;
  
     const fileExist = (filePath) => {
       try {
