@@ -1,0 +1,19 @@
+{
+  "name": "ee-bin",
+  "version": "1.0.0",
+  "description": "ee bin",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "bin": {
+    "ee-bin": "./bin/index.js"
+  },
+  "dependencies": {
+    "fs-extra": "^10.0.0",
+    "globby": "^10.0.0",
+    "javascript-obfuscator": "^4.0.2"
+  }
+}
