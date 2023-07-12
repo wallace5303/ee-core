@@ -3,6 +3,7 @@
 const path = require('path');
 const fs = require('fs');
 const fsPro = require('fs-extra');
+const chalk = require('chalk');
 
 /**
  * 资源替换
@@ -14,26 +15,18 @@ const fsPro = require('fs-extra');
    * 执行
    */  
   run(options = {}) {
-    console.log('[ee-core] [tools/rd] 开始移动资源');
+    console.log('[ee-bin] [rd] Start moving resources');
     const homeDir = process.cwd();
 
     // argv
     const distDir = options.distDir;
- 
-    const fileExist = (filePath) => {
-      try {
-        return fs.statSync(filePath).isFile();
-      } catch (err) {
-        console.error('[ee-core] [tools/rd] ERROR ', err);
-        return false;
-      }
-    };
-    
     const sourceDir = path.join(homeDir, distDir);
     const sourceIndexFile = path.join(sourceDir, 'index.html');
     
-    if (!fileExist(sourceIndexFile)) {
-      console.error('[ee-core] [tools/rd] ERROR 前端资源不存在，请构建!!!');
+    if (!this._fileExist(sourceIndexFile)) {
+      console.info(sourceIndexFile);
+      const errorTips = chalk.bgRed('Error') + ' Frontend resource does not exist, please build !';
+      console.error(errorTips);
       return
     }
     
@@ -43,11 +36,21 @@ const fsPro = require('fs-extra');
       fs.mkdirSync(eeResourceDir, {recursive: true, mode: 0o777});
     }
     this._rmFolder(eeResourceDir);
-    console.log('[ee-core] [tools/rd] 清空历史资源:', eeResourceDir);
+    console.log('[ee-bin] [rd] Clear history resources:', eeResourceDir);
 
     fsPro.copySync(sourceDir, eeResourceDir);
-    console.log('[ee-core] [tools/rd] 复制资源到:', eeResourceDir);
-    console.log('[ee-core] [tools/rd] 结束');
+    console.log('[ee-bin] [rd] Copy a resource to:', eeResourceDir);
+    console.log('[ee-bin] [rd] End');
+  },
+
+  _fileExist(filePath) {
+    try {
+      return fs.statSync(filePath).isFile();
+    } catch (err) {
+      // const errorTips = chalk.bgRed('Error') + ' [ee-bin] [rd] ';
+      // console.error(errorTips, err);
+      return false;
+    }
   },
 
   /**
