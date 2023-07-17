@@ -43,7 +43,7 @@ const Window = {
     }
 
     // DevTools
-    if (!app.isPackaged && config.openDevTools) {
+    if (config.openDevTools) {
       win.webContents.openDevTools({
         mode: 'undocked'
       });
