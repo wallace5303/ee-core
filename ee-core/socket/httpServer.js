@@ -88,6 +88,7 @@ class HttpServer {
     let params = ctx.request.query;
     params = is.object(params) ? JSON.parse(JSON.stringify(params)) : {};
     const body = ctx.request.body;
+    const files = ctx.request.files;
 
     // 默认
     ctx.response.status = 200;
@@ -112,7 +113,7 @@ class HttpServer {
         uriPath = 'controller/' + uriPath;
       }
       const cmd = uriPath.split('/').join('.');
-      const args = (method == 'POST') ? body : params;
+      const args = (method == 'POST') ? (ctx.request.header['content-type'].startsWith('multipart/form-data;') ? files : body) : params;
       let fn = null;
       if (is.string(cmd)) {
         const actions = cmd.split('.');
