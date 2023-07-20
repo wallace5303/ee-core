@@ -11,6 +11,8 @@ const path = require('path');
 const _ = require('lodash');
 const Log = require('../log');
 const Ps = require('../ps');
+const koaStatic = require('koa-static');
+
 
 /**
  * http server
@@ -58,6 +60,7 @@ class HttpServer {
     koaApp
       .use(cors(corsOptions))
       .use(koaBody(httpServer.body))
+      .use(koaStatic(httpServer.static.path, httpServer.static.options))
       .use(async (ctx, next) => {
         ctx.eeApp = app;
         await next();
