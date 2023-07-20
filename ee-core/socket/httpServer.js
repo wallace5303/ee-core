@@ -117,6 +117,9 @@ class HttpServer {
       }
       const cmd = uriPath.split('/').join('.');
       const args = (method == 'POST') ? (ctx.request.header['content-type'].startsWith('multipart/form-data;') ? files : body) : params;
+      args.files = ctx.request.files;
+      args.body = ctx.request.body;
+      args.query = ctx.request.query;
       let fn = null;
       if (is.string(cmd)) {
         const actions = cmd.split('.');
