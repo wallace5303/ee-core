@@ -50,4 +50,16 @@ program
     iconGen.run();
   });
 
+/**
+ * dev
+ */
+program
+  .command('dev')
+  .description('create frontend-server and electron-server')
+  .option('--config <folder>', 'config file', './electron/config/bin.js')
+  .action(function() {
+    const frontend = require('./tools/frontend');
+    frontend.serve(this.opts());
+  });
+
 program.parse();
