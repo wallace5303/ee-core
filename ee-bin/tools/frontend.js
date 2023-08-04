@@ -2,7 +2,7 @@
 
 const path = require('path');
 const fs = require('fs');
-const { spawn, spawnSync, exec, execFile } = require('child_process');
+const { spawn, exec } = require('child_process');
 const Utils = require('../lib/utils');
 const is = require('is-type-of');
 
