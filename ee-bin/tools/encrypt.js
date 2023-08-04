@@ -38,8 +38,7 @@ class Encrypt {
     }
 
     this.codefiles = this._initCodeFiles();
-    //console.log('[ee-core] [encrypt] codefiles:', this.codefiles);
-    console.log('[ee-core] [encrypt] cleanFiles:', this.cleanFiles);
+    console.log(chalk.blue('[ee-bin] [encrypt] ') + 'cleanFiles:' + this.cleanFiles);
   }
 
   /**
@@ -59,7 +58,7 @@ class Encrypt {
     // clean
     this.cleanCode();
 
-    console.log('[ee-core] [encrypt] backup start');
+    console.log(chalk.blue('[ee-bin] [encrypt] ') + 'backup start');
     if (this.patterns) {
       this.codefiles.forEach((filepath) => {
         let source = path.join(this.basePath, filepath);
@@ -74,13 +73,13 @@ class Encrypt {
         // check code dir
         let codeDirPath = path.join(this.basePath, this.dirs[i]);
         if (!fs.existsSync(codeDirPath)) {
-          console.log('[ee-core] [encrypt] ERROR: backup %s is not exist', codeDirPath);
+          console.log('[ee-bin] [encrypt] ERROR: backup %s is not exist', codeDirPath);
           return
         }
   
         // copy
         let targetDir = path.join(this.encryptCodeDir, this.dirs[i]);
-        console.log('[ee-core] [encrypt] backup target Dir:', targetDir);
+        console.log('[ee-bin] [encrypt] backup target Dir:', targetDir);
         if (!fs.existsSync(targetDir)) {
           this.mkdir(targetDir);
           this.chmodPath(targetDir, '777');
@@ -90,7 +89,7 @@ class Encrypt {
       }
     }
 
-    console.log('[ee-core] [encrypt] backup end');
+    console.log(chalk.blue('[ee-bin] [encrypt] ') + 'backup end');
     return true;
   }
   
@@ -101,7 +100,7 @@ class Encrypt {
     this.cleanFiles.forEach((file) => {
       let tmpFile = path.join(this.basePath, file);
       this.rmBackup(tmpFile);
-      console.log('[ee-core] [encrypt] clean up tmp files:', tmpFile);
+      console.log(chalk.blue('[ee-bin] [encrypt] ') + 'clean up tmp files:' + chalk.magenta(`${tmpFile}`));
     })
   }
 
@@ -109,7 +108,7 @@ class Encrypt {
    * 加密代码
    */
   encrypt() {
-    console.log('[ee-core] [encrypt] start ciphering');
+    console.log(chalk.blue('[ee-bin] [encrypt] ') + 'start ciphering');
     if (this.patterns) {
       for (const file of this.codefiles) {
         const fullpath = path.join(this.encryptCodeDir, file);
@@ -125,15 +124,15 @@ class Encrypt {
       }  
     } else {
       // 旧逻辑，将废弃
-      console.log('[ee-core] [encrypt] !!!!!! please use the new encryption method !!!!!!');
+      console.log('[ee-bin] [encrypt] !!!!!! please use the new encryption method !!!!!!');
       for (let i = 0; i < this.dirs.length; i++) {
         let codeDirPath = path.join(this.encryptCodeDir, this.dirs[i]);
         this.loop(codeDirPath);
       }
-      console.log('[ee-core] [encrypt] !!!!!! please use the new encryption method !!!!!!');
+      console.log('[ee-bin] [encrypt] !!!!!! please use the new encryption method !!!!!!');
     }
 
-    console.log('[ee-core] [encrypt] end ciphering');
+    console.log(chalk.blue('[ee-bin] [encrypt] ') + 'end ciphering');
   };
 
   /**
@@ -163,7 +162,7 @@ class Encrypt {
   generate(curPath, type) {
     let encryptType = type ? type : this.type;
 
-    let tips = '[ee-core] [encrypt] file: ' + chalk.green(`${curPath}`) + ' ' + chalk.blue(`(${encryptType})`);
+    let tips = chalk.blue('[ee-bin] [encrypt] ') + 'file: ' + chalk.green(`${curPath}`) + ' ' + chalk.cyan(`(${encryptType})`);
     console.log(tips);
 
     if (encryptType == 'bytecode') {
@@ -312,7 +311,7 @@ const clean = (options = {}) => {
     const tmpFile = path.join(process.cwd(), file);
     if (fs.existsSync(tmpFile)) {
       fsPro.removeSync(tmpFile);
-      console.log('[ee-core] [encrypt] clean up tmp files:', tmpFile);
+      console.log(chalk.blue('[ee-bin] [encrypt] ') + 'clean up tmp files:' + chalk.magenta(`${tmpFile}`));
     }
   })
 }
