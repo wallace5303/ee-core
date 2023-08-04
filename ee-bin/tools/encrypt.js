@@ -9,16 +9,26 @@ const crypto = require('crypto');
 const JavaScriptObfuscator = require('javascript-obfuscator');
 const globby = require('globby');
 const chalk = require('chalk');
+const Utils = require('../lib/utils');
 
 class Encrypt {
   constructor(options = {}) {
     // cli args
     const outputFolder = options.out || './public';
-    const configFile = options.config || './electron/config/encrypt.js';
+    const configFile = options.config || './electron/config/bin.js';
 
     this.basePath = process.cwd();
     this.encryptCodeDir = path.join(this.basePath, outputFolder);
-    this.config = this.loadConfig(configFile);
+
+    // 先从 bin config获取，没有的话从 config/encrypt.js
+    const hasConfig = Utils.checkConfig(configFile);
+    if (hasConfig) {
+      const cfg = Utils.loadConfig(configFile);
+      this.config = cfg.encrypt;
+    } else {
+      this.config = this.loadConfig();
+    }
+    
     this.filesExt = this.config.fileExt || ['.js'];
     this.type = this.config.type || 'confusion';
     this.bOpt = this.config.bytecodeOptions || {};
@@ -271,8 +281,9 @@ class Encrypt {
     }
   };
 
-  loadConfig(prop) {
-    const filepath = path.join(this.basePath, prop);
+  loadConfig() {
+    const configFile = './electron/config/encrypt.js';
+    const filepath = path.join(this.basePath, configFile);
     if (!fs.existsSync(filepath)) {
       const errorTips = 'config file ' + chalk.blue(`${filepath}`) + ' does not exist !';
       throw new Error(errorTips)

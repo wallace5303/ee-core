@@ -7,6 +7,15 @@ const is = require('is-type-of');
 
 const _basePath = process.cwd();
 
+function checkConfig(prop) {
+  const filepath = path.join(_basePath, prop);
+  if (fs.existsSync(filepath)) {
+    return true;
+  }
+  
+  return false;
+}
+
 function loadConfig(prop) {
   const configFile = prop || './electron/config/bin.js';
   const filepath = path.join(_basePath, configFile);
@@ -26,5 +35,6 @@ function loadConfig(prop) {
 };
 
 module.exports = {
-  loadConfig
+  loadConfig,
+  checkConfig
 }

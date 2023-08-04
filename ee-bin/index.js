@@ -20,7 +20,7 @@ program
 program
   .command('encrypt')
   .description('Code encryption')
-  .option('--config <folder>', 'config file', './electron/config/encrypt.js')
+  .option('--config <folder>', 'config file')
   .option('--out <folder>', 'output directory', './public')
   .action(function() {
     const encrypt = require('./tools/encrypt');
