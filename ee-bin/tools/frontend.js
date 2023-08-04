@@ -27,15 +27,28 @@ module.exports = {
     const frontendArgs = is.string(frontend.args) ? [frontend.args] : frontend.args;
     console.log('frontendDir:', frontendDir);
     console.log('frontendArgs:', frontendArgs);
+    //['--host --port 8080'],
     this.frontendServer = spawn(
-      frontend.cmd, 
-      frontendArgs,
+      'vite',
+      ['--host', '--port 8080'],
       {
         stdio: 'inherit', 
         cwd: frontendDir
       }
     );
+
+    // todo execSync衍生了shell无法找到cmd
+    // this.frontendServer = execSync(frontend.exec, {stdio: 'inherit', cwd: frontendDir});
+    // spawnSync(
+    //   frontend.cmd,
+    //   frontendArgs,
+    //   {
+    //     stdio: 'inherit', 
+    //     cwd: frontendDir
+    //   }
+    // );
     
+    const mainDir = path.join(process.cwd(), main.directory);
     const electronPath = this._getElectronPath();
     const mainArgs = is.string(main.args) ? [main.args] : main.args;
     this.electronServer = spawn(electronPath, mainArgs, { stdio: 'inherit' });
@@ -66,20 +79,20 @@ module.exports = {
     // this.frontendServer.on('data', (data) => {
     //   console.log(`[ee-bin] [serve] frontend-server data:${data}`);
     // });
-    // this.frontendServer.on('exit', (code, signal) => {
-    //   console.log(`[ee-bin] [serve] frontend-server code:${code}, signal:${signal}`);
-    // });
+    this.frontendServer.on('exit', (code, signal) => {
+      console.log(`[ee-bin] [serve] frontend-server code:${code}, signal:${signal}`);
+    });
 
-    // this.frontendServer.on('error', (err) => {
-    //   console.log(`[ee-bin] [serve] frontendServer error: ${err}`);
-    // });
+    this.frontendServer.on('error', (err) => {
+      console.log(`[ee-bin] [serve] frontendServer error: ${err}`);
+    });
 
-    // this.electronServer.on('exit', (code, signal) => {
-    //   console.log(`[ee-bin] [serve] electronServer code:${code}, signal:${signal}`);
-    // });
+    this.electronServer.on('exit', (code, signal) => {
+      console.log(`[ee-bin] [serve] electronServer code:${code}, signal:${signal}`);
+    });
 
-    // this.electronServer.on('error', (err) => {
-    //   console.log(`[ee-bin] [serve] electronServer error: ${err}`);
-    // });
+    this.electronServer.on('error', (err) => {
+      console.log(`[ee-bin] [serve] electronServer error: ${err}`);
+    });
   }  
 }

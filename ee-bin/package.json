@@ -1,6 +1,6 @@
 {
   "name": "ee-bin",
-  "version": "1.2.0",
+  "version": "1.2.0-bete.1",
   "description": "ee bin",
   "main": "index.js",
   "scripts": {
