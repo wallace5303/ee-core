@@ -2,8 +2,8 @@
 
 const path = require('path');
 const fs = require('fs');
-const { spawn, spawnSync } = require('child_process');
-const Util = require('../lib/util');
+const { spawn, spawnSync, exec, execFile } = require('child_process');
+const Utils = require('../lib/utils');
 const is = require('is-type-of');
 
 module.exports = {
@@ -17,26 +17,28 @@ module.exports = {
    */  
   serve(options = {}) {
     const { config } = options;
-    const cfg = Util.loadConfig(config);
+    const cfg = Utils.loadConfig(config);
 
     const { frontend, main } = cfg;
     console.log('frontend:', frontend);
     console.log('main:', main);
 
-    const frontendDir = path.join(process.cwd(), frontend.directory);
-    const frontendArgs = is.string(frontend.args) ? [frontend.args] : frontend.args;
-    console.log('frontendDir:', frontendDir);
-    console.log('frontendArgs:', frontendArgs);
-    //['--host --port 8080'],
-    this.frontendServer = spawn(
+    // const frontendDir = path.join(process.cwd(), frontend.directory);
+    // const frontendArgs = is.string(frontend.args) ? [frontend.args] : frontend.args;
+    // console.log('frontendDir:', frontendDir);
+    // console.log('frontendArgs:', frontendArgs);
+
+    //['--host --port 8080'], ['--host', '--port 8080'],
+    this.frontendServer = spawnSync(
       'vite',
-      ['--host', '--port 8080'],
+      ['--host', '--port=8080'],
       {
         stdio: 'inherit', 
-        cwd: frontendDir
+        cwd: path.join(process.cwd(), 'frontend'),
+        shell: true,
       }
     );
-
+    console.log('this.frontendServer:', this.frontendServer);
     // todo execSync衍生了shell无法找到cmd
     // this.frontendServer = execSync(frontend.exec, {stdio: 'inherit', cwd: frontendDir});
     // spawnSync(
@@ -49,8 +51,8 @@ module.exports = {
     // );
     
     const mainDir = path.join(process.cwd(), main.directory);
-    const electronPath = this._getElectronPath();
     const mainArgs = is.string(main.args) ? [main.args] : main.args;
+    const electronPath = this._getElectronPath();
     this.electronServer = spawn(electronPath, mainArgs, { stdio: 'inherit' });
     
     this._init();
@@ -79,20 +81,20 @@ module.exports = {
     // this.frontendServer.on('data', (data) => {
     //   console.log(`[ee-bin] [serve] frontend-server data:${data}`);
     // });
-    this.frontendServer.on('exit', (code, signal) => {
-      console.log(`[ee-bin] [serve] frontend-server code:${code}, signal:${signal}`);
-    });
+    // this.frontendServer.on('exit', (code, signal) => {
+    //   console.log(`[ee-bin] [serve] frontend-server code:${code}, signal:${signal}`);
+    // });
 
-    this.frontendServer.on('error', (err) => {
-      console.log(`[ee-bin] [serve] frontendServer error: ${err}`);
-    });
+    // this.frontendServer.on('error', (err) => {
+    //   console.log(`[ee-bin] [serve] frontendServer error: ${err}`);
+    // });
 
-    this.electronServer.on('exit', (code, signal) => {
-      console.log(`[ee-bin] [serve] electronServer code:${code}, signal:${signal}`);
-    });
+    // this.electronServer.on('exit', (code, signal) => {
+    //   console.log(`[ee-bin] [serve] electronServer code:${code}, signal:${signal}`);
+    // });
 
-    this.electronServer.on('error', (err) => {
-      console.log(`[ee-bin] [serve] electronServer error: ${err}`);
-    });
+    // this.electronServer.on('error', (err) => {
+    //   console.log(`[ee-bin] [serve] electronServer error: ${err}`);
+    // });
   }  
 }
