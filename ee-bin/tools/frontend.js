@@ -8,10 +8,6 @@ const is = require('is-type-of');
 
 module.exports = {
 
-  electronServer: undefined,
-
-  frontendServer: undefined,
-
   /**
    * 启动前端、主进程服务
    */  
@@ -25,12 +21,7 @@ module.exports = {
 
     // start frontend serve
     const frontendDir = path.join(process.cwd(), frontend.directory);
-    exec(frontend.exec, { stdio: 'inherit', cwd: frontendDir});
-    // const mainDir = path.join(process.cwd(), main.directory);
-    // this.electronServer = exec(main.exec, {
-    //   stdio: 'inherit', 
-    //   cwd: mainDir,
-    // });
+    exec(frontend.devCommond, { stdio: 'inherit', cwd: frontendDir});
 
     // start electron serve
     const mainDir = path.join(process.cwd(), main.directory);
