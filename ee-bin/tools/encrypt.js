@@ -322,7 +322,7 @@ const clean = (options = {}) => {
     const tmpFile = path.join(process.cwd(), file);
     if (fs.existsSync(tmpFile)) {
       fsPro.removeSync(tmpFile);
-      console.log(chalk.blue('[ee-bin] [encrypt] ') + 'clean up tmp files:' + chalk.magenta(`${tmpFile}`));
+      console.log(chalk.blue('[ee-bin] [encrypt] ') + 'clean up tmp files: ' + chalk.magenta(`${tmpFile}`));
     }
   })
 }
