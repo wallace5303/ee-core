@@ -62,4 +62,16 @@ program
     frontend.serve(this.opts());
   });
 
+/**
+ * build
+ */
+program
+  .command('build')
+  .description('build frontend dist')
+  .option('--config <folder>', 'config file', './electron/config/bin.js')
+  .action(function() {
+    const frontend = require('./tools/frontend');
+    frontend.build(this.opts());
+  });
+
 program.parse();
