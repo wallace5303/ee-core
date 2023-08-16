@@ -21,16 +21,9 @@ const CoreElectronApp = {
       app.quit();
       return;
     }
-
-    app.on('second-instance', (event) => {
-      Window.restoreMainWindow();
-    })
   
     app.whenReady().then(() => {
       CoreApp.createWindow();
-      app.on('activate', () => {
-        Window.restoreMainWindow();
-      })
     })
     
     app.on('window-all-closed', () => {
