@@ -182,6 +182,14 @@ exports.getElectronDir = function() {
 }
 
 /**
+ * 获取public目录
+ */
+exports.getPublicDir = function() {
+  const dir = path.join(process.env.EE_HOME, "public");
+  return dir;
+}
+
+/**
  * 获取 额外资源目录
  */
 exports.getExtraResourcesDir = function() {
