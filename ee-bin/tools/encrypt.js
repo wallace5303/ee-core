@@ -26,7 +26,7 @@ class Encrypt {
       const cfg = Utils.loadConfig(configFile);
       this.config = cfg.encrypt;
     } else {
-      this.config = this.loadConfig();
+      this.config = Utils.loadEncryptConfig();
     }
     
     this.filesExt = this.config.fileExt || ['.js'];
@@ -279,24 +279,6 @@ class Encrypt {
       });
       fs.chmodSync(path, mode);
     }
-  };
-
-  loadConfig() {
-    const configFile = './electron/config/encrypt.js';
-    const filepath = path.join(this.basePath, configFile);
-    if (!fs.existsSync(filepath)) {
-      const errorTips = 'config file ' + chalk.blue(`${filepath}`) + ' does not exist !';
-      throw new Error(errorTips)
-    }
-    const obj = require(filepath);
-    if (!obj) return obj;
-
-    let ret = obj;
-    if (is.function(obj) && !is.class(obj)) {
-      ret = obj();
-    }
-
-    return ret || {};
   };
 
   md5(file) {
