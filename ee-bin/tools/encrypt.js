@@ -25,7 +25,8 @@ class Encrypt {
     if (hasConfig) {
       const cfg = Utils.loadConfig(configFile);
       this.config = cfg.encrypt;
-    } else {
+    } 
+    if (!this.config) {
       this.config = Utils.loadEncryptConfig();
     }
     
