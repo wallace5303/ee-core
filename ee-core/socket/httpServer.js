@@ -65,13 +65,18 @@ class HttpServer {
       .use(this.dispatch);
 
     let msg = '[ee-core] [socket/http] server is: ' + url;
+
+    const listenOpt = {
+      host: httpServer.host,
+      port: httpServer.port
+    }
     if (isHttps) {
-      https.createServer(sslOptions, koaApp.callback()).listen(httpServer.port, (err) => {
+      https.createServer(sslOptions, koaApp.callback()).listen(listenOpt, (err) => {
         msg = err ? err : msg;
         Log.coreLogger.info(msg);
       });
     } else {
-      koaApp.listen(httpServer.port, (e) => {
+      koaApp.listen(listenOpt, (e) => {
         msg = e ? e : msg;
         Log.coreLogger.info(msg);
       });
