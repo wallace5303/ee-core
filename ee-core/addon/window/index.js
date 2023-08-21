@@ -24,6 +24,7 @@ class WinAddon {
     //   throw new Error(`[addon] [window] Name: ${name} already exists!`);
     // }
 
+    // [todo] 使用 extend, 避免多维对象被覆盖 
     const options = Object.assign({
       x: 10,
       y: 10,

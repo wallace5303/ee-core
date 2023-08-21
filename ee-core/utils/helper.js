@@ -3,6 +3,10 @@ const mkdirp = require('mkdirp');
 const convert = require('koa-convert');
 const is = require('is-type-of');
 const co = require('./co');
+const path = require('path');
+const chalk = require('chalk');
+
+const _basePath = process.cwd();
 
 /**
  * fnDebounce
@@ -138,3 +142,30 @@ exports.validValue = function(value) {
     value !== ''
   );
 }
+
+exports.checkConfig = function(prop) {
+  const filepath = path.join(_basePath, prop);
+  if (fs.existsSync(filepath)) {
+    return true;
+  }
+  
+  return false;
+}
+
+exports.loadConfig = function(prop) {
+  const configFile = prop;
+  const filepath = path.join(_basePath, configFile);
+  if (!fs.existsSync(filepath)) {
+    const errorTips = 'config file ' + chalk.blue(`${filepath}`) + ' does not exist !';
+    throw new Error(errorTips)
+  }
+  const obj = require(filepath);
+  if (!obj) return obj;
+
+  let ret = obj;
+  if (is.function(obj) && !is.class(obj)) {
+    ret = obj();
+  }
+
+  return ret || {};
+};

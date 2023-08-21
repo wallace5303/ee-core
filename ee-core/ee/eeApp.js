@@ -14,6 +14,7 @@ const Conf = require('../config');
 const Ps = require('../ps');
 const Socket = require('../socket');
 const GetPort = require('../utils/get-port');
+const UtilsHelper = require('../utils/helper');
 
 class EeApp extends BaseApp {
   constructor(options = {}) {
@@ -103,27 +104,35 @@ class EeApp extends BaseApp {
       return;
     }
 
-    const developmentModeConfig = this.config.developmentMode;
-    const selectMode = developmentModeConfig.default;
-    const modeInfo = developmentModeConfig.mode[selectMode];
-    let staticDir = null;
+    // 开发环境
+    if (Ps.isDev()) {
+      let modeInfo;
+      let url;
+      let load = 'url';
+      const configFile = './electron/config/bin.js';
 
-    // html模式
-    if (selectMode == 'html') {
-      if (Ps.isDev()) {
-        staticDir = path.join(this.config.homeDir, 'frontend', 'dist');
+      const isBin = UtilsHelper.checkConfig(configFile);
+      if (isBin) {
+        const binConfig = UtilsHelper.loadConfig(configFile);
+        const { frontend } = binConfig.dev;
+        modeInfo = frontend;
+      } else {
+        // 兼容旧的 developmentMode
+        const developmentModeConfig = this.config.developmentMode;
+        const selectMode = developmentModeConfig.default;
+        modeInfo = developmentModeConfig.mode[selectMode];
       }
-      this.loadLocalWeb('html', staticDir, modeInfo);
+
+      url = modeInfo.protocol + modeInfo.hostname + ':' + modeInfo.port;
+      if (Conf.isFileProtocol(modeInfo)) {
+        url = path.join(this.config.homeDir, modeInfo.indexPath);
+        load = 'file';
+      }
+
+      this.loadMainUrl('spa', url, load);
       return;
     }
 
-    // 单页应用
-    // 开发环境
-    if (Ps.isDev()) {
-      url = modeInfo.protocol + modeInfo.hostname + ':' + modeInfo.port;
-      this.loadMainUrl('spa', url);
-      return;
-    } 
     // 生产环境
     const mainServer = this.config.mainServer;
     if (Conf.isFileProtocol(mainServer)) {
@@ -137,7 +146,7 @@ class EeApp extends BaseApp {
   /**
    * 加载本地前端资源
    */
-  loadLocalWeb(mode, staticDir, hostInfo) {
+  loadLocalWeb(mode, staticDir) {
     if (!staticDir) {
       staticDir = path.join(this.config.homeDir, 'public', 'dist')
     }
@@ -147,9 +156,6 @@ class EeApp extends BaseApp {
 
     const mainServer = this.config.mainServer;
     let url = mainServer.protocol + mainServer.host + ':' + mainServer.port;
-    if (mode == 'html') {
-      url += '/' + hostInfo.indexPage;
-    }
 
     const isHttps = mainServer.protocol == 'https://' ? true : false;
     if (isHttps) {
@@ -170,7 +176,12 @@ class EeApp extends BaseApp {
         this.loadMainUrl(mode, url);
       });
     } else {
-      koaApp.listen(mainServer.port, () => {
+      // 使用 host port 避免绑定到0.0.0.0
+      const koaOpt = {
+        host: mainServer.host,
+        port: mainServer.port
+      }
+      koaApp.listen(koaOpt, () => {
         this.loadMainUrl(mode, url);
       });
     }
