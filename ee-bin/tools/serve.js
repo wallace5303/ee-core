@@ -33,6 +33,11 @@ module.exports = {
    * 前端服务
    */  
   frontendServe(cfg) {
+    // 如果是 file:// 协议，则不启动
+    if (cfg.protocol == 'file://') {
+      return
+    }
+
     // start frontend serve
     console.log(chalk.blue('[ee-bin] [frontendServe] ') + chalk.green('Start the frontend serve...'));
     console.log(chalk.blue('[ee-bin] [frontendServe] ') + chalk.green('config:'), cfg);
