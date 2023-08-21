@@ -1,4 +1,5 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const is = require('is-type-of');
+const { BrowserWindow, Menu } = require('electron');
 const Conf = require('../../config');
 const Ps = require('../../ps');
 const EEMainWindow = Symbol('Ee#electron#mainWindow');
@@ -43,12 +44,16 @@ const Window = {
     }
 
     // DevTools
-    if (config.openDevTools) {
+    if (is.object(config.openDevTools)) {
+      win.webContents.openDevTools(config.openDevTools);
+    } else if (config.openDevTools === true) {
       win.webContents.openDevTools({
         mode: 'undocked'
       });
+    } else {
+      //
     }
-
+    
     return win;
   },
 
