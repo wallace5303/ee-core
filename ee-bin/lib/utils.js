@@ -52,8 +52,25 @@ function loadEncryptConfig() {
   return ret || {};
 };
 
+/**
+ * get electron program
+ */   
+function getElectronProgram() {
+  let electronPath
+  const electronModulePath = path.dirname(require.resolve('electron'))
+  const pathFile = path.join(electronModulePath, 'path.txt')
+  const executablePath = fs.readFileSync(pathFile, 'utf-8')
+  if (executablePath) {
+    electronPath = path.join(electronModulePath, 'dist', executablePath)
+  } else {
+    throw new Error('Check that electron is installed!')
+  }
+  return electronPath;
+};
+
 module.exports = {
   loadConfig,
   checkConfig,
-  loadEncryptConfig
+  loadEncryptConfig,
+  getElectronProgram
 }

@@ -61,7 +61,7 @@ program
   .option('--config <folder>', 'config file', './electron/config/bin.js')
   .action(function() {
     const serve = require('./tools/serve');
-    serve.run(this.opts());
+    serve.dev(this.opts());
   });
 
 /**
@@ -74,6 +74,18 @@ program
   .action(function() {
     const serve = require('./tools/serve');
     serve.build(this.opts());
+  });
+
+/**
+ * start
+ */
+program
+  .command('start')
+  .description('preview effect')
+  .option('--config <folder>', 'config file', './electron/config/bin.js')
+  .action(function() {
+    const serve = require('./tools/serve');
+    serve.start(this.opts());
   });
 
 program.parse();
