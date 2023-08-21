@@ -27,8 +27,7 @@ module.exports = {
     console.log(chalk.blue('[ee-bin] [serve] ') + chalk.green('Start the electron serve...'));
     const electronDir = path.join(process.cwd(), electron.directory);
     const electronArgs = is.string(electron.args) ? [electron.args] : electron.args;
-    const electronPath = this._getElectronPath();
-    spawn(electronPath, electronArgs, {
+    spawn(electron.cmd, electronArgs, {
       stdio: 'inherit', 
       cwd: electronDir,
     });
@@ -40,19 +39,22 @@ module.exports = {
   build(options = {}) {
     const { config } = options;
     const cfg = Utils.loadConfig(config);
-    const { frontend } = cfg;
+    const buildCfg = cfg.build;
 
     // start build frontend dist
     console.log(chalk.blue('[ee-bin] [build] ') + chalk.green('Build frontend dist'));
+    console.log(chalk.blue('[ee-bin] [build] ') + chalk.green(`directory: `) + buildCfg.directory);
+    console.log(chalk.blue('[ee-bin] [build] ') + chalk.green(`cmd: `) + buildCfg.cmd);
+    
     let i = 1;
     let buildProgress = setInterval(() => {
       console.log(chalk.blue('[ee-bin] [build] ') + chalk.magenta(`${i}s`));
       i++;
     }, 1000)
 
-    const frontendDir = path.join(process.cwd(), frontend.directory);
+    const frontendDir = path.join(process.cwd(), buildCfg.directory);
     exec(
-      frontend.buildCommond, 
+      buildCfg.cmd, 
       { stdio: 'inherit', cwd: frontendDir, maxBuffer: 1024 * 1024 * 1024}, 
       (error, stdout, stderr) => {
         if (error) {
@@ -67,6 +69,9 @@ module.exports = {
     );
   },
 
+  /**
+   * no used
+   */   
   _getElectronPath() {
     let electronExecPath = ''
     const electronModulePath = path.dirname(require.resolve('electron'))
@@ -75,7 +80,7 @@ module.exports = {
     if (executablePath) {
       electronExecPath = path.join(electronModulePath, 'dist', executablePath)
     } else {
-      throw new Error('Electron uninstall')
+      throw new Error('Check that electron is installed!')
     }
     return electronExecPath
   },

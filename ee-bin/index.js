@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const program = require('commander');
+const { program } = require('commander');
 
 /**
  * rd - Moves front-end resources to a specified directory
@@ -76,3 +76,4 @@ program
     serve.build(this.opts());
   });
 
+program.parse();
