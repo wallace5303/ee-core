@@ -16,6 +16,7 @@ module.exports = {
     const { config } = options;
     const cfg = Utils.loadConfig(config);
     const { frontend, electron } = cfg.dev;
+    console.log("cfg.dev:", cfg.dev);
 
     // start frontend serve
     console.log(chalk.blue('[ee-bin] [serve] ') + chalk.green('Start the frontend serve...'));

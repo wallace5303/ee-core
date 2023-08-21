@@ -72,7 +72,7 @@ program
   .description('build frontend dist')
   .option('--config <folder>', 'config file', './electron/config/bin.js')
   .action(function() {
-    const frontend = require('./tools/serve');
-    frontend.build(this.opts());
+    const serve = require('./tools/serve');
+    serve.build(this.opts());
   });
 
