@@ -12,24 +12,24 @@ module.exports = {
   /**
    * 启动前端、主进程服务
    */  
-  serve(options = {}) {
+  run(options = {}) {
     const { config } = options;
     const cfg = Utils.loadConfig(config);
-    const { frontend, main } = cfg;
+    const { frontend, electron } = cfg.dev;
 
     // start frontend serve
     console.log(chalk.blue('[ee-bin] [serve] ') + chalk.green('Start the frontend serve...'));
     const frontendDir = path.join(process.cwd(), frontend.directory);
-    exec(frontend.devCommond, { stdio: 'inherit', cwd: frontendDir});
+    exec(frontend.cmd, { stdio: 'inherit', cwd: frontendDir});
 
     // start electron serve
     console.log(chalk.blue('[ee-bin] [serve] ') + chalk.green('Start the electron serve...'));
-    const mainDir = path.join(process.cwd(), main.directory);
-    const mainArgs = is.string(main.args) ? [main.args] : main.args;
+    const electronDir = path.join(process.cwd(), electron.directory);
+    const electronArgs = is.string(electron.args) ? [electron.args] : electron.args;
     const electronPath = this._getElectronPath();
-    spawn(electronPath, mainArgs, {
+    spawn(electronPath, electronArgs, {
       stdio: 'inherit', 
-      cwd: mainDir,
+      cwd: electronDir,
     });
   },
 

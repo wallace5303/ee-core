@@ -57,11 +57,11 @@ program
  */
 program
   .command('dev')
-  .description('create frontend-server and electron-server')
+  .description('create frontend-serve and electron-serve')
   .option('--config <folder>', 'config file', './electron/config/bin.js')
   .action(function() {
-    const frontend = require('./tools/frontend');
-    frontend.serve(this.opts());
+    const serve = require('./tools/serve');
+    serve.run(this.opts());
   });
 
 /**
@@ -72,8 +72,7 @@ program
   .description('build frontend dist')
   .option('--config <folder>', 'config file', './electron/config/bin.js')
   .action(function() {
-    const frontend = require('./tools/frontend');
+    const frontend = require('./tools/serve');
     frontend.build(this.opts());
   });
 
-program.parse();
