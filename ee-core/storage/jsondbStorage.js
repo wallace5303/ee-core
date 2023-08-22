@@ -79,13 +79,6 @@ class JsondbStorage {
   }
 
   /**
-   * 获取db文件名
-   */
-  getFileName(name) {
-    return name + ".json";
-  }
-
-  /**
    * 获取文件绝对路径
    */
   getFilePath() {
@@ -110,6 +103,13 @@ class JsondbStorage {
 
     return mode;
   }
+
+  /**
+   * 获取storage目录
+   */
+  getStorageDir() {
+    return this.storageDir;
+  }  
 
   /**
    * 为指定的 name 设置一个对应的值
