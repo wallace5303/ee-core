@@ -12,15 +12,16 @@ class JsondbStorage {
   constructor (name, opt = {}) {
     assert(name, `db name ${name} Cannot be empty`);
 
+    // 补全文件名
+    name = this._addExtname(name);
+
     this.name = name;
+    this.mode = this.getMode(name);
+    this.storageDir = this._createStorageDir();
+    this.fileName = this._formatFileName(name);
 
     // 数据库key列表
     this.storageKey = Constants.storageKey;
-
-    const storageDir = Ps.getStorageDir();
-    if (!fs.existsSync(storageDir)) {
-      Helper.mkdir(storageDir);
-    }
 
     this.db = this.table(name);
   }
@@ -41,19 +42,73 @@ class JsondbStorage {
   }
 
   /**
+   * 补全扩展名
+   */
+  _addExtname(name) {
+    if (path.extname(name) != '.json') {
+      name += ".json";
+    }
+
+    return name;
+  }
+
+  /**
+   * 创建storage目录
+   */
+  _createStorageDir() {
+    let storageDir = Ps.getStorageDir();
+
+    if (this.mode == 'absolute') {
+      storageDir = path.dirname(this.name); 
+    }
+
+    if (!fs.existsSync(storageDir)) {
+      Helper.mkdir(storageDir);
+      Helper.chmodPath(storageDir, '777');
+    }
+
+    return storageDir;
+  }
+
+  /**
+   * 获取文件名
+   */
+  _formatFileName(name) {
+    let fileName = path.basename(name);
+    return fileName;
+  }
+
+  /**
    * 获取db文件名
    */
-  getFileName (name) {
+  getFileName(name) {
     return name + ".json";
   }
 
   /**
    * 获取文件绝对路径
    */
-  getFilePath (name) {
-    const storageDir = Ps.getStorageDir();
-    const dbFile = path.join(storageDir, this.getFileName(name));
+  getFilePath() {
+    const dbFile = path.join(this.storageDir, this.fileName);
     return dbFile;
+  }
+
+  /**
+   * 获取file path 模式
+   */
+  getMode(name) {
+    let mode = 'relative';
+
+    // 路径模式
+    name = name.replace(/[/\\]/g, '/');
+    if (name.indexOf('/') !== -1) {
+      const isAbsolute = path.isAbsolute(name);
+      if (isAbsolute) {
+        mode = 'absolute';
+      }
+    }
+
+    return mode;
   }
 
   /**
