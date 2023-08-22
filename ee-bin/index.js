@@ -9,7 +9,6 @@ program
   .command('rd')
   .description('Move frontend resources to public/dist')
   .option('--config <folder>', 'config file', './electron/config/bin.js')
-  .option('--dist-dir <folder>', 'title to use before name', './frontend/dist') // 兼容旧的api
   .option('--dist <folder>', 'title to use before name')
   .option('--target <folder>', 'title to use before name')
   .action(function() {

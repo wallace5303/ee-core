@@ -18,17 +18,34 @@ const Utils = require('../lib/utils');
   run(options = {}) {
     console.log('[ee-bin] [rd] Start moving resources');
     const homeDir = process.cwd();
-    const { distDir, dist, target, config } = options;
+    let { dist, target, config } = options;
+
+    let distDir = './frontend/dist';
+    let targetDir = './public/dist';
 
     // 命令行优先
-    if (dist && !target) {
-      
+    if (dist) {
+      distDir = dist;
+    }
+    if (target) {
+      targetDir = target;
     }
 
+    // 如果命令行没参数，从bin config 获取
+    if (!dist && !target) {
+      const hasConfig = Utils.checkConfig(config);
+      if (hasConfig) {
+        const cfg = Utils.loadConfig(config);
+        if (cfg.rd && cfg.rd.dist) {
+          distDir = cfg.rd.dist;
+        }
+        if (cfg.rd && cfg.rd.target) {
+          targetDir = cfg.rd.target;
+        }
+      }   
+    }
 
-    // argv
-    const distFolder = dist ? dist : distDir;
-    const sourceDir = path.join(homeDir, distFolder);
+    const sourceDir = path.join(homeDir, distDir);
     if (!fs.existsSync(sourceDir)) {
       const errorTips = chalk.bgRed('Error') + ' Frontend resource does not exist, please build !';
       console.error(errorTips);
@@ -36,7 +53,7 @@ const Utils = require('../lib/utils');
     }
     
     // 清空历史资源 并 复制到ee资源目录
-    const eeResourceDir = path.join(homeDir, target);
+    const eeResourceDir = path.join(homeDir, targetDir);
     if (!fs.existsSync(eeResourceDir)) {
       fs.mkdirSync(eeResourceDir, {recursive: true, mode: 0o777});
     } else {
