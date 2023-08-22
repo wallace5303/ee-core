@@ -8,9 +8,10 @@ const { program } = require('commander');
 program
   .command('rd')
   .description('Move frontend resources to public/dist')
+  .option('--config <folder>', 'config file', './electron/config/bin.js')
   .option('--dist-dir <folder>', 'title to use before name', './frontend/dist') // 兼容旧的api
-  .option('--dist <folder>', 'title to use before name', './frontend/dist')
-  .option('--target <folder>', 'title to use before name', './public/dist')
+  .option('--dist <folder>', 'title to use before name')
+  .option('--target <folder>', 'title to use before name')
   .action(function() {
     const replaceDist = require('./tools/replaceDist');
     replaceDist.run(this.opts());

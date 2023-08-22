@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const fsPro = require('fs-extra');
 const chalk = require('chalk');
+const Utils = require('../lib/utils');
 
 /**
  * 资源替换
@@ -17,7 +18,13 @@ const chalk = require('chalk');
   run(options = {}) {
     console.log('[ee-bin] [rd] Start moving resources');
     const homeDir = process.cwd();
-    const { distDir, dist, target } = options;
+    const { distDir, dist, target, config } = options;
+
+    // 命令行优先
+    if (dist && !target) {
+      
+    }
+
 
     // argv
     const distFolder = dist ? dist : distDir;
@@ -47,39 +54,10 @@ const chalk = require('chalk');
    */
   _rmFolder(folder) {
     const nodeVersion = (process.versions && process.versions.node) || null;
-    if (nodeVersion && this._compareVersion(nodeVersion, '14.14.0') == 1) {
+    if (nodeVersion && Utils.compareVersion(nodeVersion, '14.14.0') == 1) {
       fs.rmSync(folder, {recursive: true});
     } else {
       fs.rmdirSync(folder, {recursive: true});
     }
   },
-
-  /**
-   * 版本号比较
-   */
-  _compareVersion(v1, v2) {
-    v1 = v1.split('.')
-    v2 = v2.split('.')
-    const len = Math.max(v1.length, v2.length)
-
-    while (v1.length < len) {
-      v1.push('0')
-    }
-    while (v2.length < len) {
-      v2.push('0')
-    }
-    
-    for (let i = 0; i < len; i++) {
-      const num1 = parseInt(v1[i])
-      const num2 = parseInt(v2[i])
-
-      if (num1 > num2) {
-        return 1
-      } else if (num1 < num2) {
-        return -1
-      }
-    }
-
-    return 0
-  }
 }
