@@ -14,25 +14,20 @@ class JsondbStorage {
 
     // 补全文件名
     name = this._addExtname(name);
-
     this.name = name;
     this.mode = this.getMode(name);
     this.storageDir = this._createStorageDir();
     this.fileName = this._formatFileName(name);
-
-    // 数据库key列表
     this.storageKey = Constants.storageKey;
 
-    this.db = this.table(name);
+    this.db = this.table();
   }
 
   /**
    * 创建 table
    */
-  table (name) {
-    assert(name, 'table name is required');
-
-    const dbFile = this.getFilePath(name);
+  table() {
+    const dbFile = this.getFilePath();
     const adapter = new FileSync(dbFile);
     const db = Jsondb(adapter);
 
