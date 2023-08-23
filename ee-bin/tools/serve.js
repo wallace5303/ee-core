@@ -35,55 +35,53 @@ module.exports = {
     this.electronServe(cfg.start);
   },
 
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  },
+
   /**
    * 前端服务
    */  
-  frontendServe(cfg) {
+  async frontendServe(cfg) {
     // 如果是 file:// 协议，则不启动
     if (cfg.protocol == 'file://') {
       return
     }
 
     // start frontend serve
-    console.log(chalk.blue('[ee-bin] [frontendServe] ') + chalk.green('Start the frontend serve...'));
-    console.log(chalk.blue('[ee-bin] [frontendServe] ') + chalk.green('config:'), JSON.stringify(cfg));
+    console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('Start the frontend serve...'));
+    console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('config:'), JSON.stringify(cfg));
 
     const frontendDir = path.join(process.cwd(), cfg.directory);
+    const isWindows = Utils.isWindows();
+    const cmdEncoding = isWindows ? 'binary' : 'utf8';
+    const msgEncoding = isWindows ? 'cp936' : 'utf8';
     this.frontendProcess = exec(
       cfg.cmd, 
-      { stdio: 'inherit', cwd: frontendDir, encoding: 'binary'}, // buffer utf-8 
-      (error, stdout, stderr) => {
-        if (error) {
-
-          let errMsg = error.message;
-          //errMsg = '你'
-          var encodedBuff = iconv.encode(errMsg, 'utf-8');
-          console.log(encodedBuff);
-          // const buf = Buffer.from(error);
-          // console.log('is str:', typeof error);
-          // console.log('is str:', JSON.stringify(error));
-          // console.log('is str:', error)
-          //console.log('is str:', iconv.decode(Buffer.from(error), 'cp936'))
-          // var chunks = [];
-          // chunks = Buffer.concat(error);
-          // const decodedText = iconv.decode(chunks, 'gbk')
-          //const decodedText = iconv.encode(_de, 'utf-8').toString().trim() || ''
-          //var decodedText = iconv.decode(error, 'gbk');
-          console.log(iconv.decode(new Buffer.from(error.message, 'binary'), 'cp936'))
-          //console.log(iconv.decode(Buffer.from(errMsg), 'utf-8'))
-          //console.log(chalk.blue('[ee-bin] [frontendServe] ') + chalk.red(`${error}`));
+      { stdio: 'inherit', cwd: frontendDir, encoding: cmdEncoding},
+      (err) => {
+        if (err) {
+          const errMsg = iconv.decode(new Buffer.from(err.message, cmdEncoding), msgEncoding);
+          console.log(chalk.blue('[ee-bin] [dev] ') + chalk.red(`Error: ${errMsg}`))
           process.exit();
         }
-        // console.log(stdout);
-        // console.log(stderr);
-      });
-
-    // this.frontendProcess.stdout.on('data', (data) => {
-    //   console.log(chalk.blue('[ee-bin] [frontendServe] ') + `${data}`);
-    // });
-    // this.frontendProcess.stderr.on('data', (data) => {
-    //   console.error(chalk.blue('[ee-bin] [frontendServe] ') + `${data}`);
-    // });
+      }
+    );
+    
+    this.frontendProcess.stdout.on('data', (data) => {
+      let out = data;
+      if (isWindows) {
+        out = iconv.decode(new Buffer.from(data, cmdEncoding), 'utf8');
+      }
+      console.log(chalk.blue('[ee-bin] [dev] ') + `frontend ${out}`);
+    });
+    this.frontendProcess.stderr.on('data', (data) => {
+      let out = data;
+      if (isWindows) {
+        out = iconv.decode(new Buffer.from(data, cmdEncoding), 'utf8');
+      }
+      console.error(chalk.blue('[ee-bin] [dev] ') + `frontend ${out}`);
+    });
   },
 
   /**
@@ -91,8 +89,8 @@ module.exports = {
    */  
   electronServe(cfg) {
     // start electron serve
-    console.log(chalk.blue('[ee-bin] [electronServe] ') + chalk.green('Start the electron serve...'));
-    console.log(chalk.blue('[ee-bin] [electronServe] ') + chalk.green('config:'), JSON.stringify(cfg));
+    console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('Start the electron serve...'));
+    console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('config:'), JSON.stringify(cfg));
 
     const electronDir = path.join(process.cwd(), cfg.directory);
     const electronArgs = is.string(cfg.args) ? [cfg.args] : cfg.args;
@@ -103,10 +101,11 @@ module.exports = {
       electronProgram = Utils.getElectronProgram();
     }
 
-    this.electronProcess = spawn(electronProgram, electronArgs, {
-      stdio: 'inherit', 
-      cwd: electronDir,
-    });
+    this.electronProcess = spawn(
+      electronProgram, 
+      electronArgs, 
+      {stdio: 'inherit', cwd: electronDir,}
+    );
 
     this.electronProcess.on('exit', () => {
       setTimeout(() => {
@@ -129,24 +128,29 @@ module.exports = {
     
     let i = 1;
     let buildProgress = setInterval(() => {
-      console.log(chalk.blue('[ee-bin] [build] ') + chalk.magenta(`${i}s`));
+      console.log(chalk.blue('[ee-bin] [build] ') + `${i}s`);
       i++;
     }, 1000)
 
     const frontendDir = path.join(process.cwd(), buildCfg.directory);
     const buildProcess = exec(
       buildCfg.cmd, 
-      { stdio: 'inherit', cwd: frontendDir, maxBuffer: 1024 * 1024 * 1024}, 
-      (error, stdout, stderr) => {
-        if (error) {
-          console.log(chalk.red('build error:') + error);
+      { stdio: 'inherit', cwd: frontendDir, },  // maxBuffer: 1024 * 1024 * 1024
+      (err) => {
+        if (err) {
+          console.log(chalk.blue('[ee-bin] [build] ') + chalk.red(`Error: ${err.message}`))
           process.exit();
         }
-        console.log(stdout);
-        console.log(stderr);
         clearInterval(buildProgress);
         console.log(chalk.blue('[ee-bin] [build] ') + chalk.green('End'));
       }
     );
+    
+    buildProcess.stdout.on('data', (data) => {
+      console.log(chalk.blue('[ee-bin] [build] ') + `frontend ${data}`);
+    });
+    buildProcess.stderr.on('data', (data) => {
+      console.error(chalk.blue('[ee-bin] [build] ') + chalk.yellow(`Warning: ${data}`));
+    });    
   },
 }
