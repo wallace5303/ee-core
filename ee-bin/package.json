@@ -17,6 +17,7 @@
     "commander": "^11.0.0",
     "fs-extra": "^10.0.0",
     "globby": "^10.0.0",
+    "iconv-lite": "^0.6.3",
     "is-type-of": "^1.2.1",
     "javascript-obfuscator": "^4.0.2"
   }

@@ -5,6 +5,8 @@ const { spawn, exec } = require('child_process');
 const Utils = require('../lib/utils');
 const is = require('is-type-of');
 const chalk = require('chalk');
+const iconv = require('iconv-lite');
+const { Buffer } = require('buffer');
 
 module.exports = {
 
@@ -44,37 +46,44 @@ module.exports = {
 
     // start frontend serve
     console.log(chalk.blue('[ee-bin] [frontendServe] ') + chalk.green('Start the frontend serve...'));
-    console.log(chalk.blue('[ee-bin] [frontendServe] ') + chalk.green('config:'), cfg);
+    console.log(chalk.blue('[ee-bin] [frontendServe] ') + chalk.green('config:'), JSON.stringify(cfg));
 
     const frontendDir = path.join(process.cwd(), cfg.directory);
     this.frontendProcess = exec(
       cfg.cmd, 
-      { stdio: 'inherit', cwd: frontendDir},
+      { stdio: 'inherit', cwd: frontendDir, encoding: 'binary'}, // buffer utf-8 
       (error, stdout, stderr) => {
         if (error) {
-          console.log(chalk.blue('[ee-bin] [frontendServe] ') + chalk.red('Error:') + error);
-          return;
+
+          let errMsg = error.message;
+          //errMsg = '你'
+          var encodedBuff = iconv.encode(errMsg, 'utf-8');
+          console.log(encodedBuff);
+          // const buf = Buffer.from(error);
+          // console.log('is str:', typeof error);
+          // console.log('is str:', JSON.stringify(error));
+          // console.log('is str:', error)
+          //console.log('is str:', iconv.decode(Buffer.from(error), 'cp936'))
+          // var chunks = [];
+          // chunks = Buffer.concat(error);
+          // const decodedText = iconv.decode(chunks, 'gbk')
+          //const decodedText = iconv.encode(_de, 'utf-8').toString().trim() || ''
+          //var decodedText = iconv.decode(error, 'gbk');
+          console.log(iconv.decode(new Buffer.from(error.message, 'binary'), 'cp936'))
+          //console.log(iconv.decode(Buffer.from(errMsg), 'utf-8'))
+          //console.log(chalk.blue('[ee-bin] [frontendServe] ') + chalk.red(`${error}`));
+          process.exit();
         }
-        console.log(stdout);
-        console.log(stderr);
-        console.log(chalk.blue('[ee-bin] [frontendServe] ') + chalk.green('Success'));
+        // console.log(stdout);
+        // console.log(stderr);
       });
 
-    this.frontendProcess.stdout.on('data', (data) => {
-      console.log(chalk.blue('[ee-bin] [frontendServe] ') + `${data}`);
-    });
-    this.frontendProcess.stderr.on('data', (data) => {
-      console.error(chalk.blue('[ee-bin] [frontendServe] ') + `${data}`);
-    });
-    // this.frontendProcess.on('close', (code) => {
-    //   console.log(chalk.blue('[ee-bin] [frontendServe] ') + `child process close with code ${code}`);
+    // this.frontendProcess.stdout.on('data', (data) => {
+    //   console.log(chalk.blue('[ee-bin] [frontendServe] ') + `${data}`);
     // });
-    // this.frontendProcess.on('exit', (code, signal) => {
-    //   console.log(chalk.blue('[ee-bin] [frontendServe] ') + `child process exited with code ${code} signal ${signal}`);
-    //   console.log('electronProcess', this.electronProcess)
-      
+    // this.frontendProcess.stderr.on('data', (data) => {
+    //   console.error(chalk.blue('[ee-bin] [frontendServe] ') + `${data}`);
     // });
-    //this.frontendProcess.unref();
   },
 
   /**
@@ -83,7 +92,7 @@ module.exports = {
   electronServe(cfg) {
     // start electron serve
     console.log(chalk.blue('[ee-bin] [electronServe] ') + chalk.green('Start the electron serve...'));
-    console.log(chalk.blue('[ee-bin] [electronServe] ') + chalk.green('config:'), cfg);
+    console.log(chalk.blue('[ee-bin] [electronServe] ') + chalk.green('config:'), JSON.stringify(cfg));
 
     const electronDir = path.join(process.cwd(), cfg.directory);
     const electronArgs = is.string(cfg.args) ? [cfg.args] : cfg.args;
@@ -99,8 +108,7 @@ module.exports = {
       cwd: electronDir,
     });
 
-    this.electronProcess.on('exit', (code, signal) => {
-      console.log(`child process exited with code: ${code} , signal: ${signal}`);
+    this.electronProcess.on('exit', () => {
       setTimeout(() => {
         process.exit();
       }, 500)
@@ -132,7 +140,7 @@ module.exports = {
       (error, stdout, stderr) => {
         if (error) {
           console.log(chalk.red('build error:') + error);
-          return;
+          process.exit();
         }
         console.log(stdout);
         console.log(stderr);
