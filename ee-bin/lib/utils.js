@@ -97,10 +97,15 @@ function compareVersion(v1, v2) {
   return 0
 }
 
+function isWindows(prop) {
+  return process.platform === 'win32'
+}
+
 module.exports = {
   loadConfig,
   checkConfig,
   loadEncryptConfig,
   getElectronProgram,
-  compareVersion
+  compareVersion,
+  isWindows
 }
