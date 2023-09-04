@@ -16,11 +16,24 @@ module.exports = {
    * 启动前端、主进程服务
    */  
   dev(options = {}) {
-    const { config } = options;
+    const { config, serve } = options;
     const binCfg = Utils.loadConfig(config);
     const { frontend, electron } = binCfg.dev;
-    this.frontendServe(frontend);
-    this.electronServe(electron);
+
+    if (serve == 'frontend') {
+      this.frontendServe(frontend);
+      return;
+    }
+
+    if (serve == 'electron') {
+      this.electronServe(electron);
+      return;
+    }
+
+    if (serve == 'all') {
+      this.frontendServe(frontend);
+      this.electronServe(electron);
+    }
   },
 
   /**
