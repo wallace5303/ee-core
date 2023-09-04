@@ -1,12 +1,10 @@
 'use strict';
 
 const path = require('path');
-const { spawn, exec } = require('child_process');
 const Utils = require('../lib/utils');
 const is = require('is-type-of');
 const chalk = require('chalk');
-const iconv = require('iconv-lite');
-const { Buffer } = require('buffer');
+const crossSpawn = require('cross-spawn');
 
 module.exports = {
 
@@ -19,8 +17,8 @@ module.exports = {
    */  
   dev(options = {}) {
     const { config } = options;
-    const cfg = Utils.loadConfig(config);
-    const { frontend, electron } = cfg.dev;
+    const binCfg = Utils.loadConfig(config);
+    const { frontend, electron } = binCfg.dev;
     this.frontendServe(frontend);
     this.electronServe(electron);
   },
@@ -30,9 +28,9 @@ module.exports = {
    */  
   start(options = {}) {
     const { config } = options;
-    const cfg = Utils.loadConfig(config);
+    const binCfg = Utils.loadConfig(config);
 
-    this.electronServe(cfg.start);
+    this.electronServe(binCfg.start);
   },
 
   sleep(ms) {
@@ -40,7 +38,7 @@ module.exports = {
   },
 
   /**
-   * 前端服务
+   * start frontend serve
    */  
   async frontendServe(cfg) {
     // 如果是 file:// 协议，则不启动
@@ -48,69 +46,39 @@ module.exports = {
       return
     }
 
-    // start frontend serve
     console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('Start the frontend serve...'));
     console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('config:'), JSON.stringify(cfg));
 
     const frontendDir = path.join(process.cwd(), cfg.directory);
-    const isWindows = Utils.isWindows();
-    const cmdEncoding = isWindows ? 'binary' : 'utf8';
-    const msgEncoding = isWindows ? 'cp936' : 'utf8';
-    this.frontendProcess = exec(
+    const frontendArgs = is.string(cfg.args) ? [cfg.args] : cfg.args;
+    this.frontendProcess = crossSpawn(
       cfg.cmd, 
-      { stdio: 'inherit', cwd: frontendDir, encoding: cmdEncoding},
-      (err) => {
-        if (err) {
-          const errMsg = iconv.decode(new Buffer.from(err.message, cmdEncoding), msgEncoding);
-          console.log(chalk.blue('[ee-bin] [dev] ') + chalk.red(`Error: ${errMsg}`))
-          process.exit();
-        }
-      }
+      frontendArgs,
+      { stdio: 'inherit', cwd: frontendDir, maxBuffer: 1024 * 1024 * 1024 },
     );
-    
-    this.frontendProcess.stdout.on('data', (data) => {
-      let out = data;
-      if (isWindows) {
-        out = iconv.decode(new Buffer.from(data, cmdEncoding), 'utf8');
-      }
-      console.log(chalk.blue('[ee-bin] [dev] ') + `frontend ${out}`);
-    });
-    this.frontendProcess.stderr.on('data', (data) => {
-      let out = data;
-      if (isWindows) {
-        out = iconv.decode(new Buffer.from(data, cmdEncoding), 'utf8');
-      }
-      console.error(chalk.blue('[ee-bin] [dev] ') + `frontend ${out}`);
+    this.frontendProcess.on('exit', () => {
+      console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('frontend serve exit'));
     });
   },
 
   /**
-   * 主进程服务
+   * start electron serve
    */  
   electronServe(cfg) {
-    // start electron serve
     console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('Start the electron serve...'));
     console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('config:'), JSON.stringify(cfg));
 
     const electronDir = path.join(process.cwd(), cfg.directory);
     const electronArgs = is.string(cfg.args) ? [cfg.args] : cfg.args;
     
-    // 疑问，为什么直接使用 electron，spawn会报错(或许是衍生shell问题，衍生的shell有系统环境变量)
-    let electronProgram 
-    if (cfg.cmd == 'electron') {
-      electronProgram = Utils.getElectronProgram();
-    }
-
-    this.electronProcess = spawn(
-      electronProgram, 
+    this.electronProcess = crossSpawn(
+      cfg.cmd, 
       electronArgs, 
-      {stdio: 'inherit', cwd: electronDir,}
+      {stdio: 'inherit', cwd: electronDir, maxBuffer: 1024 * 1024 * 1024 }
     );
 
     this.electronProcess.on('exit', () => {
-      setTimeout(() => {
-        process.exit();
-      }, 500)
+      console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('Press "CTRL+C" to exit'));
     });
   },  
 
@@ -119,38 +87,23 @@ module.exports = {
    */  
   build(options = {}) {
     const { config } = options;
-    const cfg = Utils.loadConfig(config);
-    const buildCfg = cfg.build;
+    const binCfg = Utils.loadConfig(config);
+    const cfg = binCfg.build;
 
     // start build frontend dist
     console.log(chalk.blue('[ee-bin] [build] ') + chalk.green('Build frontend dist'));
-    console.log(chalk.blue('[ee-bin] [build] ') + chalk.green('config:'), buildCfg);
+    console.log(chalk.blue('[ee-bin] [build] ') + chalk.green('config:'), cfg);
     
-    let i = 1;
-    let buildProgress = setInterval(() => {
-      console.log(chalk.blue('[ee-bin] [build] ') + `${i}s`);
-      i++;
-    }, 1000)
+    const frontendDir = path.join(process.cwd(), cfg.directory);
+    const buildArgs = is.string(cfg.args) ? [cfg.args] : cfg.args;
 
-    const frontendDir = path.join(process.cwd(), buildCfg.directory);
-    const buildProcess = exec(
-      buildCfg.cmd, 
-      { stdio: 'inherit', cwd: frontendDir, },  // maxBuffer: 1024 * 1024 * 1024
-      (err) => {
-        if (err) {
-          console.log(chalk.blue('[ee-bin] [build] ') + chalk.red(`Error: ${err.message}`))
-          process.exit();
-        }
-        clearInterval(buildProgress);
-        console.log(chalk.blue('[ee-bin] [build] ') + chalk.green('End'));
-      }
+    const buildProcess = crossSpawn(
+      cfg.cmd, 
+      buildArgs,
+      { stdio: 'inherit', cwd: frontendDir, maxBuffer: 1024 * 1024 * 1024 },
     );
-    
-    buildProcess.stdout.on('data', (data) => {
-      console.log(chalk.blue('[ee-bin] [build] ') + `frontend ${data}`);
-    });
-    buildProcess.stderr.on('data', (data) => {
-      console.error(chalk.blue('[ee-bin] [build] ') + chalk.yellow(`Warning: ${data}`));
-    });    
+    buildProcess.on('exit', () => {
+      console.log(chalk.blue('[ee-bin] [build] ') + chalk.green('End'));
+    }); 
   },
 }
