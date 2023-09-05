@@ -4,16 +4,19 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0" />
-    <title></title>
+    <title>Booting the frontend service</title>
     <style>
       #loadingPage {
         background-color: #dedede;
         font-size: 12px;
       }
       .base {
-        left: 50%;
+        left: 45%;
         position: absolute;
         top: 40%;
+      }
+      .desc {
+        margin: 0, 0, 20px, 0;
       }
       .loading,
       .loading > div {
@@ -23,10 +26,10 @@
       .loading {
         display: block;
         font-size: 0;
-        color: #000;
+        color: #06b359;
       }
       .loading.la-dark {
-        color: #333;
+        color: #07C160;
       }
       .loading > div {
         display: inline-block;
@@ -82,6 +85,9 @@
     <div id="boot">
       <div class='base'>
         <!-- Booting the frontend service ... -->
+        <!-- <div class='desc'>
+          Booting frontend
+        </div> -->
         <div class="loading">
           <div></div>
           <div></div>

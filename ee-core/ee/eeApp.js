@@ -139,14 +139,7 @@ class EeApp extends BaseApp {
         const hc = new HttpClient();
         console.log('url', url);
         while(!frontendReady && count < 20){
-          // const frontendPort = await GetPort({port:  modeInfo.port});
-          // console.log('frontendPort:', frontendPort)
-          // if (frontendPort != modeInfo.port) {
-          //   frontendReady = true;
-          // }
-          
           await UtilsHelper.sleep(1 * 1000);
-          
           try {
             const response = await hc.request(url, {
               method: 'GET',
@@ -159,7 +152,6 @@ class EeApp extends BaseApp {
           }
 
           count++;
-
         }
 
         if (frontendReady == false) {
