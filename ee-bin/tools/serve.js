@@ -30,10 +30,8 @@ module.exports = {
       return;
     }
 
-    if (serve == 'all') {
-      this.frontendServe(frontend);
-      this.electronServe(electron);
-    }
+    this.frontendServe(frontend);
+    this.electronServe(electron);
   },
 
   /**

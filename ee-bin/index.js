@@ -59,7 +59,7 @@ program
   .command('dev')
   .description('create frontend-serve and electron-serve')
   .option('--config <folder>', 'config file', './electron/config/bin.js')
-  .option('--serve <mode>', 'serve mode', 'all')
+  .option('--serve <mode>', 'serve mode')
   .action(function() {
     const serve = require('./tools/serve');
     serve.dev(this.opts());
