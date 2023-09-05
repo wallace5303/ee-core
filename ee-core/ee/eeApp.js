@@ -91,7 +91,7 @@ class EeApp extends BaseApp {
   /**
    * 应用类型 （远程、html、单页应用）
    */
-  selectAppType() {
+  async selectAppType() {
     let type = '';
     let url = '';
 
@@ -127,6 +127,29 @@ class EeApp extends BaseApp {
       if (Conf.isFileProtocol(modeInfo)) {
         url = path.join(this.config.homeDir, modeInfo.directory, modeInfo.indexPath);
         load = 'file';
+      }
+
+      // 检查 UI serve是否启动，先加载一个boot page
+      if (load == 'url') {
+        const bootPage = path.join(__dirname, '..', 'html', 'boot.html');
+        this.mainWindow.loadFile(bootPage);
+        let count = 0;
+        let frontendReady = false;
+        while(!frontendReady && count < 10){
+          const frontendPort = await GetPort({port:  modeInfo.port});
+          console.log('frontendPort:', frontendPort)
+          if (frontendPort != modeInfo.port) {
+            frontendReady = true;
+          }
+          count++;
+          await UtilsHelper.sleep(2 * 1000);
+        }
+
+        if (frontendReady == false) {
+          const bootFailurePage = path.join(__dirname, '..', 'html', 'failure.html');
+          this.mainWindow.loadFile(bootFailurePage);
+          return;
+        }
       }
 
       this.loadMainUrl('spa', url, load);
