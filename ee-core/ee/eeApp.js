@@ -15,6 +15,7 @@ const Ps = require('../ps');
 const Socket = require('../socket');
 const GetPort = require('../utils/get-port');
 const UtilsHelper = require('../utils/helper');
+const HttpClient = require('../httpclient');
 
 class EeApp extends BaseApp {
   constructor(options = {}) {
@@ -135,14 +136,30 @@ class EeApp extends BaseApp {
         this.mainWindow.loadFile(bootPage);
         let count = 0;
         let frontendReady = false;
-        while(!frontendReady && count < 10){
-          const frontendPort = await GetPort({port:  modeInfo.port});
-          console.log('frontendPort:', frontendPort)
-          if (frontendPort != modeInfo.port) {
+        const hc = new HttpClient();
+        console.log('url', url);
+        while(!frontendReady && count < 20){
+          // const frontendPort = await GetPort({port:  modeInfo.port});
+          // console.log('frontendPort:', frontendPort)
+          // if (frontendPort != modeInfo.port) {
+          //   frontendReady = true;
+          // }
+          
+          await UtilsHelper.sleep(1 * 1000);
+          
+          try {
+            const response = await hc.request(url, {
+              method: 'GET',
+              timeout: 1000,
+            });
+            console.log('res error response:', response);
             frontendReady = true;
+          } catch(err) {
+            console.log('-------------');
           }
+
           count++;
-          await UtilsHelper.sleep(2 * 1000);
+
         }
 
         if (frontendReady == false) {

@@ -56,7 +56,7 @@ module.exports = {
     if (cfg.protocol == 'file://') {
       return
     }
-    await this.sleep(15 * 1000);
+    await this.sleep(10 * 1000);
     console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('Start the frontend serve...'));
     console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('config:'), JSON.stringify(cfg));
 
