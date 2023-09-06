@@ -137,18 +137,16 @@ class EeApp extends BaseApp {
         let count = 0;
         let frontendReady = false;
         const hc = new HttpClient();
-        console.log('url', url);
-        while(!frontendReady && count < 20){
+        while(!frontendReady && count < 30){
           await UtilsHelper.sleep(1 * 1000);
           try {
-            const response = await hc.request(url, {
+            await hc.request(url, {
               method: 'GET',
               timeout: 1000,
             });
-            console.log('res error response:', response);
             frontendReady = true;
           } catch(err) {
-            console.log('-------------');
+            // console.log('The frontend service is starting');
           }
 
           count++;
@@ -157,6 +155,7 @@ class EeApp extends BaseApp {
         if (frontendReady == false) {
           const bootFailurePage = path.join(__dirname, '..', 'html', 'failure.html');
           this.mainWindow.loadFile(bootFailurePage);
+          Log.coreLogger.error(`[ee-core] Please check the ${url} !`);
           return;
         }
       }

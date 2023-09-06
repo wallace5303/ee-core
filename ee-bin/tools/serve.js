@@ -51,12 +51,13 @@ module.exports = {
   /**
    * start frontend serve
    */  
-  async frontendServe(cfg) {
+  frontendServe(cfg) {
     // 如果是 file:// 协议，则不启动
     if (cfg.protocol == 'file://') {
       return
     }
-    await this.sleep(5 * 1000);
+    // 模拟前端启动慢
+    // await this.sleep(5 * 1000);
     console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('Start the frontend serve...'));
     console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('config:'), JSON.stringify(cfg));
 
