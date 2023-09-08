@@ -89,4 +89,17 @@ program
     serve.start(this.opts());
   });
 
+/**
+ * exec
+ */
+program
+  .command('exec')
+  .description('create frontend-serve and electron-serve')
+  .option('--config <folder>', 'config file', './electron/config/bin.js')
+  .option('--command <command>', 'Custom command')
+  .action(function() {
+    const serve = require('./tools/serve');
+    serve.exec(this.opts());
+  });
+
 program.parse();

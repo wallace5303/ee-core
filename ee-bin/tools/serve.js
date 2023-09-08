@@ -12,6 +12,8 @@ module.exports = {
 
   electronProcess: undefined,
 
+  execProcess: {},
+
   /**
    * 启动前端、主进程服务
    */  
@@ -118,4 +120,46 @@ module.exports = {
       console.log(chalk.blue('[ee-bin] [build] ') + chalk.green('End'));
     }); 
   },
+
+  /**
+   * 执行自定义命令
+   * todo 支持多个命令
+   */  
+  exec(options = {}) {
+    const { config, command } = options;
+    const binCfg = Utils.loadConfig(config);
+    
+    let cmds;
+    const cmdString = command.trim();
+    if (cmdString.indexOf(',') !== -1) {
+      cmds = cmdString.split(',');
+    } else {
+      cmds = [cmdString];
+    }
+
+    for (let i = 0; i < cmds.length; i++) {
+      let cmd = cmds[i];
+      let cfg = binCfg.exec[cmd];
+
+      if (!cfg) {
+        console.log(chalk.blue('[ee-bin] [exec] ') + chalk.red(`Error: ${cmd} config does not exist` ));
+        return;
+      }
+  
+      console.log(chalk.blue('[ee-bin] [exec] ') + chalk.green('Run custom command'));
+      console.log(chalk.blue('[ee-bin] [exec] ') + chalk.green('config:'), cfg);
+      
+      let execDir = path.join(process.cwd(), cfg.directory);
+      let execArgs = is.string(cfg.args) ? [cfg.args] : cfg.args;
+  
+      this.execProcess[cmd] = crossSpawn(
+        cfg.cmd, 
+        execArgs,
+        { stdio: 'inherit', cwd: execDir, maxBuffer: 1024 * 1024 * 1024 },
+      );
+      this.execProcess[cmd].on('exit', () => {
+        console.log(chalk.blue('[ee-bin] [exec] ') + chalk.green('End'));
+      });
+    }
+  },  
 }
