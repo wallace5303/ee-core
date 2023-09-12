@@ -1,5 +1,4 @@
 const { app } = require('electron');
-const Window = require('../window');
 const EE = require('../../ee');
 const Log = require('../../log');
 const Electron = require('../index');
