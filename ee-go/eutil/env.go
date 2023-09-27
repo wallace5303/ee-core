@@ -1,4 +1,4 @@
-package helper
+package eutil
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func GetEnv() {
+func GetEnvs() {
 	envs := os.Environ()
 	for _, env := range envs {
 		cache := strings.Split(env, "=")
