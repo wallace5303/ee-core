@@ -13,6 +13,8 @@ import (
 
 	"ee-go/eerror"
 	"ee-go/eutil"
+
+	figure "github.com/common-nighthawk/go-figure"
 )
 
 const (
@@ -36,7 +38,8 @@ var (
 )
 
 func Run() {
-	fmt.Println("new electron-egg for go")
+	banner := figure.NewColorFigure("ElectronEgg", "standard", "green", true)
+	fmt.Println("\n" + banner.String())
 
 	environment := flag.String("env", "prod", "dev/prod")
 	appname := flag.String("appname", "", "app name")
@@ -50,6 +53,10 @@ func Run() {
 	if AppName == "" {
 		eerror.Throw("The software appname must be set!")
 	}
+
+	// [todo] 是否检查 core.exe 文件的位置是否正确（ee\resources\extraResources）
+	// [todo] 是否把 public 文件复制到 extraResources, 或者直接打进 core.exe
+	// [todo] prod HomeDir 修改
 
 	fmt.Println("ENV:", ENV)
 	fmt.Println("AppName:", AppName)
