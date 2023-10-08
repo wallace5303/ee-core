@@ -123,7 +123,7 @@ module.exports = {
 
   /**
    * 执行自定义命令
-   * todo 支持多个命令
+   * 支持多个命令
    */  
   exec(options = {}) {
     const { config, command } = options;
@@ -158,7 +158,7 @@ module.exports = {
         { stdio: 'inherit', cwd: execDir, maxBuffer: 1024 * 1024 * 1024 },
       );
       this.execProcess[cmd].on('exit', () => {
-        console.log(chalk.blue('[ee-bin] [exec] ') + chalk.green('End'));
+        console.log(chalk.blue('[ee-bin] [exec] ') + 'the ' + chalk.green(`${cmd}`) + ' is execution completed');
       });
     }
   },  
