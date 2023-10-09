@@ -4,6 +4,7 @@ const Loader = require('../../loader');
 const ForkProcess = require('../child/forkProcess');
 const Channel = require('../../const/channel');
 const Helper = require('../../utils/helper');
+const Conf = require('../../config');
 
 class ChildPoolJob extends EventEmitter {
 
@@ -13,6 +14,7 @@ class ChildPoolJob extends EventEmitter {
       weights: [],
     }, opt);
 
+    this.config = {};
     this.boundMap = new Map();
     this.children = {};
     this.min = 3;
@@ -28,6 +30,12 @@ class ChildPoolJob extends EventEmitter {
       targets: [],
     }
     this.LB = new LoadBalancer(lbOpt);
+
+    const cfg = Conf.getValue('jobs');
+    if (cfg) {
+      this.config = cfg;
+    }
+
     this._initEvents();
   }
 

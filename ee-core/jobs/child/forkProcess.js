@@ -44,8 +44,12 @@ class ForkProcess {
    * 初始化事件监听
    */
   _init() {
+    const { messageLog } = this.host.config;
     this.child.on('message', (m) => {
-      Log.coreLogger.info(`[ee-core] [jobs/child] received a message from child-process, message: ${serialize(m)}`);
+      if (messageLog == true) {
+        Log.coreLogger.info(`[ee-core] [jobs/child] received a message from child-process, message: ${serialize(m)}`);
+      }
+      
       if (m.channel == Channel.process.showException) {
         Log.coreLogger.error(`${m.data}`);
       }
