@@ -6,6 +6,15 @@ class Base {
     this.deserialize = JSON.parse
   }
 
+  _canDeserialized(obj) {
+    try {
+      this.deserialize(obj)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
   _stringify(obj) {
     return JSON.stringify(obj, null, 2)
   }

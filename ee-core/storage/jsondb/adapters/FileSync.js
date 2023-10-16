@@ -1,30 +1,39 @@
 const Base = require('./Base')
 const fs = require('fs')
+const Log = require('../../../log')
 
 class FileSync extends Base {
   
   read() {
     if (fs.existsSync(this.source)) {
       // Read database
-      try {
-        const data = fs.readFileSync(this.source, {encoding: 'utf8'}).trim()
-
-        // Handle blank file
-        return data ? this.deserialize(data) : this.defaultValue
-      } catch (e) {
-        if (e instanceof SyntaxError) {
-          e.message = `Malformed JSON in file: ${this.source}\n${e.message}`
-        }
-        throw e
+      const data = fs.readFileSync(this.source, {encoding: 'utf8'}).trim();
+      
+      const canDeserialized = this._canDeserialized(data);
+      if (!canDeserialized) {
+        const errMessage = `Malformed JSON in file: ${this.source}\n${data}`;
+        console.error(errMessage)
       }
+      const value = canDeserialized ? this.deserialize(data) : this.defaultValue;
+      return value;
     } else {
       // Initialize
-      fs.writeFileSync(this.source, this.serialize(this.defaultValue), {flag:'w+'})
+      this._fsWrite(this.defaultValue);
       return this.defaultValue
     }
   }
 
   write(data) {
+    return this._fsWrite(data);
+  }
+
+  _fsWrite(data) {
+    const isObject = Object.prototype.toString.call(data) === '[object Object]';
+    if (!isObject) {
+      Log.coreLogger.error('[ee-core] [storage/jsondb] Variable is not an object :', data);
+      return
+    }
+
     return fs.writeFileSync(this.source, this.serialize(data), {flag:'w+'})
   }
 }
