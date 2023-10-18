@@ -28,7 +28,12 @@ class JsondbStorage {
    */
   table() {
     const dbFile = this.getFilePath();
-    const adapter = new FileSync(dbFile);
+    const isSysDB = this.isSystemDB();
+    const opt = {
+      source: dbFile,
+      isSysDB: isSysDB
+    }
+    const adapter = new FileSync(opt);
     const db = Jsondb(adapter);
 
     assert(fs.existsSync(dbFile), `error: storage ${dbFile} not exists`);
@@ -36,7 +41,7 @@ class JsondbStorage {
     return db;
   }
 
-  /**
+  /** 
    * 补全扩展名
    */
   _addExtname(name) {
@@ -71,6 +76,13 @@ class JsondbStorage {
   _formatFileName(name) {
     let fileName = path.basename(name);
     return fileName;
+  }
+
+  /**
+   * is system db
+   */
+  isSystemDB() {
+    return (this.name == 'system.json') ? true : false;
   }
 
   /**

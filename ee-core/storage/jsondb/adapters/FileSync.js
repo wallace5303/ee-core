@@ -3,6 +3,12 @@ const fs = require('fs')
 const Log = require('../../../log')
 
 class FileSync extends Base {
+
+  constructor(options = {}) {
+    const { source,  isSysDB } = options;
+    super(source);
+    this.isSysDB = isSysDB;
+  }
   
   read() {
     if (fs.existsSync(this.source)) {
@@ -13,6 +19,11 @@ class FileSync extends Base {
       if (!canDeserialized) {
         const errMessage = `Malformed JSON in file: ${this.source}\n${data}`;
         console.error(errMessage)
+
+        //  reset system.json
+        if (this.isSysDB) {
+          this._fsWrite(this.defaultValue);
+        }
       }
       const value = canDeserialized ? this.deserialize(data) : this.defaultValue;
       return value;

@@ -2,6 +2,8 @@ const assert = require('assert');
 const _ = require('lodash');
 const DB = {};
 
+// jsondb 要么每次new对象，要么所有地方都用同一个实例，否则会出现数据无法刷新的情况
+
 DB.connection = function (database, options = {}) {
   let driver = options.driver || 'jsondb';
   
