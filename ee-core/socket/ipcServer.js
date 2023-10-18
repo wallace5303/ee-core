@@ -80,19 +80,30 @@ class IpcServer {
 
         // send/on 模型
         ipcMain.on(channel, async (event, params) => {
-          const fn = findFn(self.app, channel);
-          const result = await fn.call(self.app, params, event);
-
-          event.returnValue = result;
-          event.reply(`${channel}`, result);
+          try {
+            const fn = findFn(self.app, channel);
+            const result = await fn.call(self.app, params, event);
+  
+            event.returnValue = result;
+            event.reply(`${channel}`, result);
+          } catch(e) {
+            Log.coreLogger.error('[ee-core] [socket/IpcServer] send/on throw error:', e);
+            // event.returnValue = e;
+            // event.reply(`${channel}`, e);
+          }
         });
 
         // invoke/handle 模型
         ipcMain.handle(channel, async (event, params) => {
-          const fn = findFn(self.app, channel);
-          const result = await fn.call(self.app, params, event);
-
-          return result;
+          try {
+            const fn = findFn(self.app, channel);
+            const result = await fn.call(self.app, params, event);
+  
+            return result;
+          } catch(e) {
+            Log.coreLogger.error('[ee-core] [socket/IpcServer] invoke/handle throw error:', e);
+            return e
+          }
         });
       }
     }
