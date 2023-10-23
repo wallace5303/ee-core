@@ -1,17 +1,15 @@
 package eapp
 
 import (
-	"bytes"
-	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"os/exec"
-	"os/user"
+
 	"path/filepath"
-	"strings"
 
 	"ee-go/eerror"
+	"ee-go/eos"
 	"ee-go/eutil"
 
 	figure "github.com/common-nighthawk/go-figure"
@@ -27,14 +25,21 @@ var (
 	// progressDesc string  // description
 	HttpServer = false
 	AppName    = ""
+	Platform   = "pc" // pc | mobile | web
 )
 
 var (
-	BaseDir, _     = os.Getwd()
-	HomeDir        string // electron-egg home directory
-	PublicDir      string // electron-egg public directory
-	UserHomeDir    string // OS user home directory
-	AppUserDataDir string // electron app.getPath('userData')
+	BaseDir, _      = os.Getwd()
+	HomeDir         string // electron-egg home directory
+	PublicDir       string // electron-egg public directory
+	UserHomeDir     string // OS user home directory
+	UserHomeConfDir string // OS user home config directory
+	DataDir         string // electron app.getPath('userData')
+
+	// cmd args
+	// cmdEnv     string
+	// cmdAppname string
+	// cmdDataDir string
 )
 
 func Run() {
@@ -46,24 +51,34 @@ func Run() {
 	appUserData := flag.String("app-user-data", "", "The folder where you store your application configuration files")
 	flag.Parse()
 
+	fmt.Println("ENV:", *environment)
+	fmt.Println("AppName:", *appname)
+	fmt.Println("AppUserDataDir:", *appUserData)
+
 	ENV = *environment
 	AppName = *appname
-	AppUserDataDir = *appUserData
-
-	if AppName == "" {
-		eerror.Throw("The software appname must be set!")
-	}
+	DataDir = *appUserData
 
 	// [todo] 是否检查 core.exe 文件的位置是否正确（ee\resources\extraResources）
 	// [todo] 是否把 public 文件复制到 extraResources, 或者直接打进 core.exe
 	// [todo] prod HomeDir 修改
 
-	fmt.Println("ENV:", ENV)
-	fmt.Println("AppName:", AppName)
-	fmt.Println("AppUserDataDir:", AppUserDataDir)
+	userProfile := os.Getenv("USERPROFILE")
+	fmt.Println("userProfile:", userProfile)
 
-	initDirectory()
+	initDir()
 
+	if AppName == "" {
+		pkg := ReadPackage()
+		if pkg.Name == "" {
+			eerror.Throw("The app name is required!")
+		}
+		AppName = pkg.Name
+		//fmt.Printf("pkg: %+v", pkg)
+		// eerror.Throw(pkg)
+	}
+
+	initUserDir()
 	//logger := elog.GetLogger()
 	//logger := elog.CreateLogger()
 	// logger.Infof("hconf example success tttt")
@@ -77,24 +92,45 @@ func Pwd() string {
 	return filepath.Dir(pwd)
 }
 
-func initDirectory() {
+func initDir() {
 	HomeDir = filepath.Join(BaseDir, "..")
 	PublicDir = filepath.Join(HomeDir, "public")
-	UserHomeDir, _ = getUserHomeDir()
-	userHomeConfDir := filepath.Join(UserHomeDir, ".config", AppName)
-	//workDataConf := filepath.Join(userHomeConfDir, "workdata.json")
-	if !eutil.FileIsExist(userHomeConfDir) {
-		if err := os.MkdirAll(userHomeConfDir, 0755); err != nil && !os.IsExist(err) {
-			errMsg := fmt.Sprintf("create user home conf folder [%s] failed: %s", userHomeConfDir, err)
+
+	fmt.Println("HomeDir:", HomeDir)
+	fmt.Println("PublicDir:", PublicDir)
+}
+
+func initUserDir() {
+	UserHomeDir, _ = eos.GetUserHomeDir()
+	UserHomeConfDir := filepath.Join(UserHomeDir, ".config", AppName)
+	if !eutil.FileIsExist(UserHomeConfDir) {
+		if err := os.MkdirAll(UserHomeConfDir, 0755); err != nil && !os.IsExist(err) {
+			errMsg := fmt.Sprintf("create user home conf folder [%s] failed: %s", UserHomeConfDir, err)
+			eerror.Throw(errMsg)
+		}
+	}
+
+	if DataDir != "" {
+		DataDir = filepath.Join(UserHomeDir, AppName)
+		// windows
+		if eos.IsWindows() {
+			userProfile := os.Getenv("USERPROFILE")
+			if userProfile != "" {
+				DataDir = filepath.Join(userProfile, "Documents", AppName)
+			}
+		}
+	}
+	if !eutil.FileIsExist(DataDir) {
+		if err := os.MkdirAll(DataDir, 0755); err != nil && !os.IsExist(err) {
+			errMsg := fmt.Sprintf("create app data folder [%s] failed: %s", DataDir, err)
 			eerror.Throw(errMsg)
 		}
 	}
 
 	logDir := filepath.Join(HomeDir, "logs")
 	if ENV == "prod" {
-		logDir = filepath.Join(AppUserDataDir, "logs")
-		if AppUserDataDir != "" && eutil.FileIsExist(AppUserDataDir) {
-			logDir = filepath.Join(AppUserDataDir, "logs")
+		if DataDir != "" && eutil.FileIsExist(DataDir) {
+			logDir = filepath.Join(DataDir, "logs")
 		}
 	}
 	if !eutil.FileIsExist(logDir) {
@@ -104,60 +140,7 @@ func initDirectory() {
 		}
 	}
 
-	fmt.Println("HomeDir:", HomeDir)
-	fmt.Println("PublicDir:", PublicDir)
 	fmt.Println("UserHomeDir:", UserHomeDir)
-	fmt.Println("userHomeConfDir:", userHomeConfDir)
+	fmt.Println("UserHomeConfDir:", UserHomeConfDir)
 	fmt.Println("logDir:", logDir)
-}
-
-func getUserHomeDir() (string, error) {
-	user, err := user.Current()
-	if nil == err {
-		return user.HomeDir, nil
-	}
-
-	// cross compile support
-	if eutil.IsWindows() {
-		return homeWindows()
-	}
-
-	// Unix-like system, so just assume Unix
-	return homeUnix()
-}
-
-func homeUnix() (string, error) {
-	// First prefer the HOME environmental variable
-	if home := os.Getenv("HOME"); home != "" {
-		return home, nil
-	}
-
-	// If that fails, try the shell
-	var stdout bytes.Buffer
-	cmd := exec.Command("sh", "-c", "eval echo ~$USER")
-	cmd.Stdout = &stdout
-	if err := cmd.Run(); err != nil {
-		return "", err
-	}
-
-	result := strings.TrimSpace(stdout.String())
-	if result == "" {
-		return "", errors.New("blank output when reading home directory")
-	}
-
-	return result, nil
-}
-
-func homeWindows() (string, error) {
-	drive := os.Getenv("HOMEDRIVE")
-	path := os.Getenv("HOMEPATH")
-	home := drive + path
-	if drive == "" || path == "" {
-		home = os.Getenv("USERPROFILE")
-	}
-	if home == "" {
-		return "", errors.New("HOMEDRIVE, HOMEPATH, and USERPROFILE are blank")
-	}
-
-	return home, nil
 }
