@@ -1,7 +1,6 @@
 package eapp
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"os/exec"
@@ -9,10 +8,9 @@ import (
 	"path/filepath"
 
 	"ee-go/eerror"
+	"ee-go/elog"
 	"ee-go/eos"
 	"ee-go/eutil"
-
-	figure "github.com/common-nighthawk/go-figure"
 )
 
 const (
@@ -34,38 +32,18 @@ var (
 	PublicDir       string // electron-egg public directory
 	UserHomeDir     string // OS user home directory
 	UserHomeConfDir string // OS user home config directory
-	DataDir         string // electron app.getPath('userData')
-
-	// cmd args
-	// cmdEnv     string
-	// cmdAppname string
-	// cmdDataDir string
+	WorkDir         string // App working directory
+	DataDir         string // data directory
 )
 
-func Run() {
-	banner := figure.NewColorFigure("ElectronEgg", "standard", "green", true)
-	fmt.Println("\n" + banner.String())
+func New(cmdENV, cmdAppName, cmdAppUserData string) {
 
-	environment := flag.String("env", "prod", "dev/prod")
-	appname := flag.String("appname", "", "app name")
-	appUserData := flag.String("app-user-data", "", "The folder where you store your application configuration files")
-	flag.Parse()
-
-	fmt.Println("ENV:", *environment)
-	fmt.Println("AppName:", *appname)
-	fmt.Println("AppUserDataDir:", *appUserData)
-
-	ENV = *environment
-	AppName = *appname
-	DataDir = *appUserData
+	ENV = cmdENV
+	AppName = cmdAppName
+	WorkDir = cmdAppUserData
 
 	// [todo] 是否检查 core.exe 文件的位置是否正确（ee\resources\extraResources）
 	// [todo] 是否把 public 文件复制到 extraResources, 或者直接打进 core.exe
-	// [todo] prod HomeDir 修改
-
-	userProfile := os.Getenv("USERPROFILE")
-	fmt.Println("userProfile:", userProfile)
-
 	initDir()
 
 	if AppName == "" {
@@ -74,14 +52,15 @@ func Run() {
 			eerror.Throw("The app name is required!")
 		}
 		AppName = pkg.Name
-		//fmt.Printf("pkg: %+v", pkg)
-		// eerror.Throw(pkg)
 	}
 
 	initUserDir()
-	//logger := elog.GetLogger()
-	//logger := elog.CreateLogger()
-	// logger.Infof("hconf example success tttt")
+
+	// [todo] init logger  读取config
+	elog.CreateLogger(nil)
+	elog.Logger.Errorf("eeeeeeeeeeeeeeeeeee")
+	elog.Logger.Infof("dddddddddddddddddd")
+
 }
 
 // Pwd gets the path of current working directory.
@@ -93,7 +72,10 @@ func Pwd() string {
 }
 
 func initDir() {
-	HomeDir = filepath.Join(BaseDir, "..")
+	HomeDir = BaseDir
+	// if ENV == "prod" {
+	// 	HomeDir = filepath.Join(WorkDir, "data")
+	// }
 	PublicDir = filepath.Join(HomeDir, "public")
 
 	fmt.Println("HomeDir:", HomeDir)
@@ -110,28 +92,38 @@ func initUserDir() {
 		}
 	}
 
-	if DataDir != "" {
-		DataDir = filepath.Join(UserHomeDir, AppName)
+	if WorkDir == "" {
+		WorkDir = filepath.Join(UserHomeDir, AppName)
 		// windows
 		if eos.IsWindows() {
+			// [todo] 判断一下userProfile路径中 有没有 Documents
 			userProfile := os.Getenv("USERPROFILE")
 			if userProfile != "" {
-				DataDir = filepath.Join(userProfile, "Documents", AppName)
+				WorkDir = filepath.Join(userProfile, "Documents", AppName)
 			}
 		}
 	}
+	if !eutil.FileIsExist(WorkDir) {
+		if err := os.MkdirAll(WorkDir, 0755); err != nil && !os.IsExist(err) {
+			errMsg := fmt.Sprintf("create app data folder [%s] failed: %s", WorkDir, err)
+			eerror.Throw(errMsg)
+		}
+	}
+
+	DataDir := filepath.Join(HomeDir, "data")
+	if ENV == "prod" {
+		DataDir = filepath.Join(WorkDir, "data")
+	}
 	if !eutil.FileIsExist(DataDir) {
 		if err := os.MkdirAll(DataDir, 0755); err != nil && !os.IsExist(err) {
-			errMsg := fmt.Sprintf("create app data folder [%s] failed: %s", DataDir, err)
+			errMsg := fmt.Sprintf("create data folder [%s] failed: %s", DataDir, err)
 			eerror.Throw(errMsg)
 		}
 	}
 
 	logDir := filepath.Join(HomeDir, "logs")
 	if ENV == "prod" {
-		if DataDir != "" && eutil.FileIsExist(DataDir) {
-			logDir = filepath.Join(DataDir, "logs")
-		}
+		logDir = filepath.Join(WorkDir, "logs")
 	}
 	if !eutil.FileIsExist(logDir) {
 		if err := os.MkdirAll(logDir, 0755); err != nil && !os.IsExist(err) {
@@ -139,8 +131,11 @@ func initUserDir() {
 			eerror.Throw(errMsg)
 		}
 	}
+	elog.SetLogDir(logDir)
 
 	fmt.Println("UserHomeDir:", UserHomeDir)
 	fmt.Println("UserHomeConfDir:", UserHomeConfDir)
+	fmt.Println("WorkDir:", WorkDir)
+	fmt.Println("DataDir:", DataDir)
 	fmt.Println("logDir:", logDir)
 }

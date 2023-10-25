@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"ee-go/eerror"
+
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -14,17 +16,16 @@ import (
 var (
 	LogDir  string // electron-egg logs directory
 	LogName = "ee-go.log"
-	LogPath string
 	zlogger *zap.Logger
-	logger  *zap.SugaredLogger
+	Logger  *zap.SugaredLogger
 )
 
 type LogConfig struct {
-	Level      string `json:"level"`       // Level 最低日志等级，DEBUG<INFO<WARN<ERROR<FATAL 例如：info-->收集info等级以上的日志
-	FileName   string `json:"file_name"`   // FileName 日志文件位置
-	MaxSize    int    `json:"max_size"`    // MaxSize 进行切割之前，日志文件的最大大小(MB为单位)，默认为100MB
-	MaxAge     int    `json:"max_age"`     // MaxAge 是根据文件名中编码的时间戳保留旧日志文件的最大天数。
-	MaxBackups int    `json:"max_backups"` // MaxBackups 是要保留的旧日志文件的最大数量。默认是保留所有旧的日志文件（尽管 MaxAge 可能仍会导致它们被删除。）
+	OutputJSON bool   `json:"output_json"`
+	Level      string `json:"level"`     // Level 最低日志等级，DEBUG<INFO<WARN<ERROR<FATAL 例如：info-->收集info等级以上的日志
+	FileName   string `json:"file_name"` // FileName 日志文件位置
+	MaxSize    int    `json:"max_size"`  // MaxSize 进行切割之前，日志文件的最大大小(MB为单位)，默认为100MB
+	MaxAge     int    `json:"max_age"`   // MaxAge 是根据文件名中编码的时间戳保留旧日志文件的最大天数。
 }
 
 func init() {
@@ -34,96 +35,187 @@ func init() {
 		dir = "./"
 	}
 	LogDir = dir
-	LogPath = filepath.Join(LogDir, LogName)
 }
 
-func SetLogPath(path string) {
-	LogPath = path
+func SetLogDir(path string) {
+	LogDir = path
 }
 
-// 负责设置 encoding 的日志格式
-func getEncoder() zapcore.Encoder {
-	// 获取一个指定的的EncoderConfig，进行自定义
+// func NewLogConfig() *LogConfig {
+// 	return &LogConfig{
+
+// 	}
+// }
+
+// Log format
+func getEncoder(OutputJSON bool) (encoder zapcore.Encoder) {
 	encodeConfig := zap.NewProductionEncoderConfig()
 
-	// 设置每个日志条目使用的键。如果有任何键为空，则省略该条目的部分。
-
-	// 序列化时间。eg: 2022-09-01T19:11:35.921+0800
+	// eg: 2022-09-01T19:11:35.921+0800
 	encodeConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	// "time":"2022-09-01T19:11:35.921+0800"
 	encodeConfig.TimeKey = "time"
-	// 将Level序列化为全大写字符串。例如，将info level序列化为INFO。
 	encodeConfig.EncodeLevel = zapcore.CapitalLevelEncoder
-	// 以 package/file:行 的格式 序列化调用程序，从完整路径中删除除最后一个目录外的所有目录。
+	// Removes all directories except the last directory from the full path.
 	encodeConfig.EncodeCaller = zapcore.ShortCallerEncoder
-	return zapcore.NewJSONEncoder(encodeConfig)
+
+	encoder = zapcore.NewConsoleEncoder(encodeConfig)
+	if OutputJSON {
+		encoder = zapcore.NewJSONEncoder(encodeConfig)
+	}
+	return
 }
 
-// 负责日志写入的位置
-func getLogWriter(filename string, maxsize, maxBackup, maxAge int) (ioWS zapcore.WriteSyncer) {
+// The location responsible for log writing
+func getLogWriter(filename string, maxsize, maxAge int) (ioWS zapcore.WriteSyncer) {
 	lumberJackLogger := &lumberjack.Logger{
-		Filename:   filename,  // 文件位置
-		MaxSize:    maxsize,   // 进行切割之前,日志文件的最大大小(MB为单位)
-		MaxAge:     maxAge,    // 保留旧文件的最大天数
-		MaxBackups: maxBackup, // 保留旧文件的最大个数
-		Compress:   false,     // 是否压缩/归档旧文件
+		Filename: filename,
+		MaxSize:  maxsize,
+		MaxAge:   maxAge,
+		Compress: false,
 	}
-	// AddSync 将 io.Writer 转换为 WriteSyncer。
-	// 它试图变得智能：如果 io.Writer 的具体类型实现了 WriteSyncer，我们将使用现有的 Sync 方法。
-	// 如果没有，我们将添加一个无操作同步。
-	syncFile := zapcore.AddSync(lumberJackLogger) // 打印到文件
-	syncConsole := zapcore.AddSync(os.Stderr)     // 打印到控制台
+
+	syncFile := zapcore.AddSync(lumberJackLogger) // Print to file
+	syncConsole := zapcore.AddSync(os.Stderr)     // Print to console
 	ioWS = zapcore.NewMultiWriteSyncer(syncFile, syncConsole)
 	return
 }
 
-// InitLogger 初始化Logger
-func InitLogger(lCfg LogConfig) (err error) {
-	// 获取日志写入位置
-	writeSyncer := getLogWriter(lCfg.FileName, lCfg.MaxSize, lCfg.MaxBackups, lCfg.MaxAge)
-	// 获取日志编码格式
-	encoder := getEncoder()
+// Init Logger
+func initLogger(lCfg LogConfig) (err error) {
+	writeSyncer := getLogWriter(lCfg.FileName, lCfg.MaxSize, lCfg.MaxAge)
+	encoder := getEncoder(lCfg.OutputJSON)
 
-	// 获取日志最低等级，即>=该等级，才会被写入。
 	var l = new(zapcore.Level)
 	err = l.UnmarshalText([]byte(lCfg.Level))
 	if err != nil {
 		return
 	}
 
-	// 创建一个将日志写入 WriteSyncer 的核心。
+	// Create a core that writes logs to WriteSyncer.
 	core := zapcore.NewCore(encoder, writeSyncer, l)
 	zlogger = zap.New(core, zap.AddCaller())
 
-	// 替换zap包中全局的logger实例，后续在其他包中只需使用zap.L()调用即可
+	// Replace the global logger instance in the zap package, and then only use the Zap.l () call in other packages
 	zap.ReplaceGlobals(zlogger)
 	return
 }
 
-func CreateLogger() (logger *zap.SugaredLogger) {
+// [todo] 跨天情况待测试
+func CreateLogger(cfg interface{}) *zap.SugaredLogger {
+
+	fmt.Printf("params cfg :%v\n", cfg)
+	// log abs path
+	fileFullPath := filepath.Join(LogDir, LogName)
+
 	lc := LogConfig{
-		Level:      "debug",
-		FileName:   "ee-go.log",
-		MaxSize:    1,
-		MaxBackups: 5,
+		OutputJSON: false,
+		Level:      "info",
+		FileName:   fileFullPath,
+		MaxSize:    1024,
 		MaxAge:     30,
 	}
-	errInit := InitLogger(lc)
-	if errInit != nil {
-		fmt.Println("create logger error:", errInit)
+
+	if cfg != nil {
+		logCfg, ok := cfg.(LogConfig)
+		if !ok {
+			eerror.Throw("CreateLogger params error !")
+		}
+		if logCfg.Level != "" {
+			lc.Level = logCfg.Level
+		}
+		if logCfg.FileName != "" {
+			lc.FileName = logCfg.FileName
+		}
+		if logCfg.MaxSize != 0 {
+			lc.MaxSize = logCfg.MaxSize
+		}
+		if logCfg.MaxAge != 0 {
+			lc.MaxAge = logCfg.MaxAge
+		}
 	}
-	// sugar := zap.NewExample().Sugar()
+	fmt.Printf("lc:%#v\n", lc)
+
+	errInit := initLogger(lc)
+	if errInit != nil {
+		errMsg := fmt.Sprintf("create logger error: %s", errInit)
+		eerror.Throw(errMsg)
+	}
+
 	lg := zap.L()
-	logger = lg.Sugar()
-	return
+	Logger = lg.Sugar()
+	return Logger
 }
 
-// GetLogger returns logger
+// Get Logger
 func GetLogger() *zap.SugaredLogger {
-	fmt.Printf("logger: %+v", logger)
-	if logger == nil {
-		fmt.Println("Please initialize the hlog service first")
-		return nil
+	if Logger != nil {
+		return Logger
 	}
-	return logger
+	Logger := CreateLogger(nil)
+	return Logger
 }
+
+// // Logger Debug
+// func Debug(args ...interface{}) {
+// 	if Logger == nil {
+// 		Logger = CreateLogger(nil)
+// 	}
+// 	Logger.Debug(args...)
+// }
+
+// // Logger Debugf
+// func Debugf(template string, args ...interface{}) {
+// 	if Logger == nil {
+// 		Logger = CreateLogger(nil)
+// 	}
+// 	Logger.Debugf(template, args...)
+// }
+
+// // Logger Error
+// func Error(args ...interface{}) {
+// 	if Logger == nil {
+// 		Logger = CreateLogger(nil)
+// 	}
+// 	Logger.Error(args...)
+// }
+
+// // Logger Errorf
+// func Errorf(template string, args ...interface{}) {
+// 	if Logger == nil {
+// 		Logger = CreateLogger(nil)
+// 	}
+// 	Logger.Errorf(template, args...)
+// }
+
+// // Logger Fatal
+// func Fatal(args ...interface{}) {
+// 	if Logger == nil {
+// 		Logger = CreateLogger(nil)
+// 	}
+// 	Logger.Fatal(args...)
+// }
+
+// // Logger Fatalf
+// func Fatalf(template string, args ...interface{}) {
+// 	if Logger == nil {
+// 		Logger = CreateLogger(nil)
+// 	}
+// 	Logger.Fatalf(template, args...)
+// }
+
+// // Logger Info
+// func Info(args ...interface{}) {
+// 	if Logger == nil {
+// 		Logger = CreateLogger(nil)
+// 	}
+// 	Logger.Info(args...)
+// }
+
+// // Logger Infof
+// func Infof(template string, args ...interface{}) {
+// 	if Logger == nil {
+// 		Logger = CreateLogger(nil)
+// 	}
+// 	return Logger.Infof
+// }
