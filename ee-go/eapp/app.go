@@ -7,6 +7,7 @@ import (
 
 	"path/filepath"
 
+	"ee-go/econfig"
 	"ee-go/eerror"
 	"ee-go/elog"
 	"ee-go/eos"
@@ -18,7 +19,7 @@ const (
 )
 
 var (
-	ENV = "prod" // 'dev' 'prod'
+	ENV = "dev" // 'dev' 'prod'
 	// progressBar  float64 // 0 ~ 100
 	// progressDesc string  // description
 	HttpServer = false
@@ -29,6 +30,7 @@ var (
 var (
 	BaseDir, _      = os.Getwd()
 	HomeDir         string // electron-egg home directory
+	GoDir           string // electron-egg go directory
 	PublicDir       string // electron-egg public directory
 	UserHomeDir     string // OS user home directory
 	UserHomeConfDir string // OS user home config directory
@@ -56,10 +58,11 @@ func New(cmdENV, cmdAppName, cmdAppUserData string) {
 
 	initUserDir()
 
+	// init config
+	econfig.InitConfig()
+
 	// [todo] init logger  读取config
-	elog.CreateLogger(nil)
-	elog.Logger.Errorf("eeeeeeeeeeeeeeeeeee")
-	elog.Logger.Infof("dddddddddddddddddd")
+	//elog.InitLogger(nil)
 
 }
 
@@ -76,9 +79,12 @@ func initDir() {
 	// if ENV == "prod" {
 	// 	HomeDir = filepath.Join(WorkDir, "data")
 	// }
+
+	GoDir = filepath.Join(HomeDir, "go")
 	PublicDir = filepath.Join(HomeDir, "public")
 
 	fmt.Println("HomeDir:", HomeDir)
+	fmt.Println("GoDir:", HomeDir)
 	fmt.Println("PublicDir:", PublicDir)
 }
 

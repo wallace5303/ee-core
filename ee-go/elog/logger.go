@@ -21,11 +21,11 @@ var (
 )
 
 type LogConfig struct {
-	OutputJSON bool   `json:"output_json"`
-	Level      string `json:"level"`     // Level 最低日志等级，DEBUG<INFO<WARN<ERROR<FATAL 例如：info-->收集info等级以上的日志
-	FileName   string `json:"file_name"` // FileName 日志文件位置
-	MaxSize    int    `json:"max_size"`  // MaxSize 进行切割之前，日志文件的最大大小(MB为单位)，默认为100MB
-	MaxAge     int    `json:"max_age"`   // MaxAge 是根据文件名中编码的时间戳保留旧日志文件的最大天数。
+	OutputJSON bool   `json:"outputJson"`
+	Level      string `json:"level"`    // Level 最低日志等级，DEBUG<INFO<WARN<ERROR<FATAL 例如：info-->收集info等级以上的日志
+	FileName   string `json:"fileName"` // FileName 日志文件位置
+	MaxSize    int    `json:"maxSize"`  // MaxSize 进行切割之前，日志文件的最大大小(MB为单位)，默认为100MB
+	MaxAge     int    `json:"maxAge"`   // MaxAge 是根据文件名中编码的时间戳保留旧日志文件的最大天数。
 }
 
 func init() {
@@ -81,8 +81,8 @@ func getLogWriter(filename string, maxsize, maxAge int) (ioWS zapcore.WriteSynce
 	return
 }
 
-// Init Logger
-func initLogger(lCfg LogConfig) (err error) {
+// generate Logger
+func generateLogger(lCfg LogConfig) (err error) {
 	writeSyncer := getLogWriter(lCfg.FileName, lCfg.MaxSize, lCfg.MaxAge)
 	encoder := getEncoder(lCfg.OutputJSON)
 
@@ -102,7 +102,7 @@ func initLogger(lCfg LogConfig) (err error) {
 }
 
 // [todo] 跨天情况待测试
-func CreateLogger(cfg interface{}) *zap.SugaredLogger {
+func InitLogger(cfg interface{}) *zap.SugaredLogger {
 
 	fmt.Printf("params cfg :%v\n", cfg)
 	// log abs path
@@ -136,7 +136,7 @@ func CreateLogger(cfg interface{}) *zap.SugaredLogger {
 	}
 	fmt.Printf("lc:%#v\n", lc)
 
-	errInit := initLogger(lc)
+	errInit := generateLogger(lc)
 	if errInit != nil {
 		errMsg := fmt.Sprintf("create logger error: %s", errInit)
 		eerror.Throw(errMsg)
@@ -152,7 +152,7 @@ func GetLogger() *zap.SugaredLogger {
 	if Logger != nil {
 		return Logger
 	}
-	Logger := CreateLogger(nil)
+	Logger := InitLogger(nil)
 	return Logger
 }
 

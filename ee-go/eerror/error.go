@@ -27,7 +27,6 @@ func throw(msg string, err error, code int) {
 		errInfo = E.New(msg)
 	}
 
-	fmt.Printf("Error: %+v", errInfo)
-	fmt.Println()
+	fmt.Printf("Error: %+v \n", errInfo)
 	os.Exit(code)
 }
