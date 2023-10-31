@@ -22,7 +22,7 @@ func InitConfig() {
 	devConfigPath := filepath.Join(eapp.GoDir, "config", "config.local.json")
 	prodConfigPath := filepath.Join(eapp.GoDir, "config", "config.prod.json")
 
-	defaultViper := viper.New()
+	defaultViper = viper.New()
 	defaultViper.SetConfigType("json")
 	defaultViper.SetConfigFile(defaultConfigPath)
 	defaultErr := defaultViper.ReadInConfig()
@@ -31,7 +31,7 @@ func InitConfig() {
 	}
 
 	if eapp.IsDev() {
-		devViper := viper.New()
+		devViper = viper.New()
 		devViper.SetConfigType("json")
 		devViper.SetConfigFile(devConfigPath)
 		devErr := devViper.ReadInConfig()
@@ -42,7 +42,7 @@ func InitConfig() {
 	}
 
 	if eapp.IsPord() {
-		prodViper := viper.New()
+		prodViper = viper.New()
 		prodViper.SetConfigType("json")
 		prodViper.SetConfigFile(prodConfigPath)
 		prodErr := prodViper.ReadInConfig()
@@ -52,41 +52,13 @@ func InitConfig() {
 		defaultViper.MergeConfigMap(prodViper.AllSettings())
 	}
 
-	fmt.Printf("defaultViper: %v", defaultViper.AllSettings())
-
-	// Conf := readConfigFile(defaultConfigPath)
-	// if eutil.FileIsExist(devConfigPath) {
-	// 	devConfig := readConfigFile(devConfigPath)
-	// 	eutil.MapMerge(Conf, devConfig)
-	// }
-
-	// if eutil.FileIsExist(prodConfigPath) {
-	// 	prodConfig := readConfigFile(prodConfigPath)
-	// 	eutil.MapMerge(Conf, prodConfig)
-	// }
-
-	// res := viper.AllSettings()
-	// fmt.Printf("res: %v", res)
-
-	// res1 := viper.AllKeys()
-	// fmt.Printf("res1: %v", res1)
+	//fmt.Printf("config : %v", defaultViper.AllSettings())
 }
 
-// read config file and clean viper
-// func readConfigFile(path string) map[string]interface{} {
-// 	data, err := os.ReadFile(path)
-// 	if err != nil {
-// 		msg := fmt.Sprintf("read file failed: %s", err)
-// 		eerror.Throw(msg)
-// 	}
+func GetAll() map[string]any {
+	return defaultViper.AllSettings()
+}
 
-// 	viper.SetConfigType("json")
-// 	viper.ReadConfig(bytes.NewBuffer(data))
-// 	if err := viper.ReadConfig(bytes.NewBuffer(data)); err != nil {
-// 		panic(err)
-// 	}
-// 	res := viper.AllSettings()
-
-// 	viper.Reset()
-// 	return res
-// }
+func GetLogger() any {
+	return defaultViper.Get("logger")
+}

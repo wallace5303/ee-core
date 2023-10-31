@@ -68,9 +68,10 @@ func NewApp(cmdENV, cmdAppName, cmdAppUserData string) {
 	// init config
 	econfig.InitConfig()
 
-	// [todo] init logger  读取config
-	//elog.InitLogger(nil)
-
+	// init logger
+	//fmt.Printf("logConfig : %v", logConfig)
+	elog.InitLogger(econfig.GetLogger())
+	elog.Logger.Infof("test: %s", "----------")
 }
 
 func initDir() {
@@ -116,7 +117,7 @@ func initUserDir() {
 	}
 
 	DataDir := filepath.Join(eapp.HomeDir, "data")
-	if eapp.ENV == "prod" {
+	if eapp.IsPord() {
 		DataDir = filepath.Join(eapp.WorkDir, "data")
 	}
 	if !eutil.FileIsExist(DataDir) {
@@ -127,7 +128,7 @@ func initUserDir() {
 	}
 
 	logDir := filepath.Join(eapp.HomeDir, "logs")
-	if eapp.ENV == "prod" {
+	if eapp.IsPord() {
 		logDir = filepath.Join(eapp.WorkDir, "logs")
 	}
 	if !eutil.FileIsExist(logDir) {

@@ -41,12 +41,6 @@ func SetLogDir(path string) {
 	LogDir = path
 }
 
-// func NewLogConfig() *LogConfig {
-// 	return &LogConfig{
-
-// 	}
-// }
-
 // Log format
 func getEncoder(OutputJSON bool) (encoder zapcore.Encoder) {
 	encodeConfig := zap.NewProductionEncoderConfig()
@@ -103,8 +97,6 @@ func generateLogger(lCfg LogConfig) (err error) {
 
 // [todo] 跨天情况待测试
 func InitLogger(cfg interface{}) *zap.SugaredLogger {
-
-	fmt.Printf("params cfg :%v\n", cfg)
 	// log abs path
 	fileFullPath := filepath.Join(LogDir, LogName)
 
@@ -117,24 +109,27 @@ func InitLogger(cfg interface{}) *zap.SugaredLogger {
 	}
 
 	if cfg != nil {
-		logCfg, ok := cfg.(LogConfig)
+		logCfg, ok := cfg.(map[string]any)
 		if !ok {
 			eerror.Throw("CreateLogger params error !")
 		}
-		if logCfg.Level != "" {
-			lc.Level = logCfg.Level
+		if logCfg["outputjson"] != "" {
+			lc.OutputJSON = logCfg["outputjson"].(bool)
 		}
-		if logCfg.FileName != "" {
-			lc.FileName = logCfg.FileName
+		if logCfg["level"] != "" {
+			lc.Level = logCfg["level"].(string)
 		}
-		if logCfg.MaxSize != 0 {
-			lc.MaxSize = logCfg.MaxSize
+		if logCfg["filename"] != "" {
+			lc.FileName = filepath.Join(LogDir, logCfg["filename"].(string))
 		}
-		if logCfg.MaxAge != 0 {
-			lc.MaxAge = logCfg.MaxAge
+		if logCfg["maxsize"] != 0 {
+			lc.MaxSize = int(logCfg["maxsize"].(float64))
+		}
+		if logCfg["maxage"] != 0 {
+			lc.MaxAge = int(logCfg["maxage"].(float64))
 		}
 	}
-	fmt.Printf("lc:%#v\n", lc)
+	// fmt.Printf("lc:%#v\n", lc)
 
 	errInit := generateLogger(lc)
 	if errInit != nil {
