@@ -69,22 +69,31 @@ func NewApp(cmdENV, cmdAppName, cmdAppUserData string) {
 	econfig.InitConfig()
 
 	// init logger
-	//fmt.Printf("logConfig : %v", logConfig)
 	elog.InitLogger(econfig.GetLogger())
 	elog.Logger.Infof("test: %s", "----------")
+	//elog.Infof("test2: %s", "----------")
 }
 
 func initDir() {
-	eapp.HomeDir = eapp.BaseDir
-	// if ENV == "prod" {
-	// 	HomeDir = filepath.Join(WorkDir, "data")
-	// }
+	eapp.HomeDir = filepath.Join(eapp.BaseDir, "..")
+	if eapp.IsPord() {
+		eapp.HomeDir = eapp.BaseDir
+	}
 
 	eapp.GoDir = filepath.Join(eapp.HomeDir, "go")
-	eapp.PublicDir = filepath.Join(eapp.HomeDir, "public")
+	if eapp.IsPord() {
+		eapp.GoDir = eapp.BaseDir
+	}
 
+	eapp.PublicDir = filepath.Join(eapp.HomeDir, "public")
+	// [todo]
+	// if eapp.IsPord() {
+
+	// }
+
+	fmt.Println("BaseDir:", eapp.BaseDir)
 	fmt.Println("HomeDir:", eapp.HomeDir)
-	fmt.Println("GoDir:", eapp.HomeDir)
+	fmt.Println("GoDir:", eapp.GoDir)
 	fmt.Println("PublicDir:", eapp.PublicDir)
 }
 

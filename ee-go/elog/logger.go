@@ -20,6 +20,10 @@ var (
 	Logger  *zap.SugaredLogger
 )
 
+// var (
+// 	Infof func()
+// )
+
 type LogConfig struct {
 	OutputJSON bool   `json:"outputJson"`
 	Level      string `json:"level"`    // Level 最低日志等级，DEBUG<INFO<WARN<ERROR<FATAL 例如：info-->收集info等级以上的日志
@@ -113,8 +117,8 @@ func InitLogger(cfg interface{}) *zap.SugaredLogger {
 		if !ok {
 			eerror.Throw("CreateLogger params error !")
 		}
-		if logCfg["outputjson"] != "" {
-			lc.OutputJSON = logCfg["outputjson"].(bool)
+		if logCfg["output_json"] != "" {
+			lc.OutputJSON = logCfg["output_json"].(bool)
 		}
 		if logCfg["level"] != "" {
 			lc.Level = logCfg["level"].(string)
@@ -122,11 +126,11 @@ func InitLogger(cfg interface{}) *zap.SugaredLogger {
 		if logCfg["filename"] != "" {
 			lc.FileName = filepath.Join(LogDir, logCfg["filename"].(string))
 		}
-		if logCfg["maxsize"] != 0 {
-			lc.MaxSize = int(logCfg["maxsize"].(float64))
+		if logCfg["max_size"] != 0 {
+			lc.MaxSize = int(logCfg["max_size"].(float64))
 		}
-		if logCfg["maxage"] != 0 {
-			lc.MaxAge = int(logCfg["maxage"].(float64))
+		if logCfg["max_age"] != 0 {
+			lc.MaxAge = int(logCfg["max_age"].(float64))
 		}
 	}
 	// fmt.Printf("lc:%#v\n", lc)
@@ -139,6 +143,7 @@ func InitLogger(cfg interface{}) *zap.SugaredLogger {
 
 	lg := zap.L()
 	Logger = lg.Sugar()
+
 	return Logger
 }
 
@@ -207,10 +212,10 @@ func GetLogger() *zap.SugaredLogger {
 // 	Logger.Info(args...)
 // }
 
-// // Logger Infof
-// func Infof(template string, args ...interface{}) {
+// Logger Infof
+// func Infof(template string, args ...interface{}) func() {
 // 	if Logger == nil {
-// 		Logger = CreateLogger(nil)
+// 		Logger = InitLogger(nil)
 // 	}
-// 	return Logger.Infof
+// 	return Logger.Infof(template, args...)
 // }
