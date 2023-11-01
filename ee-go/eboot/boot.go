@@ -19,8 +19,7 @@ var (
 	cmdENV = "prod" // 'dev' 'prod'
 	// progressBar  float64 // 0 ~ 100
 	// progressDesc string  // description
-	cmdAppName     = ""
-	cmdAppUserData = "" //
+	cmdAppName = ""
 )
 
 func Run() {
@@ -29,27 +28,23 @@ func Run() {
 
 	environment := flag.String("env", "prod", "dev/prod")
 	appname := flag.String("appname", "", "app name")
-	appUserData := flag.String("app-user-data", "", "The folder where you store your application configuration files")
 	flag.Parse()
 
 	fmt.Println("cmdENV:", *environment)
 	fmt.Println("cmdAppName:", *appname)
-	fmt.Println("cmdAppUserData:", *appUserData)
 
 	cmdENV = *environment
 	cmdAppName = *appname
-	cmdAppUserData = *appUserData
 
 	// [todo] 是否检查 core.exe 文件的位置是否正确（ee\resources\extraResources）
 	// [todo] 是否把 public 文件复制到 extraResources, 或者直接打进 core.exe
-	NewApp(cmdENV, cmdAppName, cmdAppUserData)
+	NewApp(cmdENV, cmdAppName)
 }
 
-func NewApp(cmdENV, cmdAppName, cmdAppUserData string) {
+func NewApp(cmdENV, cmdAppName string) {
 
 	eapp.ENV = cmdENV
 	eapp.AppName = cmdAppName
-	eapp.WorkDir = cmdAppUserData
 
 	// [todo] 是否检查 core.exe 文件的位置是否正确（ee\resources\extraResources）
 	// [todo] 是否把 public 文件复制到 extraResources, 或者直接打进 core.exe
@@ -107,12 +102,16 @@ func initUserDir() {
 		}
 	}
 
-	if eapp.WorkDir == "" {
+	if eapp.IsDev() {
+		eapp.WorkDir = eapp.HomeDir
+	}
+	if eapp.IsPord() {
 		eapp.WorkDir = filepath.Join(eapp.UserHomeDir, eapp.AppName)
 		// windows
 		if eos.IsWindows() {
 			// [todo] 判断一下userProfile路径中 有没有 Documents
 			userProfile := os.Getenv("USERPROFILE")
+			//fmt.Println("userProfile:", userProfile)
 			if userProfile != "" {
 				eapp.WorkDir = filepath.Join(userProfile, "Documents", eapp.AppName)
 			}
@@ -125,21 +124,15 @@ func initUserDir() {
 		}
 	}
 
-	DataDir := filepath.Join(eapp.HomeDir, "data")
-	if eapp.IsPord() {
-		DataDir = filepath.Join(eapp.WorkDir, "data")
-	}
-	if !eutil.FileIsExist(DataDir) {
-		if err := os.MkdirAll(DataDir, 0755); err != nil && !os.IsExist(err) {
-			errMsg := fmt.Sprintf("create data folder [%s] failed: %s", DataDir, err)
+	eapp.DataDir = filepath.Join(eapp.WorkDir, "data")
+	if !eutil.FileIsExist(eapp.DataDir) {
+		if err := os.MkdirAll(eapp.DataDir, 0755); err != nil && !os.IsExist(err) {
+			errMsg := fmt.Sprintf("create data folder [%s] failed: %s", eapp.DataDir, err)
 			eerror.Throw(errMsg)
 		}
 	}
 
-	logDir := filepath.Join(eapp.HomeDir, "logs")
-	if eapp.IsPord() {
-		logDir = filepath.Join(eapp.WorkDir, "logs")
-	}
+	logDir := filepath.Join(eapp.WorkDir, "logs")
 	if !eutil.FileIsExist(logDir) {
 		if err := os.MkdirAll(logDir, 0755); err != nil && !os.IsExist(err) {
 			errMsg := fmt.Sprintf("create logs folder [%s] failed: %s", logDir, err)
@@ -148,9 +141,23 @@ func initUserDir() {
 	}
 	elog.SetLogDir(logDir)
 
+	// [todo]
+	eapp.TmpDir = filepath.Join(eapp.WorkDir, "data", "tmp")
+	os.RemoveAll(eapp.TmpDir)
+	if !eutil.FileIsExist(eapp.TmpDir) {
+		if err := os.MkdirAll(eapp.TmpDir, 0755); err != nil && !os.IsExist(err) {
+			errMsg := fmt.Sprintf("create data folder [%s] failed: %s", eapp.TmpDir, err)
+			eerror.Throw(errMsg)
+		}
+	}
+	os.Setenv("TMPDIR", eapp.TmpDir)
+	os.Setenv("TEMP", eapp.TmpDir)
+	os.Setenv("TMP", eapp.TmpDir)
+
 	fmt.Println("UserHomeDir:", eapp.UserHomeDir)
 	fmt.Println("UserHomeConfDir:", eapp.UserHomeConfDir)
 	fmt.Println("WorkDir:", eapp.WorkDir)
-	fmt.Println("DataDir:", DataDir)
+	fmt.Println("DataDir:", eapp.DataDir)
 	fmt.Println("logDir:", logDir)
+	fmt.Println("TmpDir:", eapp.TmpDir)
 }

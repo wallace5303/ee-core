@@ -29,6 +29,7 @@ var (
 	UserHomeConfDir string // OS user home config directory
 	WorkDir         string // App working directory
 	DataDir         string // data directory
+	TmpDir          string // tmp directory
 )
 
 // Pwd gets the path of current working directory.
