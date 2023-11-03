@@ -70,7 +70,7 @@ func NewApp(cmdENV, cmdAppName string) {
 	//elog.Infof("test2: %s", "----------")
 
 	// init http server
-	eserver.InitServer()
+	eserver.InitHttp()
 
 }
 

@@ -32,9 +32,9 @@ var (
 	GinInstance *gin.Engine
 )
 
-func InitServer() {
+func InitHttp() {
 	gin.SetMode(gin.ReleaseMode)
-	GinInstance := gin.New()
+	GinInstance = gin.New()
 	GinInstance.MaxMultipartMemory = 1024 * 1024 * 64
 	GinInstance.Use(
 		setCors(),
@@ -64,7 +64,7 @@ func InitServer() {
 
 	url := "http://" + address
 	pid := os.Getpid()
-	elog.Logger.Infof("[ee-go] http server address : %s, pid: %s", url, pid)
+	elog.Logger.Infof("[ee-go] http server address : %s, pid: %d", url, pid)
 	eapp.HttpServerIsRunning = true
 
 	if err = http.Serve(Listener, GinInstance); nil != err {
@@ -120,6 +120,7 @@ func loadDebug() {
 }
 
 func loadViews() {
+	elog.Logger.Infof("[ee-go] loadViews--------- ")
 	// home page
 	GinInstance.Handle("GET", "/", func(ctx *gin.Context) {
 		location := url.URL{}
@@ -137,12 +138,16 @@ func loadViews() {
 		queryParams.Set("f", eutil.GetRandomString(8))
 		location.RawQuery = queryParams.Encode()
 
+		elog.Logger.Infof("[ee-go] location : %s,", location)
+
 		ctx.Redirect(302, location.String())
 	})
 }
 
 func loadAssets() {
-	GinInstance.StaticFile("favicon.ico", filepath.Join(eapp.PublicDir, "stage", "logo-32.png"))
+	logo := filepath.Join(eapp.PublicDir, "images", "logo-32.png")
+	elog.Logger.Infof("[ee-go] logo : %s,", logo)
+	GinInstance.StaticFile("favicon.ico", filepath.Join(eapp.PublicDir, "images", "logo-32.png"))
 	GinInstance.Static("/public/", eapp.PublicDir)
 
 	// [todo] 后续可以考虑做成多目录
