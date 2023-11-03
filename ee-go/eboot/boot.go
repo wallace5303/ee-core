@@ -11,6 +11,7 @@ import (
 	"ee-go/eerror"
 	"ee-go/elog"
 	"ee-go/eos"
+	"ee-go/eserver"
 	"ee-go/eutil"
 	//figure "github.com/common-nighthawk/go-figure"
 )
@@ -53,7 +54,7 @@ func NewApp(cmdENV, cmdAppName string) {
 	if eapp.AppName == "" {
 		pkg := eapp.ReadPackage()
 		if pkg.Name == "" {
-			eerror.Throw("The app name is required!")
+			eerror.ThrowWithCode("The app name is required!", eerror.ExitAppNameIsEmpty)
 		}
 		eapp.AppName = pkg.Name
 	}
@@ -67,6 +68,10 @@ func NewApp(cmdENV, cmdAppName string) {
 	elog.InitLogger(econfig.GetLogger())
 	elog.Logger.Infof("test: %s", "----------")
 	//elog.Infof("test2: %s", "----------")
+
+	// init http server
+	eserver.InitServer()
+
 }
 
 func initDir() {
@@ -98,7 +103,7 @@ func initUserDir() {
 	if !eutil.FileIsExist(eapp.UserHomeConfDir) {
 		if err := os.MkdirAll(eapp.UserHomeConfDir, 0755); err != nil && !os.IsExist(err) {
 			errMsg := fmt.Sprintf("create user home conf folder [%s] failed: %s", eapp.UserHomeConfDir, err)
-			eerror.Throw(errMsg)
+			eerror.ThrowWithCode(errMsg, eerror.ExitCreateUserHomeConfDir)
 		}
 	}
 
@@ -119,8 +124,8 @@ func initUserDir() {
 	}
 	if !eutil.FileIsExist(eapp.WorkDir) {
 		if err := os.MkdirAll(eapp.WorkDir, 0755); err != nil && !os.IsExist(err) {
-			errMsg := fmt.Sprintf("create app data folder [%s] failed: %s", eapp.WorkDir, err)
-			eerror.Throw(errMsg)
+			errMsg := fmt.Sprintf("create work folder [%s] failed: %s", eapp.WorkDir, err)
+			eerror.ThrowWithCode(errMsg, eerror.ExitCreateWorkDir)
 		}
 	}
 
@@ -128,7 +133,7 @@ func initUserDir() {
 	if !eutil.FileIsExist(eapp.DataDir) {
 		if err := os.MkdirAll(eapp.DataDir, 0755); err != nil && !os.IsExist(err) {
 			errMsg := fmt.Sprintf("create data folder [%s] failed: %s", eapp.DataDir, err)
-			eerror.Throw(errMsg)
+			eerror.ThrowWithCode(errMsg, eerror.ExitCreateDataDir)
 		}
 	}
 
@@ -136,7 +141,7 @@ func initUserDir() {
 	if !eutil.FileIsExist(logDir) {
 		if err := os.MkdirAll(logDir, 0755); err != nil && !os.IsExist(err) {
 			errMsg := fmt.Sprintf("create logs folder [%s] failed: %s", logDir, err)
-			eerror.Throw(errMsg)
+			eerror.ThrowWithCode(errMsg, eerror.ExitCreateLogDir)
 		}
 	}
 	elog.SetLogDir(logDir)
@@ -146,8 +151,8 @@ func initUserDir() {
 	os.RemoveAll(eapp.TmpDir)
 	if !eutil.FileIsExist(eapp.TmpDir) {
 		if err := os.MkdirAll(eapp.TmpDir, 0755); err != nil && !os.IsExist(err) {
-			errMsg := fmt.Sprintf("create data folder [%s] failed: %s", eapp.TmpDir, err)
-			eerror.Throw(errMsg)
+			errMsg := fmt.Sprintf("create tmp folder [%s] failed: %s", eapp.TmpDir, err)
+			eerror.ThrowWithCode(errMsg, eerror.ExitCreateTmpDir)
 		}
 	}
 	os.Setenv("TMPDIR", eapp.TmpDir)

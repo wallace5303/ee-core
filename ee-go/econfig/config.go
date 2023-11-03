@@ -27,7 +27,7 @@ func InitConfig() {
 	defaultViper.SetConfigFile(defaultConfigPath)
 	defaultErr := defaultViper.ReadInConfig()
 	if defaultErr != nil {
-		eerror.Throw(fmt.Sprintf("Fatal error config.default.json file: %s \n", defaultErr))
+		eerror.ThrowWithCode(fmt.Sprintf("Fatal error config.default.json file: %s \n", defaultErr), eerror.ExitConfigDefaultFile)
 	}
 
 	if eapp.IsDev() {
@@ -36,7 +36,7 @@ func InitConfig() {
 		devViper.SetConfigFile(devConfigPath)
 		devErr := devViper.ReadInConfig()
 		if devErr != nil {
-			eerror.Throw(fmt.Sprintf("Fatal error config.local.json file: %s \n", devErr))
+			eerror.ThrowWithCode(fmt.Sprintf("Fatal error config.local.json file: %s \n", devErr), eerror.ExitConfigDevFile)
 		}
 		defaultViper.MergeConfigMap(devViper.AllSettings())
 	}
@@ -47,7 +47,7 @@ func InitConfig() {
 		prodViper.SetConfigFile(prodConfigPath)
 		prodErr := prodViper.ReadInConfig()
 		if prodErr != nil {
-			eerror.Throw(fmt.Sprintf("Fatal error config.prod.json file: %s \n", prodErr))
+			eerror.ThrowWithCode(fmt.Sprintf("Fatal error config.prod.json file: %s \n", prodErr), eerror.ExitConfigProdFile)
 		}
 		defaultViper.MergeConfigMap(prodViper.AllSettings())
 	}

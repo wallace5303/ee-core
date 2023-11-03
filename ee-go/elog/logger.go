@@ -115,7 +115,7 @@ func InitLogger(cfg interface{}) *zap.SugaredLogger {
 	if cfg != nil {
 		logCfg, ok := cfg.(map[string]any)
 		if !ok {
-			eerror.Throw("CreateLogger params error !")
+			eerror.ThrowWithCode("Init Logger params error !", eerror.ExitConfigParams)
 		}
 		if logCfg["output_json"] != "" {
 			lc.OutputJSON = logCfg["output_json"].(bool)
@@ -137,8 +137,8 @@ func InitLogger(cfg interface{}) *zap.SugaredLogger {
 
 	errInit := generateLogger(lc)
 	if errInit != nil {
-		errMsg := fmt.Sprintf("create logger error: %s", errInit)
-		eerror.Throw(errMsg)
+		errMsg := fmt.Sprintf("Generate logger error: %s", errInit)
+		eerror.ThrowWithCode(errMsg, eerror.ExitConfigGenerate)
 	}
 
 	lg := zap.L()

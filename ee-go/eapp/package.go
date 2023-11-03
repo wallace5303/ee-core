@@ -38,18 +38,18 @@ func ReadPackage() (ret *Package) {
 
 	pkgPath := filepath.Join(HomeDir, "package.json")
 	if !eutil.FileIsExist(pkgPath) {
-		eerror.Throw(fmt.Sprintf("Electon %s does not exist!", pkgPath))
+		eerror.ThrowWithCode(fmt.Sprintf("Electon %s does not exist!", pkgPath), eerror.ExitPackageFile)
 		return
 	}
 
 	data, err := os.ReadFile(pkgPath)
 	if err != nil {
-		eerror.Throw(fmt.Sprintf("file %s read failure!", pkgPath))
+		eerror.ThrowWithCode(fmt.Sprintf("file %s read failure!", pkgPath), eerror.ExitPackageFile)
 		return
 	}
 	err = json.Unmarshal(data, ret)
 	if err != nil {
-		eerror.Throw(fmt.Sprintf("file %s is not in json format!", pkgPath))
+		eerror.ThrowWithCode(fmt.Sprintf("file %s is not in json format!", pkgPath), eerror.ExitPackageFile)
 		return
 	}
 	return

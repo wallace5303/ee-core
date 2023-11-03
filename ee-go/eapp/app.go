@@ -32,6 +32,12 @@ var (
 	TmpDir          string // tmp directory
 )
 
+var (
+	HttpPort            = "6666"
+	HttpServerIsRunning = false
+	Ssl                 = false
+)
+
 // Pwd gets the path of current working directory.
 func IsPord() bool {
 	return (ENV == "prod")
