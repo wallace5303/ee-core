@@ -29,24 +29,22 @@ var (
 	PlatformPhone   = "phone"
 	PlatformPad     = "pad"
 
-	GinInstance *gin.Engine
+	Router *gin.Engine
 )
 
-func InitHttp() {
+func CreateHttpServer() {
 	gin.SetMode(gin.ReleaseMode)
-	GinInstance = gin.New()
-	GinInstance.MaxMultipartMemory = 1024 * 1024 * 64
-	GinInstance.Use(
+	Router = gin.New()
+	Router.MaxMultipartMemory = 1024 * 1024 * 64
+	Router.Use(
 		setCors(),
-		setGzip(),
 		setSession(),
+		setGzip(),
 	)
 
 	loadDebug()
 	loadAssets()
 	loadViews()
-
-	// router()
 
 	host := "0.0.0.0"
 	// if model.Conf.System.NetworkServe {
@@ -56,19 +54,23 @@ func InitHttp() {
 	// }
 
 	address := host + ":" + eapp.HttpPort
-	Listener, err := net.Listen("tcp", address)
+	ln, err := net.Listen("tcp", address)
 	if nil != err {
-		elog.Logger.Errorf("[ee-go] http service startup failure : %s", err)
+		elog.Logger.Errorf("[ee-go] http server startup failure : %s", err)
 		eerror.ThrowWithCode("", eerror.ExitListenPortErr)
 	}
 
 	url := "http://" + address
 	pid := os.Getpid()
-	elog.Logger.Infof("[ee-go] http server address : %s, pid: %d", url, pid)
+	elog.Logger.Infof("[ee-go] http server %s, pid:%d", url, pid)
 	eapp.HttpServerIsRunning = true
 
-	if err = http.Serve(Listener, GinInstance); nil != err {
-		elog.Logger.Errorf("[ee-go] http service startup failure: %s", err)
+	go run(ln)
+}
+
+func run(ln net.Listener) {
+	if err := http.Serve(ln, Router); nil != err {
+		elog.Logger.Errorf("[ee-go] http server startup failure: %s", err)
 		eerror.ThrowWithCode("", eerror.ExitHttpStartupErr)
 	}
 }
@@ -76,11 +78,11 @@ func InitHttp() {
 // set CORS
 func setCors() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		ctx.Header("Access-Control-Allow-Origin", "*")
 		ctx.Header("Access-Control-Allow-Credentials", "true")
 		ctx.Header("Access-Control-Allow-Headers", "origin, Content-Length, X-Custom-Header, Content-Type, Authorization")
 		ctx.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS")
 		ctx.Header("Access-Control-Allow-Private-Network", "true")
-		ctx.Header("Access-Control-Allow-Origin", "*")
 
 		if ctx.Request.Method == "OPTIONS" {
 			ctx.Header("Access-Control-Max-Age", "3600")
@@ -112,17 +114,17 @@ func setSession() gin.HandlerFunc {
 }
 
 func loadDebug() {
-	GinInstance.GET("/debug/pprof/", gin.WrapF(pprof.Index))
-	GinInstance.GET("/debug/pprof/cmdline", gin.WrapF(pprof.Cmdline))
-	GinInstance.GET("/debug/pprof/symbol", gin.WrapF(pprof.Symbol))
-	GinInstance.GET("/debug/pprof/trace", gin.WrapF(pprof.Trace))
-	GinInstance.GET("/debug/pprof/profile", gin.WrapF(pprof.Profile))
+	Router.GET("/debug/pprof/", gin.WrapF(pprof.Index))
+	Router.GET("/debug/pprof/cmdline", gin.WrapF(pprof.Cmdline))
+	Router.GET("/debug/pprof/symbol", gin.WrapF(pprof.Symbol))
+	Router.GET("/debug/pprof/trace", gin.WrapF(pprof.Trace))
+	Router.GET("/debug/pprof/profile", gin.WrapF(pprof.Profile))
 }
 
 func loadViews() {
 	elog.Logger.Infof("[ee-go] loadViews--------- ")
 	// home page
-	GinInstance.Handle("GET", "/", func(ctx *gin.Context) {
+	Router.Handle("GET", "/", func(ctx *gin.Context) {
 		location := url.URL{}
 
 		if GetPlatform(ctx) == PlatformPC {
@@ -146,16 +148,17 @@ func loadViews() {
 
 func loadAssets() {
 	logo := filepath.Join(eapp.PublicDir, "images", "logo-32.png")
-	elog.Logger.Infof("[ee-go] logo : %s,", logo)
-	GinInstance.StaticFile("favicon.ico", filepath.Join(eapp.PublicDir, "images", "logo-32.png"))
-	GinInstance.Static("/public/", eapp.PublicDir)
+	elog.Logger.Infof("[ee-go] logo : %s", logo)
+	Router.StaticFile("favicon.ico", filepath.Join(eapp.PublicDir, "images", "logo-32.png"))
+	Router.Static("/public/", eapp.PublicDir)
 
 	// [todo] 后续可以考虑做成多目录
-	GinInstance.Static("/app/", filepath.Join(eapp.PublicDir, "dist"))
-	GinInstance.Static("/browser/", filepath.Join(eapp.PublicDir, "dist"))
-	GinInstance.Static("/mobile/", filepath.Join(eapp.PublicDir, "dist"))
+	Router.Static("/app/", filepath.Join(eapp.PublicDir, "dist"))
+	Router.Static("/browser/", filepath.Join(eapp.PublicDir, "dist"))
+	Router.Static("/mobile/", filepath.Join(eapp.PublicDir, "dist"))
 }
 
+// get platform
 func GetPlatform(ctx *gin.Context) string {
 	userAgent := ctx.GetHeader("User-Agent")
 
@@ -176,37 +179,6 @@ func GetPlatform(ctx *gin.Context) string {
 		}
 	}
 }
-
-// func router(GinInstance *gin.Engine) {
-// 	GinInstance.Handle("GET", "/api/system/bootProgress", bootProgress)
-// }
-
-// func rewritePortJSON(pid, port string) {
-// 	portJSON := filepath.Join(util.HomeDir, ".config", "siyuan", "port.json")
-// 	pidPorts := map[string]string{}
-// 	var data []byte
-// 	var err error
-
-// 	if gulu.File.IsExist(portJSON) {
-// 		data, err = os.ReadFile(portJSON)
-// 		if nil != err {
-// 			logging.LogWarnf("read port.json failed: %s", err)
-// 		} else {
-// 			if err = gulu.JSON.UnmarshalJSON(data, &pidPorts); nil != err {
-// 				logging.LogWarnf("unmarshal port.json failed: %s", err)
-// 			}
-// 		}
-// 	}
-
-// 	pidPorts[pid] = port
-// 	if data, err = gulu.JSON.MarshalIndentJSON(pidPorts, "", "  "); nil != err {
-// 		logging.LogWarnf("marshal port.json failed: %s", err)
-// 	} else {
-// 		if err = os.WriteFile(portJSON, data, 0644); nil != err {
-// 			logging.LogWarnf("write port.json failed: %s", err)
-// 		}
-// 	}
-// }
 
 // port is open
 func isPortOpen(port string) bool {

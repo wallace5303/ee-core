@@ -11,9 +11,11 @@ import (
 	"ee-go/eerror"
 	"ee-go/elog"
 	"ee-go/eos"
+	"ee-go/eruntime"
 	"ee-go/eserver"
 	"ee-go/eutil"
-	//figure "github.com/common-nighthawk/go-figure"
+
+	figure "github.com/common-nighthawk/go-figure"
 )
 
 var (
@@ -23,9 +25,9 @@ var (
 	cmdAppName = ""
 )
 
-func Run() {
-	// banner := figure.NewColorFigure("ElectronEgg", "standard", "green", true)
-	// fmt.Println("\n" + banner.String())
+func Init() {
+	banner := figure.NewColorFigure("ElectronEgg", "standard", "green", true)
+	fmt.Println("\n" + banner.String())
 
 	environment := flag.String("env", "prod", "dev/prod")
 	appname := flag.String("appname", "", "app name")
@@ -37,8 +39,6 @@ func Run() {
 	cmdENV = *environment
 	cmdAppName = *appname
 
-	// [todo] 是否检查 core.exe 文件的位置是否正确（ee\resources\extraResources）
-	// [todo] 是否把 public 文件复制到 extraResources, 或者直接打进 core.exe
 	NewApp(cmdENV, cmdAppName)
 }
 
@@ -62,16 +62,19 @@ func NewApp(cmdENV, cmdAppName string) {
 	initUserDir()
 
 	// init config
-	econfig.InitConfig()
+	econfig.Init()
 
 	// init logger
-	elog.InitLogger(econfig.GetLogger())
-	elog.Logger.Infof("test: %s", "----------")
-	//elog.Infof("test2: %s", "----------")
+	logCfg := econfig.GetLogger()
+	elog.Init(logCfg)
 
-	// init http server
-	eserver.InitHttp()
+	// http server
+	eserver.Init("http")
 
+}
+
+func Run() {
+	eruntime.Init()
 }
 
 func initDir() {

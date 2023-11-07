@@ -18,6 +18,7 @@ var (
 	HttpServer = false
 	AppName    = ""
 	Platform   = "pc" // pc | mobile | web
+	IsExiting  = false
 )
 
 var (
@@ -33,7 +34,7 @@ var (
 )
 
 var (
-	HttpPort            = "6666"
+	HttpPort            = "7073"
 	HttpServerIsRunning = false
 	Ssl                 = false
 )

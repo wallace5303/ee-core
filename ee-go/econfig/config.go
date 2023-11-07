@@ -17,7 +17,7 @@ var (
 	prodViper    *viper.Viper
 )
 
-func InitConfig() {
+func Init() {
 	defaultConfigPath := filepath.Join(eapp.GoDir, "config", "config.default.json")
 	devConfigPath := filepath.Join(eapp.GoDir, "config", "config.local.json")
 	prodConfigPath := filepath.Join(eapp.GoDir, "config", "config.prod.json")

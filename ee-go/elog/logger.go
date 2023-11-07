@@ -41,6 +41,54 @@ func init() {
 	LogDir = dir
 }
 
+// [todo] 跨天情况待测试
+func Init(cfg interface{}) *zap.SugaredLogger {
+	// log abs path
+	fileFullPath := filepath.Join(LogDir, LogName)
+
+	lc := LogConfig{
+		OutputJSON: false,
+		Level:      "info",
+		FileName:   fileFullPath,
+		MaxSize:    1024,
+		MaxAge:     30,
+	}
+
+	if cfg != nil {
+		logCfg, ok := cfg.(map[string]any)
+		if !ok {
+			eerror.ThrowWithCode("Init Logger params error !", eerror.ExitConfigParams)
+		}
+		if logCfg["output_json"] != "" {
+			lc.OutputJSON = logCfg["output_json"].(bool)
+		}
+		if logCfg["level"] != "" {
+			lc.Level = logCfg["level"].(string)
+		}
+		if logCfg["filename"] != "" {
+			lc.FileName = filepath.Join(LogDir, logCfg["filename"].(string))
+		}
+		if logCfg["max_size"] != 0 {
+			lc.MaxSize = int(logCfg["max_size"].(float64))
+		}
+		if logCfg["max_age"] != 0 {
+			lc.MaxAge = int(logCfg["max_age"].(float64))
+		}
+	}
+	// fmt.Printf("lc:%#v\n", lc)
+
+	errInit := generateLogger(lc)
+	if errInit != nil {
+		errMsg := fmt.Sprintf("Generate logger error: %s", errInit)
+		eerror.ThrowWithCode(errMsg, eerror.ExitConfigGenerate)
+	}
+
+	lg := zap.L()
+	Logger = lg.Sugar()
+
+	return Logger
+}
+
 func SetLogDir(path string) {
 	LogDir = path
 }
@@ -99,60 +147,12 @@ func generateLogger(lCfg LogConfig) (err error) {
 	return
 }
 
-// [todo] 跨天情况待测试
-func InitLogger(cfg interface{}) *zap.SugaredLogger {
-	// log abs path
-	fileFullPath := filepath.Join(LogDir, LogName)
-
-	lc := LogConfig{
-		OutputJSON: false,
-		Level:      "info",
-		FileName:   fileFullPath,
-		MaxSize:    1024,
-		MaxAge:     30,
-	}
-
-	if cfg != nil {
-		logCfg, ok := cfg.(map[string]any)
-		if !ok {
-			eerror.ThrowWithCode("Init Logger params error !", eerror.ExitConfigParams)
-		}
-		if logCfg["output_json"] != "" {
-			lc.OutputJSON = logCfg["output_json"].(bool)
-		}
-		if logCfg["level"] != "" {
-			lc.Level = logCfg["level"].(string)
-		}
-		if logCfg["filename"] != "" {
-			lc.FileName = filepath.Join(LogDir, logCfg["filename"].(string))
-		}
-		if logCfg["max_size"] != 0 {
-			lc.MaxSize = int(logCfg["max_size"].(float64))
-		}
-		if logCfg["max_age"] != 0 {
-			lc.MaxAge = int(logCfg["max_age"].(float64))
-		}
-	}
-	// fmt.Printf("lc:%#v\n", lc)
-
-	errInit := generateLogger(lc)
-	if errInit != nil {
-		errMsg := fmt.Sprintf("Generate logger error: %s", errInit)
-		eerror.ThrowWithCode(errMsg, eerror.ExitConfigGenerate)
-	}
-
-	lg := zap.L()
-	Logger = lg.Sugar()
-
-	return Logger
-}
-
 // Get Logger
 func GetLogger() *zap.SugaredLogger {
 	if Logger != nil {
 		return Logger
 	}
-	Logger := InitLogger(nil)
+	Logger := Init(nil)
 	return Logger
 }
 
