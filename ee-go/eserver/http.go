@@ -30,6 +30,7 @@ var (
 	PlatformPad     = "pad"
 
 	Router *gin.Engine
+	//Context *gin.Context
 )
 
 func CreateHttpServer() {
