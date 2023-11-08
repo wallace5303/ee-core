@@ -1,12 +1,14 @@
 package eserver
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/pprof"
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -14,8 +16,6 @@ import (
 	"ee-go/eerror"
 	"ee-go/elog"
 	"ee-go/eutil"
-
-	// "ee-go/gin"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/sessions"
@@ -35,7 +35,8 @@ var (
 	//Context *gin.Context
 )
 
-func CreateHttpServer() {
+func CreateHttpServer(cfg map[string]any) {
+	fmt.Printf("http config: %#v\n", cfg)
 	gin.SetMode(gin.ReleaseMode)
 	Router = gin.New()
 	Router.MaxMultipartMemory = 1024 * 1024 * 64
@@ -49,21 +50,26 @@ func CreateHttpServer() {
 	loadAssets()
 	loadViews()
 
-	host := "0.0.0.0"
-	// if model.Conf.System.NetworkServe {
-	// 	host = "0.0.0.0"
-	// } else {
-	// 	host = "127.0.0.1"
-	// }
+	protocol := cfg["protocol"].(string)
+	hostname := cfg["hostname"].(string)
+	if cfg["network"] == true {
+		hostname = "0.0.0.0"
+	}
+	port := eapp.HttpPort
+	cfgPort := int(cfg["port"].(float64))
+	if cfgPort > 0 {
+		port = cfgPort
+	}
+	portStr := strconv.Itoa(port)
 
-	address := host + ":" + eapp.HttpPort
+	address := hostname + ":" + portStr
 	ln, err := net.Listen("tcp", address)
 	if nil != err {
 		elog.Logger.Errorf("[ee-go] http server startup failure : %s", err)
 		eerror.ThrowWithCode("", eerror.ExitListenPortErr)
 	}
 
-	url := "http://" + address
+	url := protocol + address
 	pid := os.Getpid()
 	elog.Logger.Infof("[ee-go] http server %s, pid:%d", url, pid)
 	eapp.HttpServerIsRunning = true
@@ -109,7 +115,7 @@ func setSession() gin.HandlerFunc {
 	cookieStore := cookie.NewStore([]byte("TAM36OimHa8LDbtk"))
 	cookieStore.Options(sessions.Options{
 		Path:     "/",
-		Secure:   eapp.Ssl,
+		Secure:   false,
 		HttpOnly: true,
 	})
 

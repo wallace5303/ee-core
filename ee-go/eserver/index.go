@@ -1,9 +1,9 @@
 package eserver
 
-func Init(serve string) {
+func Init(serve string, cfg map[string]any) {
 	switch serve {
 	case "http":
-		CreateHttpServer()
+		CreateHttpServer(cfg)
 	case "websocket":
 		//
 	default:

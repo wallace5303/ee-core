@@ -34,9 +34,8 @@ var (
 )
 
 var (
-	HttpPort            = "7073"
+	HttpPort            = 7073
 	HttpServerIsRunning = false
-	Ssl                 = false
 )
 
 // Pwd gets the path of current working directory.

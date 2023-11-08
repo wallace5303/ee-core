@@ -42,7 +42,7 @@ func init() {
 }
 
 // [todo] 跨天情况待测试
-func Init(cfg interface{}) *zap.SugaredLogger {
+func Init(cfg map[string]any) *zap.SugaredLogger {
 	// log abs path
 	fileFullPath := filepath.Join(LogDir, LogName)
 
@@ -54,28 +54,24 @@ func Init(cfg interface{}) *zap.SugaredLogger {
 		MaxAge:     30,
 	}
 
-	if cfg != nil {
-		logCfg, ok := cfg.(map[string]any)
-		if !ok {
-			eerror.ThrowWithCode("Init Logger params error !", eerror.ExitConfigParams)
+	if len(cfg) > 0 {
+		if cfg["output_json"] != "" {
+			lc.OutputJSON = cfg["output_json"].(bool)
 		}
-		if logCfg["output_json"] != "" {
-			lc.OutputJSON = logCfg["output_json"].(bool)
+		if cfg["level"] != "" {
+			lc.Level = cfg["level"].(string)
 		}
-		if logCfg["level"] != "" {
-			lc.Level = logCfg["level"].(string)
+		if cfg["filename"] != "" {
+			lc.FileName = filepath.Join(LogDir, cfg["filename"].(string))
 		}
-		if logCfg["filename"] != "" {
-			lc.FileName = filepath.Join(LogDir, logCfg["filename"].(string))
+		if cfg["max_size"] != 0 {
+			lc.MaxSize = int(cfg["max_size"].(float64))
 		}
-		if logCfg["max_size"] != 0 {
-			lc.MaxSize = int(logCfg["max_size"].(float64))
-		}
-		if logCfg["max_age"] != 0 {
-			lc.MaxAge = int(logCfg["max_age"].(float64))
+		if cfg["max_age"] != 0 {
+			lc.MaxAge = int(cfg["max_age"].(float64))
 		}
 	}
-	// fmt.Printf("lc:%#v\n", lc)
+	//fmt.Printf("lc:%#v\n", lc)
 
 	errInit := generateLogger(lc)
 	if errInit != nil {

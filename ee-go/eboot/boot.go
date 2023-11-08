@@ -69,7 +69,10 @@ func NewApp(cmdENV, cmdAppName string) {
 	elog.Init(logCfg)
 
 	// http server
-	eserver.Init("http")
+	httpCfg := econfig.GetHttp()
+	if httpCfg["enable"] == true {
+		eserver.Init("http", httpCfg)
+	}
 
 }
 

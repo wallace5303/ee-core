@@ -17,10 +17,11 @@ const (
 	ExitConfigProdFile    = -13
 
 	// log
-	ExitConfigParams   = -21
+	ExitLogConfigErr   = -21
 	ExitConfigGenerate = -22
 
 	// http
 	ExitListenPortErr  = -31
 	ExitHttpStartupErr = -32
+	ExitHttpConfigErr  = -33
 )

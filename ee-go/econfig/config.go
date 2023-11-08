@@ -59,6 +59,21 @@ func GetAll() map[string]any {
 	return defaultViper.AllSettings()
 }
 
-func GetLogger() any {
-	return defaultViper.Get("logger")
+func GetLogger() map[string]any {
+	cfg := defaultViper.Get("logger")
+	logCfg, ok := cfg.(map[string]any)
+	if !ok {
+		eerror.ThrowWithCode("Get logger config error !", eerror.ExitLogConfigErr)
+	}
+	return logCfg
+}
+
+func GetHttp() map[string]any {
+	cfg := defaultViper.Get("http")
+	httpCfg, ok := cfg.(map[string]any)
+	if !ok {
+		eerror.ThrowWithCode("Get http config error !", eerror.ExitHttpConfigErr)
+	}
+
+	return httpCfg
 }
