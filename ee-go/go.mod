@@ -6,6 +6,7 @@ require (
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-contrib/sessions v0.0.5
+	// github.com/gin-gonic/gin v1.9.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/mssola/useragent v1.0.0
 	github.com/natefinch/lumberjack v2.0.0+incompatible
