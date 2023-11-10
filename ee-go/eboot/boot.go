@@ -74,10 +74,6 @@ func NewApp(cmdENV, cmdAppName string) {
 
 	// http server
 	httpCfg := econfig.GetHttp()
-
-	aaa := econfig.GetAll()
-	fmt.Printf("aaa: %v\n", aaa)
-	fmt.Printf("httpCfg: %v\n", httpCfg)
 	if httpCfg["enable"] == true {
 		eserver.Init("http", httpCfg)
 	}

@@ -32,8 +32,8 @@ func Init() {
 	}
 
 	if eapp.IsPord() {
-		defaultCfg = ReadJsonFromStaticFS("static/config/config.default.json")
-		prodCfg := ReadJsonFromStaticFS("static/config/config.prod.json")
+		defaultCfg = ReadJsonFromStaticFS("public/config/config.default.json")
+		prodCfg := ReadJsonFromStaticFS("public/config/config.prod.json")
 
 		// merge
 		eutil.Mapserge(prodCfg, defaultCfg, nil)

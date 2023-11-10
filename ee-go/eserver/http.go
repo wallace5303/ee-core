@@ -1,6 +1,7 @@
 package eserver
 
 import (
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/pprof"
@@ -131,9 +132,18 @@ func loadDebug() {
 }
 
 func loadViews() {
-	elog.Logger.Infof("[ee-go] loadViews--------- ")
+	// static
+	// fsys, _ := fs.Sub(eapp.StaticFS, "static")
+	// fileServer := http.FileServer(http.FS(fsys))
+	// handler := WrapStaticHandler(fileServer)
+	// router.GET("/", handler)
+	// router.GET("/favicon.ico", handler)
+	// router.GET("/config.js", handler)
+	// // 所有/assets/**开头的都是静态资源文件
+	// router.GET("/assets/*file", handler)
+
 	// home page
-	Router.Handle("GET", "/", func(ctx *gin.Context) {
+	Router.GET("/", func(ctx *gin.Context) {
 		location := url.URL{}
 
 		if GetPlatform(ctx) == PlatformPC {
@@ -153,10 +163,16 @@ func loadViews() {
 
 		ctx.Redirect(302, location.String())
 	})
-	// 没有路由即 404返回
-	// Router.NoRoute(func(g *gin.Context) {
-	// 	g.JSON(http.StatusNotFound, gin.H{"code": 404, "msg": fmt.Sprintf("not found '%s:%s'", g.Request.Method, g.Request.URL.Path)})
-	// })
+
+	// 404
+	Router.NoRoute(func(ctx *gin.Context) {
+		ret := NewJson()
+		ret.Code = http.StatusNotFound
+		ret.Msg = fmt.Sprintf("not found '%s:%s'", ctx.Request.Method, ctx.Request.URL.Path)
+
+		ctx.JSON(http.StatusNotFound, ret)
+	})
+
 }
 
 func loadAssets() {
