@@ -1,6 +1,7 @@
 package eboot
 
 import (
+	"embed"
 	"flag"
 	"fmt"
 	"os"
@@ -25,7 +26,7 @@ var (
 	cmdAppName = ""
 )
 
-func Init() {
+func Init(staticFS embed.FS) {
 	banner := figure.NewColorFigure("ElectronEgg", "standard", "green", true)
 	fmt.Println("\n" + banner.String())
 
@@ -38,6 +39,9 @@ func Init() {
 
 	cmdENV = *environment
 	cmdAppName = *appname
+
+	// static "./static"
+	eapp.StaticFS = staticFS
 
 	NewApp(cmdENV, cmdAppName)
 }
@@ -70,10 +74,26 @@ func NewApp(cmdENV, cmdAppName string) {
 
 	// http server
 	httpCfg := econfig.GetHttp()
+
+	aaa := econfig.GetAll()
+	fmt.Printf("aaa: %v\n", aaa)
+	fmt.Printf("httpCfg: %v\n", httpCfg)
 	if httpCfg["enable"] == true {
 		eserver.Init("http", httpCfg)
 	}
 
+	// test
+	fmt.Println("BaseDir:", eapp.BaseDir)
+	fmt.Println("HomeDir:", eapp.HomeDir)
+	fmt.Println("GoDir:", eapp.GoDir)
+	fmt.Println("PublicDir:", eapp.PublicDir)
+
+	fmt.Println("UserHomeDir:", eapp.UserHomeDir)
+	fmt.Println("UserHomeConfDir:", eapp.UserHomeConfDir)
+	fmt.Println("WorkDir:", eapp.WorkDir)
+	fmt.Println("DataDir:", eapp.DataDir)
+	fmt.Println("logDir:", elog.LogDir)
+	fmt.Println("TmpDir:", eapp.TmpDir)
 }
 
 func Run() {
@@ -96,11 +116,6 @@ func initDir() {
 	// if eapp.IsPord() {
 
 	// }
-
-	fmt.Println("BaseDir:", eapp.BaseDir)
-	fmt.Println("HomeDir:", eapp.HomeDir)
-	fmt.Println("GoDir:", eapp.GoDir)
-	fmt.Println("PublicDir:", eapp.PublicDir)
 }
 
 func initUserDir() {
@@ -165,10 +180,4 @@ func initUserDir() {
 	os.Setenv("TEMP", eapp.TmpDir)
 	os.Setenv("TMP", eapp.TmpDir)
 
-	fmt.Println("UserHomeDir:", eapp.UserHomeDir)
-	fmt.Println("UserHomeConfDir:", eapp.UserHomeConfDir)
-	fmt.Println("WorkDir:", eapp.WorkDir)
-	fmt.Println("DataDir:", eapp.DataDir)
-	fmt.Println("logDir:", logDir)
-	fmt.Println("TmpDir:", eapp.TmpDir)
 }

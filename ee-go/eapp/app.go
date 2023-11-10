@@ -1,20 +1,21 @@
 package eapp
 
 import (
+	"embed"
 	"os"
 	"os/exec"
 
 	"path/filepath"
 )
 
-const (
-	Version = "0.1.0"
-)
-
 var (
-	ENV = "dev" // 'dev' 'prod'
+	Version = "0.1.0"
+	ENV     = "dev" // 'dev' 'prod'
 	// progressBar  float64 // 0 ~ 100
 	// progressDesc string  // description
+
+	StaticFS embed.FS
+
 	HttpServer = false
 	AppName    = ""
 	Platform   = "pc" // pc | mobile | web

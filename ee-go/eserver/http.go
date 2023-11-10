@@ -1,7 +1,6 @@
 package eserver
 
 import (
-	"fmt"
 	"net"
 	"net/http"
 	"net/http/pprof"
@@ -36,7 +35,7 @@ var (
 )
 
 func CreateHttpServer(cfg map[string]any) {
-	fmt.Printf("http config: %#v\n", cfg)
+	//fmt.Printf("http config: %#v\n", cfg)
 	gin.SetMode(gin.ReleaseMode)
 	Router = gin.New()
 	Router.MaxMultipartMemory = 1024 * 1024 * 64
@@ -88,14 +87,15 @@ func run(ln net.Listener) {
 func setCors() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Header("Access-Control-Allow-Origin", "*")
-		ctx.Header("Access-Control-Allow-Credentials", "true")
-		ctx.Header("Access-Control-Allow-Headers", "origin, Content-Length, X-Custom-Header, Content-Type, Authorization")
-		ctx.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS")
+		ctx.Header("Access-Control-Allow-Headers", "*")
+		ctx.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
+		ctx.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, HEAD, UPDATE, OPTIONS")
 		ctx.Header("Access-Control-Allow-Private-Network", "true")
+		ctx.Header("Access-Control-Allow-Credentials", "true")
 
 		if ctx.Request.Method == "OPTIONS" {
 			ctx.Header("Access-Control-Max-Age", "3600")
-			ctx.AbortWithStatus(204)
+			ctx.AbortWithStatus(http.StatusNoContent)
 			return
 		}
 
@@ -153,12 +153,17 @@ func loadViews() {
 
 		ctx.Redirect(302, location.String())
 	})
+	// 没有路由即 404返回
+	// Router.NoRoute(func(g *gin.Context) {
+	// 	g.JSON(http.StatusNotFound, gin.H{"code": 404, "msg": fmt.Sprintf("not found '%s:%s'", g.Request.Method, g.Request.URL.Path)})
+	// })
 }
 
 func loadAssets() {
-	logo := filepath.Join(eapp.PublicDir, "images", "logo-32.png")
-	elog.Logger.Infof("[ee-go] logo : %s", logo)
+
 	Router.StaticFile("favicon.ico", filepath.Join(eapp.PublicDir, "images", "logo-32.png"))
+
+	// 所有/assets/**开头的都是静态资源文件
 	Router.Static("/public/", eapp.PublicDir)
 
 	// [todo] 后续可以考虑做成多目录

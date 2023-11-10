@@ -1,20 +1,108 @@
 package eutil
 
-func MapMerge(dest map[string]interface{}, src map[string]interface{}) {
-	for k, v := range src {
-		if _, ok := dest[k]; ok {
-			// 如果键已经存在，则需要进行特殊处理
-			switch dest[k].(type) {
-			case map[string]interface{}:
-				// 如果目标map中该键对应的值也是map类型，则递归调用mergeMaps函数
-				MapMerge(dest[k].(map[string]interface{}), v.(map[string]interface{}))
-			default:
-				// 否则，直接覆盖目标map中的值
-				dest[k] = v
+import (
+	"fmt"
+	"strings"
+)
+
+func Mapserge(src, tgt map[string]any, itgt map[any]any) {
+	mergeMaps(src, tgt, itgt)
+}
+
+func mergeMaps(src, tgt map[string]any, itgt map[any]any) {
+	for sk, sv := range src {
+		tk := keyExists(sk, tgt)
+		if tk == "" {
+			// elog.logger.Debug("", "tk", "\"\"", fmt.Sprintf("tgt[%s]", sk), sv)
+			tgt[sk] = sv
+			if itgt != nil {
+				itgt[sk] = sv
 			}
-		} else {
-			// 如果键不存在，则直接赋值
-			dest[k] = v
+			continue
+		}
+
+		tv, ok := tgt[tk]
+		if !ok {
+			// elog.logger.Debug("", fmt.Sprintf("ok[%s]", tk), false, fmt.Sprintf("tgt[%s]", sk), sv)
+			tgt[sk] = sv
+			if itgt != nil {
+				itgt[sk] = sv
+			}
+			continue
+		}
+
+		// svType := reflect.TypeOf(sv)
+		// tvType := reflect.TypeOf(tv)
+		// elog.logger.Debug(
+		// 	"processing",
+		// 	"key", sk,
+		// 	"st", svType,
+		// 	"tt", tvType,
+		// 	"sv", sv,
+		// 	"tv", tv,
+		// )
+
+		switch ttv := tv.(type) {
+		case map[any]any:
+			//elog.logger.Debug("merging maps (must convert)")
+			tsv, ok := sv.(map[any]any)
+			if !ok {
+				// elog.logger.Error(
+				// 	"Could not cast sv to map[any]any",
+				// 	"key", sk,
+				// 	"st", svType,
+				// 	"tt", tvType,
+				// 	"sv", sv,
+				// 	"tv", tv,
+				// )
+				continue
+			}
+
+			ssv := castToMapStringInterface(tsv)
+			stv := castToMapStringInterface(ttv)
+			mergeMaps(ssv, stv, ttv)
+		case map[string]any:
+			//elog.logger.Debug("merging maps")
+			tsv, ok := sv.(map[string]any)
+			if !ok {
+				// elog.logger.Error(
+				// 	"Could not cast sv to map[string]any",
+				// 	"key", sk,
+				// 	"st", svType,
+				// 	"tt", tvType,
+				// 	"sv", sv,
+				// 	"tv", tv,
+				// )
+				continue
+			}
+			mergeMaps(tsv, ttv, nil)
+		default:
+			//elog.logger.Debug("setting value")
+			tgt[tk] = sv
+			if itgt != nil {
+				itgt[tk] = sv
+			}
 		}
 	}
+}
+
+func keyExists(k string, m map[string]any) string {
+	lk := strings.ToLower(k)
+	for mk := range m {
+		lmk := strings.ToLower(mk)
+		if lmk == lk {
+			return mk
+		}
+	}
+	return ""
+}
+
+func castToMapStringInterface(
+	src map[any]any,
+) map[string]any {
+	tgt := map[string]any{}
+	for k, v := range src {
+		tgt[fmt.Sprintf("%v", k)] = v
+	}
+	return tgt
 }

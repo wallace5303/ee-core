@@ -12,9 +12,9 @@ const (
 	ExitPackageFile           = -7
 
 	// config
-	ExitConfigDefaultFile = -11
-	ExitConfigDevFile     = -12
-	ExitConfigProdFile    = -13
+	ExitConfigFile         = -11
+	ExitConfigFileFS       = -12
+	ExitConfigFileNotExist = -13
 
 	// log
 	ExitLogConfigErr   = -21
