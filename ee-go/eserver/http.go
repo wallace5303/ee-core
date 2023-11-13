@@ -2,6 +2,7 @@ package eserver
 
 import (
 	"fmt"
+	"io/fs"
 	"net"
 	"net/http"
 	"net/http/pprof"
@@ -13,6 +14,7 @@ import (
 	"time"
 
 	"ee-go/eapp"
+	"ee-go/econfig"
 	"ee-go/eerror"
 	"ee-go/elog"
 	"ee-go/eutil"
@@ -33,10 +35,14 @@ var (
 
 	Router *gin.Engine
 	//Context *gin.Context
+
+	Conf map[string]any
 )
 
 func CreateHttpServer(cfg map[string]any) {
+	Conf = cfg
 	//fmt.Printf("http config: %#v\n", cfg)
+
 	gin.SetMode(gin.ReleaseMode)
 	Router = gin.New()
 	Router.MaxMultipartMemory = 1024 * 1024 * 64
@@ -50,13 +56,13 @@ func CreateHttpServer(cfg map[string]any) {
 	loadAssets()
 	loadViews()
 
-	protocol := cfg["protocol"].(string)
-	hostname := cfg["hostname"].(string)
-	if cfg["network"] == true {
+	protocol := Conf["protocol"].(string)
+	hostname := Conf["hostname"].(string)
+	if Conf["network"] == true {
 		hostname = "0.0.0.0"
 	}
 	port := eapp.HttpPort
-	cfgPort := int(cfg["port"].(float64))
+	cfgPort := int(Conf["port"].(float64))
 	if cfgPort > 0 {
 		port = cfgPort
 	}
@@ -176,16 +182,31 @@ func loadViews() {
 }
 
 func loadAssets() {
+	staticCfg := econfig.GetStatic()
+	if staticCfg["enable"] == true {
+		fmt.Println("http dist Dir:", staticCfg["dist"].(string))
+		HttpFS := http.FS(eapp.StaticFS)
 
-	Router.StaticFile("favicon.ico", filepath.Join(eapp.PublicDir, "images", "logo-32.png"))
+		distFsys, _ := fs.Sub(eapp.StaticFS, staticCfg["dist"].(string))
+		distHttpFS := http.FS(distFsys)
+		// fileServer := http.FileServer(http.FS(fsys))
 
-	// 所有/assets/**开头的都是静态资源文件
-	Router.Static("/public/", eapp.PublicDir)
+		Router.StaticFileFS("favicon.ico", "public/images/logo-32.png", HttpFS)
 
-	// [todo] 后续可以考虑做成多目录
-	Router.Static("/app/", filepath.Join(eapp.PublicDir, "dist"))
-	Router.Static("/browser/", filepath.Join(eapp.PublicDir, "dist"))
-	Router.Static("/mobile/", filepath.Join(eapp.PublicDir, "dist"))
+		// [todo] 后续可以考虑做成多目录
+		Router.StaticFS("/app/", distHttpFS)
+		Router.StaticFS("/browser/", distHttpFS)
+		Router.StaticFS("/mobile/", distHttpFS)
+
+	} else {
+		Router.StaticFile("favicon.ico", filepath.Join(eapp.PublicDir, "images", "logo-32.png"))
+
+		// [todo] 后续可以考虑做成多目录
+		Router.Static("/app/", filepath.Join(eapp.PublicDir, "dist"))
+		Router.Static("/browser/", filepath.Join(eapp.PublicDir, "dist"))
+		Router.Static("/mobile/", filepath.Join(eapp.PublicDir, "dist"))
+	}
+
 }
 
 // get platform

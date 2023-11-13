@@ -40,7 +40,7 @@ func Init(staticFS embed.FS) {
 	cmdENV = *environment
 	cmdAppName = *appname
 
-	// static "./static"
+	// static "./public"
 	eapp.StaticFS = staticFS
 
 	NewApp(cmdENV, cmdAppName)
@@ -63,10 +63,11 @@ func NewApp(cmdENV, cmdAppName string) {
 		eapp.AppName = pkg.Name
 	}
 
-	initUserDir()
-
 	// init config
 	econfig.Init()
+
+	// init user dir
+	initUserDir()
 
 	// init logger
 	logCfg := econfig.GetLogger()
@@ -106,15 +107,10 @@ func initDir() {
 	if eapp.IsPord() {
 		eapp.GoDir = eapp.BaseDir
 	}
-
-	eapp.PublicDir = filepath.Join(eapp.HomeDir, "public")
-	// [todo]
-	// if eapp.IsPord() {
-
-	// }
 }
 
 func initUserDir() {
+	eapp.PublicDir = filepath.Join(eapp.HomeDir, "public")
 	eapp.UserHomeDir, _ = eos.GetUserHomeDir()
 	eapp.UserHomeConfDir = filepath.Join(eapp.UserHomeDir, ".config", eapp.AppName)
 	if !eutil.FileIsExist(eapp.UserHomeConfDir) {

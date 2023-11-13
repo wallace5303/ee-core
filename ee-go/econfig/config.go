@@ -35,6 +35,8 @@ func Init() {
 		defaultCfg = ReadJsonFromStaticFS("public/config/config.default.json")
 		prodCfg := ReadJsonFromStaticFS("public/config/config.prod.json")
 
+		// [todo] read other config
+
 		// merge
 		eutil.Mapserge(prodCfg, defaultCfg, nil)
 	}
@@ -71,6 +73,15 @@ func GetHttp() map[string]any {
 	}
 
 	return httpCfg
+}
+
+func GetStatic() map[string]any {
+	cfg := Vip.Get("static")
+	logCfg, ok := cfg.(map[string]any)
+	if !ok {
+		eerror.ThrowWithCode("Get static config error !", eerror.ExitLogConfigErr)
+	}
+	return logCfg
 }
 
 // Read config json
