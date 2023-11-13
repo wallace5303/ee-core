@@ -26,7 +26,7 @@ var (
 	cmdAppName = ""
 )
 
-func Init(staticFS embed.FS) {
+func New(staticFS embed.FS) {
 	banner := figure.NewColorFigure("ElectronEgg", "standard", "green", true)
 	fmt.Println("\n" + banner.String())
 
@@ -43,10 +43,10 @@ func Init(staticFS embed.FS) {
 	// static "./public"
 	eruntime.StaticFS = staticFS
 
-	NewApp(cmdENV, cmdAppName)
+	InitApp(cmdENV, cmdAppName)
 }
 
-func NewApp(cmdENV, cmdAppName string) {
+func InitApp(cmdENV, cmdAppName string) {
 
 	eruntime.ENV = cmdENV
 	eruntime.AppName = cmdAppName
