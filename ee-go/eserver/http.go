@@ -13,10 +13,10 @@ import (
 	"strings"
 	"time"
 
-	"ee-go/eapp"
 	"ee-go/econfig"
 	"ee-go/eerror"
 	"ee-go/elog"
+	"ee-go/eruntime"
 	"ee-go/eutil"
 
 	"github.com/gin-contrib/gzip"
@@ -61,7 +61,7 @@ func CreateHttpServer(cfg map[string]any) {
 	if Conf["network"] == true {
 		hostname = "0.0.0.0"
 	}
-	port := eapp.HttpPort
+	port := eruntime.HttpPort
 	cfgPort := int(Conf["port"].(float64))
 	if cfgPort > 0 {
 		port = cfgPort
@@ -78,7 +78,7 @@ func CreateHttpServer(cfg map[string]any) {
 	url := protocol + address
 	pid := os.Getpid()
 	elog.Logger.Infof("[ee-go] http server %s, pid:%d", url, pid)
-	eapp.HttpServerIsRunning = true
+	eruntime.HttpServerIsRunning = true
 
 	go run(ln)
 }
@@ -126,7 +126,7 @@ func setSession() gin.HandlerFunc {
 		HttpOnly: true,
 	})
 
-	return sessions.Sessions(eapp.AppName, cookieStore)
+	return sessions.Sessions(eruntime.AppName, cookieStore)
 }
 
 func loadDebug() {
@@ -138,15 +138,6 @@ func loadDebug() {
 }
 
 func loadViews() {
-	// static
-	// fsys, _ := fs.Sub(eapp.StaticFS, "static")
-	// fileServer := http.FileServer(http.FS(fsys))
-	// handler := WrapStaticHandler(fileServer)
-	// router.GET("/", handler)
-	// router.GET("/favicon.ico", handler)
-	// router.GET("/config.js", handler)
-	// // 所有/assets/**开头的都是静态资源文件
-	// router.GET("/assets/*file", handler)
 
 	// home page
 	Router.GET("/", func(ctx *gin.Context) {
@@ -182,12 +173,13 @@ func loadViews() {
 }
 
 func loadAssets() {
+
 	staticCfg := econfig.GetStatic()
 	if staticCfg["enable"] == true {
 		fmt.Println("http dist Dir:", staticCfg["dist"].(string))
-		HttpFS := http.FS(eapp.StaticFS)
+		HttpFS := http.FS(eruntime.StaticFS)
 
-		distFsys, _ := fs.Sub(eapp.StaticFS, staticCfg["dist"].(string))
+		distFsys, _ := fs.Sub(eruntime.StaticFS, staticCfg["dist"].(string))
 		distHttpFS := http.FS(distFsys)
 		// fileServer := http.FileServer(http.FS(fsys))
 
@@ -199,12 +191,12 @@ func loadAssets() {
 		Router.StaticFS("/mobile/", distHttpFS)
 
 	} else {
-		Router.StaticFile("favicon.ico", filepath.Join(eapp.PublicDir, "images", "logo-32.png"))
+		Router.StaticFile("favicon.ico", filepath.Join(eruntime.PublicDir, "images", "logo-32.png"))
 
 		// [todo] 后续可以考虑做成多目录
-		Router.Static("/app/", filepath.Join(eapp.PublicDir, "dist"))
-		Router.Static("/browser/", filepath.Join(eapp.PublicDir, "dist"))
-		Router.Static("/mobile/", filepath.Join(eapp.PublicDir, "dist"))
+		Router.Static("/app/", filepath.Join(eruntime.PublicDir, "dist"))
+		Router.Static("/browser/", filepath.Join(eruntime.PublicDir, "dist"))
+		Router.Static("/mobile/", filepath.Join(eruntime.PublicDir, "dist"))
 	}
 
 }
@@ -231,8 +223,8 @@ func GetPlatform(ctx *gin.Context) string {
 	}
 }
 
-// port is open
-func isPortOpen(port string) bool {
+// net port is open
+func IsPortOpen(port string) bool {
 	timeout := time.Second
 	conn, err := net.DialTimeout("tcp", net.JoinHostPort("127.0.0.1", port), timeout)
 	if nil != err {

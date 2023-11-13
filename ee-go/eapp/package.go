@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"ee-go/eerror"
+	"ee-go/eruntime"
 	"ee-go/eutil"
 )
 
@@ -36,7 +37,11 @@ func NewPackage() *Package {
 func ReadPackage() (ret *Package) {
 	ret = NewPackage()
 
-	pkgPath := filepath.Join(HomeDir, "package.json")
+	// staticCfg := econfig.GetStatic()
+	// if staticCfg["enable"] == true {
+
+	// }
+	pkgPath := filepath.Join(eruntime.HomeDir, "package.json")
 	if !eutil.FileIsExist(pkgPath) {
 		eerror.ThrowWithCode(fmt.Sprintf("Electon %s does not exist!", pkgPath), eerror.ExitPackageFile)
 		return

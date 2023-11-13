@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"ee-go/eapp"
 	"ee-go/eerror"
+	"ee-go/eruntime"
 	"ee-go/eutil"
 
 	"github.com/spf13/viper"
@@ -20,9 +20,9 @@ var (
 func Init() {
 	var defaultCfg map[string]any
 
-	if eapp.IsDev() {
-		defaultConfigPath := filepath.Join(eapp.GoDir, "config", "config.default.json")
-		devConfigPath := filepath.Join(eapp.GoDir, "config", "config.local.json")
+	if eruntime.IsDev() {
+		defaultConfigPath := filepath.Join(eruntime.GoDir, "config", "config.default.json")
+		devConfigPath := filepath.Join(eruntime.GoDir, "config", "config.local.json")
 
 		defaultCfg = ReadJson(defaultConfigPath)
 		devCfg := ReadJson(devConfigPath)
@@ -31,7 +31,7 @@ func Init() {
 		eutil.Mapserge(devCfg, defaultCfg, nil)
 	}
 
-	if eapp.IsPord() {
+	if eruntime.IsPord() {
 		defaultCfg = ReadJsonFromStaticFS("public/config/config.default.json")
 		prodCfg := ReadJsonFromStaticFS("public/config/config.prod.json")
 
@@ -110,7 +110,7 @@ func ReadJson(f string) map[string]any {
 // Read config json from StaticFS (prod)
 func ReadJsonFromStaticFS(f string) map[string]any {
 	var ret map[string]any
-	data, err := eapp.StaticFS.ReadFile(f)
+	data, err := eruntime.StaticFS.ReadFile(f)
 	if nil != err {
 		msg := fmt.Sprintf("Read file: %s failed: %s\n", f, err)
 		eerror.ThrowWithCode(msg, eerror.ExitConfigFileFS)

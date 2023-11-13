@@ -1,42 +1,81 @@
 package eruntime
 
 import (
+	"embed"
+	"fmt"
 	"os"
-	"os/signal"
-	"sync"
-	"syscall"
-	"time"
-
-	"ee-go/eapp"
-	"ee-go/elog"
+	"os/exec"
+	"path/filepath"
 )
 
 var (
-	exitLock = sync.Mutex{}
+	Version = "0.1.0"
+	ENV     = "dev" // 'dev' 'prod'
+	// progressBar  float64 // 0 ~ 100
+	// progressDesc string  // description
+
+	StaticFS embed.FS
+
+	HttpServer = false
+	AppName    = ""
+	Platform   = "pc" // pc | mobile | web
+	IsExiting  = false
 )
 
-func Init() {
-	sigCh := make(chan os.Signal)
-	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-	sig := <-sigCh
+var (
+	BaseDir, _      = os.Getwd()
+	HomeDir         string // electron-egg home directory
+	GoDir           string // electron-egg go directory
+	PublicDir       string // electron-egg public directory
+	UserHomeDir     string // OS user home directory
+	UserHomeConfDir string // OS user home config directory
+	WorkDir         string // App working directory
+	DataDir         string // data directory
+	TmpDir          string // tmp directory
+)
 
-	elog.Logger.Infof("[ee-go] received signal: %s", sig)
-	Close()
+var (
+	HttpPort            = 7073
+	HttpServerIsRunning = false
+)
+
+func InitDir() {
+	HomeDir = filepath.Join(BaseDir, "..")
+	if IsPord() {
+		HomeDir = BaseDir
+	}
+
+	GoDir = filepath.Join(HomeDir, "go")
+	if IsPord() {
+		GoDir = BaseDir
+	}
 }
 
-// Close process
-func Close() (exitCode int) {
-	exitLock.Lock()
-	defer exitLock.Unlock()
-	eapp.IsExiting = true
-	elog.Logger.Infof("[ee-go] process is exiting...")
+// Pwd gets the path of current working directory.
+func IsPord() bool {
+	return (ENV == "prod")
+}
 
-	// [todo] wait other
-	go func() {
-		time.Sleep(3000 * time.Millisecond)
-		eapp.IsExiting = false
-		elog.Logger.Infof("[ee-go] process has exited!")
-		os.Exit(0)
-	}()
-	return
+func IsDev() bool {
+	return (ENV == "dev")
+}
+
+func Pwd() string {
+	file, _ := exec.LookPath(os.Args[0])
+	pwd, _ := filepath.Abs(file)
+
+	return filepath.Dir(pwd)
+}
+
+func Debug() {
+	fmt.Println("BaseDir:", BaseDir)
+	fmt.Println("HomeDir:", HomeDir)
+	fmt.Println("GoDir:", GoDir)
+	fmt.Println("PublicDir:", PublicDir)
+
+	fmt.Println("UserHomeDir:", UserHomeDir)
+	fmt.Println("UserHomeConfDir:", UserHomeConfDir)
+	fmt.Println("WorkDir:", WorkDir)
+	fmt.Println("DataDir:", DataDir)
+	fmt.Println("TmpDir:", TmpDir)
 }

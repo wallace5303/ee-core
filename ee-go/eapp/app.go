@@ -1,56 +1,42 @@
 package eapp
 
 import (
-	"embed"
 	"os"
-	"os/exec"
+	"os/signal"
+	"sync"
+	"syscall"
+	"time"
 
-	"path/filepath"
+	"ee-go/elog"
+	"ee-go/eruntime"
 )
 
 var (
-	Version = "0.1.0"
-	ENV     = "dev" // 'dev' 'prod'
-	// progressBar  float64 // 0 ~ 100
-	// progressDesc string  // description
-
-	StaticFS embed.FS
-
-	HttpServer = false
-	AppName    = ""
-	Platform   = "pc" // pc | mobile | web
-	IsExiting  = false
+	exitLock = sync.Mutex{}
 )
 
-var (
-	BaseDir, _      = os.Getwd()
-	HomeDir         string // electron-egg home directory
-	GoDir           string // electron-egg go directory
-	PublicDir       string // electron-egg public directory
-	UserHomeDir     string // OS user home directory
-	UserHomeConfDir string // OS user home config directory
-	WorkDir         string // App working directory
-	DataDir         string // data directory
-	TmpDir          string // tmp directory
-)
+func Run() {
+	sigCh := make(chan os.Signal)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	sig := <-sigCh
 
-var (
-	HttpPort            = 7073
-	HttpServerIsRunning = false
-)
-
-// Pwd gets the path of current working directory.
-func IsPord() bool {
-	return (ENV == "prod")
+	elog.Logger.Infof("[ee-go] received signal: %s", sig)
+	Close()
 }
 
-func IsDev() bool {
-	return (ENV == "dev")
-}
+// Close process
+func Close() (exitCode int) {
+	exitLock.Lock()
+	defer exitLock.Unlock()
+	eruntime.IsExiting = true
+	elog.Logger.Infof("[ee-go] process is exiting...")
 
-func Pwd() string {
-	file, _ := exec.LookPath(os.Args[0])
-	pwd, _ := filepath.Abs(file)
-
-	return filepath.Dir(pwd)
+	// [todo] wait other
+	go func() {
+		time.Sleep(3000 * time.Millisecond)
+		eruntime.IsExiting = false
+		elog.Logger.Infof("[ee-go] process has exited!")
+		os.Exit(0)
+	}()
+	return
 }
