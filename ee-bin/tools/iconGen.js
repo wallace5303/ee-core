@@ -52,14 +52,14 @@ class IconGen {
         }
       }
     } catch (e) {
-      console.error("[ee-core] [tools/iconGen] args: ", args);
-      console.error("[ee-core] [tools/iconGen] ERROR: ", e);
+      console.error("[ee-bin] [icon-gen] args: ", args);
+      console.error("[ee-bin] [icon-gen] ERROR: ", e);
       throw new Error("参数错误!!");
     }
     this.params = params;
 
     // ---> 组装参数
-    console.log("[ee-core] [tools/iconGen] icon 当前路径: ", process.cwd());
+    console.log("[ee-bin] [icon-gen] icon 当前路径: ", process.cwd());
     this.input = path.join(process.cwd(), params.input);
     this.output = path.join(process.cwd(), params.output);
     this.imagesDir = path.join(process.cwd(), params.imagesDir);
@@ -82,9 +82,9 @@ class IconGen {
    * 生成图标
    */
   generateIcons() {
-    console.log("[ee-core] [tools/iconGen] iconGen 开始处理生成logo图片");
+    console.log("[ee-bin] [icon-gen] iconGen 开始处理生成logo图片");
     if (!fs.existsSync(this.input)) {
-      console.error("[ee-core] [tools/iconGen] input: ", this.input);
+      console.error("[ee-bin] [icon-gen] input: ", this.input);
       throw new Error("输入的图片不存在或路径错误");
     }
     if (!fs.existsSync(this.output)) {
@@ -98,13 +98,13 @@ class IconGen {
     }
     icongen(this.input, this.output, this.iconOptions)
       .then((results) => {
-        console.log("[ee-core] [tools/iconGen] iconGen 已生成下方图片资源");
+        console.log("[ee-bin] [icon-gen] iconGen 已生成下方图片资源");
         console.log(results);
         this._renameForEE(results);
       })
       .catch((err) => {
         console.error(err);
-        throw new Error("[ee-core] [tools/iconGen] iconGen 生成失败!");
+        throw new Error("[ee-bin] [icon-gen] iconGen 生成失败!");
       });
   }
 
@@ -134,7 +134,7 @@ class IconGen {
    * 为生成的资源重命名 (logo-32.png -> 32x32.png)
    */    
   _renameForEE(filesPath) {
-    console.log("[ee-core] [tools/iconGen] iconGen 开始重新命名logo图片资源");
+    console.log("[ee-bin] [icon-gen] iconGen 开始重新命名logo图片资源");
     try {
       const len = filesPath.length;
       for (let i = 0; i < len; i++) {
@@ -165,9 +165,9 @@ class IconGen {
           console.log(`${filename}${extname} --> ${newName} 重命名成功!`);
         }
       }
-      console.log("[ee-core] [tools/iconGen] iconGen 资源处理完成!");
+      console.log("[ee-bin] [icon-gen] iconGen 资源处理完成!");
     } catch (e) {
-      console.error("[ee-core] [tools/iconGen] ERROR: ", e);
+      console.error("[ee-bin] [icon-gen] ERROR: ", e);
       throw new Error("重命名logo图片资源失败!!");
     }
   }

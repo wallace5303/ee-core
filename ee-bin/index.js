@@ -3,7 +3,20 @@
 const { program } = require('commander');
 
 /**
- * rd - Moves front-end resources to a specified directory
+ * move - Moves resources
+ */
+program
+  .command('move')
+  .description('Move multip resources')
+  .option('--config <folder>', 'config file', './electron/config/bin.js')
+  .option('--flag <flag>', 'Custom flag')
+  .action(function() {
+    const moveScript = require('./tools/move');
+    moveScript.run(this.opts());
+  });
+
+/**
+ * (deprecated) rd - Moves front-end resources to a specified directory
  */
 program
   .command('rd')

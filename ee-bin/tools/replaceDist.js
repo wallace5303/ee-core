@@ -16,6 +16,9 @@ const Utils = require('../lib/utils');
    * 执行
    */  
   run(options = {}) {
+    const warnTips = chalk.bgYellow('Warning') + ': This command is deprecated. Use move instead !';
+    console.log(warnTips);
+
     console.log('[ee-bin] [rd] Start moving resources');
     const homeDir = process.cwd();
     let { dist, target, config } = options;
