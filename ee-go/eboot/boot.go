@@ -14,6 +14,7 @@ import (
 	"ee-go/eos"
 	"ee-go/eruntime"
 	"ee-go/eserver"
+	"ee-go/estatic"
 	"ee-go/eutil"
 
 	figure "github.com/common-nighthawk/go-figure"
@@ -41,7 +42,7 @@ func New(staticFS embed.FS) {
 	cmdAppName = *appname
 
 	// static "./public"
-	eruntime.StaticFS = staticFS
+	estatic.StaticFS = staticFS
 
 	InitApp(cmdENV, cmdAppName)
 }
@@ -59,10 +60,11 @@ func InitApp(cmdENV, cmdAppName string) {
 
 	if eruntime.AppName == "" {
 		pkg := eapp.ReadPackage()
-		if pkg.Name == "" {
+		pkgName := pkg["name"].(string)
+		if pkgName == "" {
 			eerror.ThrowWithCode("The app name is required!", eerror.ExitAppNameIsEmpty)
 		}
-		eruntime.AppName = pkg.Name
+		eruntime.AppName = pkgName
 	}
 
 	// init user dir

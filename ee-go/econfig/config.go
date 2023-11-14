@@ -8,6 +8,7 @@ import (
 
 	"ee-go/eerror"
 	"ee-go/eruntime"
+	"ee-go/estatic"
 	"ee-go/eutil"
 
 	"github.com/spf13/viper"
@@ -19,27 +20,26 @@ var (
 
 func Init() {
 	var defaultCfg map[string]any
+	var envCfg map[string]any
+
+	if eruntime.IsPord() {
+		defaultCfg = estatic.ReadConfigJson("public/config/config.default.json")
+		envCfg = estatic.ReadConfigJson("public/config/config.prod.json")
+
+		// [todo] read other config
+
+	}
 
 	if eruntime.IsDev() {
 		defaultConfigPath := filepath.Join(eruntime.GoDir, "config", "config.default.json")
 		devConfigPath := filepath.Join(eruntime.GoDir, "config", "config.local.json")
 
 		defaultCfg = ReadJson(defaultConfigPath)
-		devCfg := ReadJson(devConfigPath)
-
-		// merge
-		eutil.Mapserge(devCfg, defaultCfg, nil)
+		envCfg = ReadJson(devConfigPath)
 	}
 
-	if eruntime.IsPord() {
-		defaultCfg = ReadJsonFromStaticFS("public/config/config.default.json")
-		prodCfg := ReadJsonFromStaticFS("public/config/config.prod.json")
-
-		// [todo] read other config
-
-		// merge
-		eutil.Mapserge(prodCfg, defaultCfg, nil)
-	}
+	// merge
+	eutil.Mapserge(envCfg, defaultCfg, nil)
 
 	Vip = viper.New()
 	for key, value := range defaultCfg {
@@ -102,23 +102,6 @@ func ReadJson(f string) map[string]any {
 	if nil != err {
 		msg := fmt.Sprintf("unmarshal file: %s failed: %s", f, err)
 		eerror.ThrowWithCode(msg, eerror.ExitConfigFile)
-	}
-
-	return ret
-}
-
-// Read config json from StaticFS (prod)
-func ReadJsonFromStaticFS(f string) map[string]any {
-	var ret map[string]any
-	data, err := eruntime.StaticFS.ReadFile(f)
-	if nil != err {
-		msg := fmt.Sprintf("Read file: %s failed: %s\n", f, err)
-		eerror.ThrowWithCode(msg, eerror.ExitConfigFileFS)
-	}
-	err = json.Unmarshal(data, &ret)
-	if nil != err {
-		msg := fmt.Sprintf("unmarshal file: %s failed: %s", f, err)
-		eerror.ThrowWithCode(msg, eerror.ExitConfigFileFS)
 	}
 
 	return ret
