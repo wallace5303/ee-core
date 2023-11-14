@@ -1,7 +1,6 @@
 package eruntime
 
 import (
-	"embed"
 	"fmt"
 	"os"
 	"os/exec"
@@ -13,8 +12,6 @@ var (
 	ENV     = "dev" // 'dev' 'prod'
 	// progressBar  float64 // 0 ~ 100
 	// progressDesc string  // description
-
-	StaticFS embed.FS
 
 	HttpServer = false
 	AppName    = ""

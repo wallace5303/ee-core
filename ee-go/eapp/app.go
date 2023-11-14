@@ -25,7 +25,7 @@ func Run() {
 }
 
 // Close process
-func Close() (exitCode int) {
+func Close() {
 	exitLock.Lock()
 	defer exitLock.Unlock()
 	eruntime.IsExiting = true
@@ -33,10 +33,9 @@ func Close() (exitCode int) {
 
 	// [todo] wait other
 	go func() {
-		time.Sleep(3000 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 		eruntime.IsExiting = false
 		elog.Logger.Infof("[ee-go] process has exited!")
 		os.Exit(0)
 	}()
-	return
 }

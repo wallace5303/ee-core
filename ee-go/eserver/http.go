@@ -17,6 +17,7 @@ import (
 	"ee-go/eerror"
 	"ee-go/elog"
 	"ee-go/eruntime"
+	"ee-go/estatic"
 	"ee-go/eutil"
 
 	"github.com/gin-contrib/gzip"
@@ -173,13 +174,11 @@ func loadViews() {
 }
 
 func loadAssets() {
-
 	staticCfg := econfig.GetStatic()
 	if staticCfg["enable"] == true {
-		fmt.Println("http dist Dir:", staticCfg["dist"].(string))
-		HttpFS := http.FS(eruntime.StaticFS)
+		HttpFS := http.FS(estatic.StaticFS)
 
-		distFsys, _ := fs.Sub(eruntime.StaticFS, staticCfg["dist"].(string))
+		distFsys, _ := fs.Sub(estatic.StaticFS, staticCfg["dist"].(string))
 		distHttpFS := http.FS(distFsys)
 		// fileServer := http.FileServer(http.FS(fsys))
 

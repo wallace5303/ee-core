@@ -35,18 +35,23 @@ import (
 // 	}
 // }
 
-// get electron package.json
+// get package.json
 func ReadPackage() map[string]any {
 	var ret map[string]any
 
-	staticCfg := econfig.GetStatic()
-	if staticCfg["enable"] == true {
-		pkgData, err := estatic.ReadJson("public/package.json")
-		if err != nil {
-			eerror.ThrowWithCode("StaticFS package.json does not exist!", eerror.ExitPackageFile)
+	if eruntime.IsPord() {
+		staticCfg := econfig.GetStatic()
+		if staticCfg["enable"] == true {
+			pkgData, err := estatic.ReadJson("public/package.json")
+			if err != nil {
+				eerror.ThrowWithCode("StaticFS package.json does not exist!", eerror.ExitPackageFile)
+			}
+			ret = pkgData
 		}
-		ret = pkgData
-	} else {
+	}
+
+	// read from external file
+	if len(ret) == 0 {
 		pkgPath := filepath.Join(eruntime.HomeDir, "package.json")
 		if !eutil.FileIsExist(pkgPath) {
 			eerror.ThrowWithCode(fmt.Sprintf("file %s does not exist!", pkgPath), eerror.ExitPackageFile)

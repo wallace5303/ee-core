@@ -24,7 +24,6 @@ var (
 	cmdENV = "prod" // 'dev' 'prod'
 	// progressBar  float64 // 0 ~ 100
 	// progressDesc string  // description
-	cmdAppName = ""
 )
 
 func New(staticFS embed.FS) {
@@ -32,40 +31,32 @@ func New(staticFS embed.FS) {
 	fmt.Println("\n" + banner.String())
 
 	environment := flag.String("env", "prod", "dev/prod")
-	appname := flag.String("appname", "", "app name")
 	flag.Parse()
-
 	fmt.Println("cmdENV:", *environment)
-	fmt.Println("cmdAppName:", *appname)
 
 	cmdENV = *environment
-	cmdAppName = *appname
 
 	// static "./public"
 	estatic.StaticFS = staticFS
 
-	InitApp(cmdENV, cmdAppName)
+	initApp(cmdENV)
 }
 
-func InitApp(cmdENV, cmdAppName string) {
-
+func initApp(cmdENV string) {
 	eruntime.ENV = cmdENV
-	eruntime.AppName = cmdAppName
 
-	// [todo] 是否检查 core.exe 文件的位置是否正确（ee\resources\extraResources）
+	// init dir
 	eruntime.InitDir()
 
 	// init config
 	econfig.Init()
 
-	if eruntime.AppName == "" {
-		pkg := eapp.ReadPackage()
-		pkgName := pkg["name"].(string)
-		if pkgName == "" {
-			eerror.ThrowWithCode("The app name is required!", eerror.ExitAppNameIsEmpty)
-		}
-		eruntime.AppName = pkgName
+	pkg := eapp.ReadPackage()
+	pkgName := pkg["name"].(string)
+	if pkgName == "" {
+		eerror.ThrowWithCode("The app name is required!", eerror.ExitAppNameIsEmpty)
 	}
+	eruntime.AppName = pkgName
 
 	// init user dir
 	initUserDir()
@@ -82,10 +73,6 @@ func InitApp(cmdENV, cmdAppName string) {
 
 	// test
 	eruntime.Debug()
-}
-
-func Run() {
-	eapp.Run()
 }
 
 func initUserDir() {
@@ -150,5 +137,8 @@ func initUserDir() {
 	os.Setenv("TMPDIR", eruntime.TmpDir)
 	os.Setenv("TEMP", eruntime.TmpDir)
 	os.Setenv("TMP", eruntime.TmpDir)
+}
 
+func Run() {
+	eapp.Run()
 }

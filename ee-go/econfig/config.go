@@ -25,12 +25,9 @@ func Init() {
 	if eruntime.IsPord() {
 		defaultCfg = estatic.ReadConfigJson("public/config/config.default.json")
 		envCfg = estatic.ReadConfigJson("public/config/config.prod.json")
-
-		// [todo] read other config
-
 	}
 
-	if eruntime.IsDev() {
+	if len(defaultCfg) == 0 || len(envCfg) == 0 {
 		defaultConfigPath := filepath.Join(eruntime.GoDir, "config", "config.default.json")
 		devConfigPath := filepath.Join(eruntime.GoDir, "config", "config.local.json")
 
@@ -45,7 +42,7 @@ func Init() {
 	for key, value := range defaultCfg {
 		Vip.Set(key, value)
 	}
-	//fmt.Printf("config : %v", Vip.AllSettings())
+	fmt.Printf("defaultCfg : %v", Vip.AllSettings())
 }
 
 func Get(key string) any {
@@ -60,7 +57,7 @@ func GetLogger() map[string]any {
 	cfg := Vip.Get("logger")
 	logCfg, ok := cfg.(map[string]any)
 	if !ok {
-		eerror.ThrowWithCode("Get logger config error !", eerror.ExitLogConfigErr)
+		eerror.ThrowWithCode("Get logger config error !", eerror.ExitConfigLogErr)
 	}
 	return logCfg
 }
@@ -69,7 +66,7 @@ func GetHttp() map[string]any {
 	cfg := Vip.Get("http")
 	httpCfg, ok := cfg.(map[string]any)
 	if !ok {
-		eerror.ThrowWithCode("Get http config error !", eerror.ExitHttpConfigErr)
+		eerror.ThrowWithCode("Get http config error !", eerror.ExitConfigHttpErr)
 	}
 
 	return httpCfg
@@ -77,11 +74,11 @@ func GetHttp() map[string]any {
 
 func GetStatic() map[string]any {
 	cfg := Vip.Get("static")
-	logCfg, ok := cfg.(map[string]any)
+	staticCfg, ok := cfg.(map[string]any)
 	if !ok {
-		eerror.ThrowWithCode("Get static config error !", eerror.ExitLogConfigErr)
+		eerror.ThrowWithCode("Get static config error !", eerror.ExitConfigStaticErr)
 	}
-	return logCfg
+	return staticCfg
 }
 
 // Read config json

@@ -15,13 +15,17 @@ const (
 	ExitConfigFile         = -11
 	ExitConfigFileFS       = -12
 	ExitConfigFileNotExist = -13
+	ExitConfigStaticErr    = -14
+	ExitConfigLogErr       = -15
+	ExitConfigHttpErr      = -16
 
 	// log
-	ExitLogConfigErr   = -21
-	ExitConfigGenerate = -22
+	ExitConfigGenerate = -21
 
 	// http
 	ExitListenPortErr  = -31
 	ExitHttpStartupErr = -32
-	ExitHttpConfigErr  = -33
+
+	// static
+
 )
