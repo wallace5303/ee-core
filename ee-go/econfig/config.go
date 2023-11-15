@@ -42,7 +42,8 @@ func Init() {
 	for key, value := range defaultCfg {
 		Vip.Set(key, value)
 	}
-	fmt.Printf("defaultCfg : %v", Vip.AllSettings())
+
+	//fmt.Println("defaultCfg: ", Vip.AllSettings())
 }
 
 func Get(key string) any {

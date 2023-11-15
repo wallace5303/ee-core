@@ -59,7 +59,8 @@ func CreateHttpServer(cfg map[string]any) {
 
 	protocol := Conf["protocol"].(string)
 	hostname := Conf["hostname"].(string)
-	if Conf["network"] == true {
+	network := Conf["network"].(bool)
+	if network == true {
 		hostname = "0.0.0.0"
 	}
 	port := eruntime.HttpPort
@@ -156,8 +157,6 @@ func loadViews() {
 		queryParams := ctx.Request.URL.Query()
 		queryParams.Set("f", eutil.GetRandomString(8))
 		location.RawQuery = queryParams.Encode()
-
-		elog.Logger.Infof("[ee-go] location : %s,", location)
 
 		ctx.Redirect(302, location.String())
 	})
