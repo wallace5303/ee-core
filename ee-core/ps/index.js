@@ -128,6 +128,13 @@ exports.processType = function() {
 };
 
 /**
+ * app name
+ */
+exports.appName = function() {
+  return process.env.EE_APP_NAME;
+}
+
+/**
  * 获取home路径
  */
 exports.getHomeDir = function () {
@@ -230,8 +237,33 @@ exports.getExecDir = function() {
 /**
  * 获取操作系统用户目录
  */
-exports.getUserHomeDir = function () {
+exports.getUserHomeDir = function() {
   return process.env.EE_USER_HOME;
+}
+
+/**
+ * 获取用户目录配置数据目录
+ */
+exports.getUserHomeConfigDir = function() {
+  // const filePath = path.join(this.getHomeDir(), 'package.json');
+  // if (!fs.existsSync(filePath)) {
+  //   throw new Error(filePath + ' is not found');
+  // }
+  // const pkg = JSON.parse(fs.readFileSync(filePath));
+  // if (!pkg.name || pkg.name == "") {
+  //   throw new Error(`name is required from ${filePath}`);
+  // }
+  const appname = this.appName();
+  const cfgDir = path.join(this.getUserHomeDir(), ".config", appname);
+  return cfgDir;
+}
+
+/**
+ * 获取基础数据路径
+ */
+exports.getUserHomeAppFilePath = function() {
+  const p = path.join(this.getUserHomeConfigDir(), "app.json");
+  return p;
 }
 
 /**

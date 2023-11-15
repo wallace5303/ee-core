@@ -16,6 +16,7 @@ const Socket = require('../socket');
 const GetPort = require('../utils/get-port');
 const UtilsHelper = require('../utils/helper');
 const HttpClient = require('../httpclient');
+const Cross = require('../cross');
 
 class EeApp extends BaseApp {
   constructor(options = {}) {
@@ -85,6 +86,8 @@ class EeApp extends BaseApp {
     await this._loderAddons();
 
     await this._loderPreload();
+
+    Cross.create()
 
     this.selectAppType();
   }
