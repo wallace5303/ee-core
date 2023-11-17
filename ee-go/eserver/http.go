@@ -63,12 +63,11 @@ func CreateHttpServer(cfg map[string]any) {
 	if network == true {
 		hostname = "0.0.0.0"
 	}
-	port := eruntime.HttpPort
+	portStr := eruntime.HttpPort
 	cfgPort := int(Conf["port"].(float64))
 	if cfgPort > 0 {
-		port = cfgPort
+		portStr = strconv.Itoa(cfgPort)
 	}
-	portStr := strconv.Itoa(port)
 
 	address := hostname + ":" + portStr
 	ln, err := net.Listen("tcp", address)

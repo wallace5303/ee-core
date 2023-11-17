@@ -52,7 +52,7 @@ func ReadPackage() map[string]any {
 
 	// read from external file
 	if len(ret) == 0 {
-		pkgPath := filepath.Join(eruntime.HomeDir, "package.json")
+		pkgPath := filepath.Join(eruntime.BaseDir, "package.json")
 		if !eutil.FileIsExist(pkgPath) {
 			eerror.ThrowWithCode(fmt.Sprintf("file %s does not exist!", pkgPath), eerror.ExitPackageFile)
 		}

@@ -21,9 +21,10 @@ import (
 )
 
 var (
-	cmdENV = "prod" // 'dev' 'prod'
-	// progressBar  float64 // 0 ~ 100
-	// progressDesc string  // description
+// cmdENV  = "prod" // 'dev' 'prod'
+// cmdPort = "0"
+// progressBar  float64 // 0 ~ 100
+// progressDesc string  // description
 )
 
 func New(staticFS embed.FS) {
@@ -31,19 +32,24 @@ func New(staticFS embed.FS) {
 	fmt.Println("\n" + banner.String())
 
 	environment := flag.String("env", "prod", "dev/prod")
+	baseDir := flag.String("basedir", "", "base directory")
+	goport := flag.String("port", "0", "service port")
 	flag.Parse()
 	fmt.Println("cmdENV:", *environment)
+	fmt.Println("baseDir:", *baseDir)
+	fmt.Println("HttpPort:", *goport)
 
-	cmdENV = *environment
+	eruntime.ENV = *environment
+	eruntime.BaseDir = *baseDir
+	eruntime.HttpPort = *goport
 
 	// static "./public"
 	estatic.StaticFS = staticFS
 
-	initApp(cmdENV)
+	initApp()
 }
 
-func initApp(cmdENV string) {
-	eruntime.ENV = cmdENV
+func initApp() {
 
 	// init dir
 	eruntime.InitDir()
@@ -71,12 +77,9 @@ func initApp(cmdENV string) {
 		eserver.Init("http", httpCfg)
 	}
 
-	// test
-	eruntime.Debug()
 }
 
 func initUserDir() {
-	eruntime.PublicDir = filepath.Join(eruntime.HomeDir, "public")
 	eruntime.UserHomeDir, _ = eos.GetUserHomeDir()
 	eruntime.UserHomeConfDir = filepath.Join(eruntime.UserHomeDir, ".config", eruntime.AppName)
 	if !eutil.FileIsExist(eruntime.UserHomeConfDir) {
@@ -86,9 +89,7 @@ func initUserDir() {
 		}
 	}
 
-	if eruntime.IsDev() {
-		eruntime.WorkDir = eruntime.HomeDir
-	}
+	eruntime.WorkDir = eruntime.BaseDir
 	if eruntime.IsPord() {
 		eruntime.WorkDir = filepath.Join(eruntime.UserHomeDir, eruntime.AppName)
 		// windows
@@ -125,8 +126,7 @@ func initUserDir() {
 	}
 	elog.SetLogDir(logDir)
 
-	// [todo]
-	eruntime.TmpDir = filepath.Join(eruntime.WorkDir, "data", "tmp")
+	eruntime.TmpDir = filepath.Join(eruntime.WorkDir, "tmp")
 	os.RemoveAll(eruntime.TmpDir)
 	if !eutil.FileIsExist(eruntime.TmpDir) {
 		if err := os.MkdirAll(eruntime.TmpDir, 0755); err != nil && !os.IsExist(err) {
@@ -137,6 +137,12 @@ func initUserDir() {
 	os.Setenv("TMPDIR", eruntime.TmpDir)
 	os.Setenv("TEMP", eruntime.TmpDir)
 	os.Setenv("TMP", eruntime.TmpDir)
+
+	fmt.Println("UserHomeDir:", eruntime.UserHomeDir)
+	fmt.Println("UserHomeConfDir:", eruntime.UserHomeConfDir)
+	fmt.Println("WorkDir:", eruntime.WorkDir)
+	fmt.Println("DataDir:", eruntime.DataDir)
+	fmt.Println("TmpDir:", eruntime.TmpDir)
 }
 
 func Run() {

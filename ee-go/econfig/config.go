@@ -21,18 +21,39 @@ var (
 func Init() {
 	var defaultCfg map[string]any
 	var envCfg map[string]any
+	defaultCfgName := "public/config/config.default.json"
+	envCfgName := "public/config/config.prod.json"
 
-	if eruntime.IsPord() {
-		defaultCfg = estatic.ReadConfigJson("public/config/config.default.json")
-		envCfg = estatic.ReadConfigJson("public/config/config.prod.json")
+	// dev
+	if eruntime.IsDev() {
+		// 优先读项目中的（构建后，项目中的是不存在的）
+		defaultConfigPath := filepath.Join(eruntime.BaseDir, "go", "config", "config.default.json")
+		devConfigPath := filepath.Join(eruntime.BaseDir, "go", "config", "config.local.json")
+		if eutil.FileIsExist(defaultConfigPath) && eutil.FileIsExist(devConfigPath) {
+			defaultCfg = ReadJson(defaultConfigPath)
+			envCfg = ReadJson(devConfigPath)
+		}
 	}
 
 	if len(defaultCfg) == 0 || len(envCfg) == 0 {
-		defaultConfigPath := filepath.Join(eruntime.GoDir, "config", "config.default.json")
-		devConfigPath := filepath.Join(eruntime.GoDir, "config", "config.local.json")
+		// 读 嵌入的StaticFS
+		if estatic.FileIsExist(defaultCfgName) && estatic.FileIsExist(envCfgName) {
+			defaultCfg = estatic.ReadConfigJson(defaultCfgName)
+			envCfg = estatic.ReadConfigJson(envCfgName)
+		} else {
+			// 读 外部的 （config 没有被嵌入）
+			defaultConfigPath := filepath.Join(eruntime.BaseDir, defaultCfgName)
+			devConfigPath := filepath.Join(eruntime.BaseDir, envCfgName)
+			if eutil.FileIsExist(defaultConfigPath) && eutil.FileIsExist(devConfigPath) {
+				defaultCfg = ReadJson(defaultConfigPath)
+				envCfg = ReadJson(devConfigPath)
+			}
+		}
+	}
 
-		defaultCfg = ReadJson(defaultConfigPath)
-		envCfg = ReadJson(devConfigPath)
+	// 都没有，直接报错
+	if len(defaultCfg) == 0 || len(envCfg) == 0 {
+		eerror.ThrowWithCode("The config file does not exist !", eerror.ExitConfigFileNotExist)
 	}
 
 	// merge
@@ -85,13 +106,13 @@ func GetStatic() map[string]any {
 // Read config json
 func ReadJson(f string) map[string]any {
 	if !eutil.FileIsExist(f) {
-		msg := fmt.Sprintf("File: %s is not exist \n", f)
+		msg := fmt.Sprintf("File: %s is not exist !", f)
 		eerror.ThrowWithCode(msg, eerror.ExitConfigFileNotExist)
 	}
 
 	data, err := os.ReadFile(f)
 	if nil != err {
-		msg := fmt.Sprintf("Read file: %s failed: %s\n", f, err)
+		msg := fmt.Sprintf("Read file: %s failed: %s", f, err)
 		eerror.ThrowWithCode(msg, eerror.ExitConfigFile)
 	}
 

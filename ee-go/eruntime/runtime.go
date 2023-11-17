@@ -21,8 +21,6 @@ var (
 
 var (
 	BaseDir, _      = os.Getwd()
-	HomeDir         string // electron-egg home directory
-	GoDir           string // electron-egg go directory
 	PublicDir       string // electron-egg public directory
 	UserHomeDir     string // OS user home directory
 	UserHomeConfDir string // OS user home config directory
@@ -32,20 +30,15 @@ var (
 )
 
 var (
-	HttpPort            = 7073
+	HttpPort            = "7073"
 	HttpServerIsRunning = false
 )
 
 func InitDir() {
-	HomeDir = filepath.Join(BaseDir, "..")
-	if IsPord() {
-		HomeDir = BaseDir
-	}
+	PublicDir = filepath.Join(BaseDir, "public")
 
-	GoDir = filepath.Join(HomeDir, "go")
-	if IsPord() {
-		GoDir = BaseDir
-	}
+	fmt.Println("BaseDir:", BaseDir)
+	fmt.Println("PublicDir:", PublicDir)
 }
 
 // Pwd gets the path of current working directory.
@@ -62,17 +55,4 @@ func Pwd() string {
 	pwd, _ := filepath.Abs(file)
 
 	return filepath.Dir(pwd)
-}
-
-func Debug() {
-	fmt.Println("BaseDir:", BaseDir)
-	fmt.Println("HomeDir:", HomeDir)
-	fmt.Println("GoDir:", GoDir)
-	fmt.Println("PublicDir:", PublicDir)
-
-	fmt.Println("UserHomeDir:", UserHomeDir)
-	fmt.Println("UserHomeConfDir:", UserHomeConfDir)
-	fmt.Println("WorkDir:", WorkDir)
-	fmt.Println("DataDir:", DataDir)
-	fmt.Println("TmpDir:", TmpDir)
 }
