@@ -1,9 +1,6 @@
 package eapp
 
 import (
-	"encoding/json"
-	"fmt"
-	"os"
 	"path/filepath"
 
 	"ee-go/econfig"
@@ -13,58 +10,34 @@ import (
 	"ee-go/eutil"
 )
 
-// type Package struct {
-// 	Name        string `json:"name"`        // app name
-// 	Version     string `json:"version"`     // app version
-// 	Description string `json:"description"` // description
-// 	Main        string `json:"main"`        // electron main file
-// 	Repository  string `json:"repository"`  // project repository
-// 	Author      string `json:"author"`      // author
-// 	License     string `json:"license"`     // project license
-// }
-
-// func NewPackage() *Package {
-// 	return &Package{
-// 		Name:        "",
-// 		Version:     "",
-// 		Description: "",
-// 		Main:        "",
-// 		Repository:  "",
-// 		Author:      "",
-// 		License:     "",
-// 	}
-// }
-
-// get package.json
+// package.json
 func ReadPackage() map[string]any {
 	var ret map[string]any
 
-	if eruntime.IsPord() {
-		staticCfg := econfig.GetStatic()
-		if staticCfg["enable"] == true {
-			pkgData, err := estatic.ReadJson("public/package.json")
-			if err != nil {
-				eerror.ThrowWithCode("StaticFS package.json does not exist!", eerror.ExitPackageFile)
-			}
-			ret = pkgData
+	if eruntime.IsDev() {
+		// 优先读项目中的 (构建后，不嵌入是没有的)
+		pkgPath := filepath.Join(eruntime.BaseDir, "package.json")
+		if eutil.FileIsExist(pkgPath) {
+			ret = eutil.ReadJsonStrict(pkgPath)
 		}
 	}
 
-	// read from external file
 	if len(ret) == 0 {
-		pkgPath := filepath.Join(eruntime.BaseDir, "package.json")
-		if !eutil.FileIsExist(pkgPath) {
-			eerror.ThrowWithCode(fmt.Sprintf("file %s does not exist!", pkgPath), eerror.ExitPackageFile)
+		// 读嵌入的
+		staticCfg := econfig.GetStatic()
+		if staticCfg["enable"] == true {
+			ret = estatic.ReadJsonStrict("public/package.json")
+		} else {
+			// 读外部的
+			pkgPath := filepath.Join(eruntime.BaseDir, "public/package.json")
+			if eutil.FileIsExist(pkgPath) {
+				ret = eutil.ReadJsonStrict(pkgPath)
+			}
 		}
+	}
 
-		data, err := os.ReadFile(pkgPath)
-		if err != nil {
-			eerror.ThrowWithCode(fmt.Sprintf("file %s read failure!", pkgPath), eerror.ExitPackageFile)
-		}
-		err = json.Unmarshal(data, &ret)
-		if err != nil {
-			eerror.ThrowWithCode(fmt.Sprintf("file %s is not in json format!", pkgPath), eerror.ExitPackageFile)
-		}
+	if len(ret) == 0 {
+		eerror.ThrowWithCode("The package.json does not exist!", eerror.ExitPackageFile)
 	}
 
 	return ret

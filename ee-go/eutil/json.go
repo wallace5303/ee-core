@@ -1,35 +1,31 @@
-package estatic
+package eutil
 
 import (
-	"embed"
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"ee-go/eerror"
 )
 
-var (
-	StaticFS embed.FS
-)
-
-func FileIsExist(name string) bool {
-	_, err := StaticFS.ReadFile(name)
-
-	return err == nil || false
-}
-
-// Read config json
+// Read json strict
 func ReadJsonStrict(f string) map[string]any {
-	var ret map[string]any
-	data, err := StaticFS.ReadFile(f)
-	if nil != err {
-		msg := fmt.Sprintf("Read file: %s failed: %s\n", f, err)
-		eerror.ThrowWithCode(msg, eerror.ExitConfigFileFS)
+	if !FileIsExist(f) {
+		msg := fmt.Sprintf("File: %s is not exist !", f)
+		eerror.ThrowWithCode(msg, eerror.ExitConfigFileNotExist)
 	}
+
+	data, err := os.ReadFile(f)
+	if nil != err {
+		msg := fmt.Sprintf("Read file: %s failed: %s", f, err)
+		eerror.ThrowWithCode(msg, eerror.ExitConfigFile)
+	}
+
+	var ret map[string]any
 	err = json.Unmarshal(data, &ret)
 	if nil != err {
 		msg := fmt.Sprintf("unmarshal file: %s failed: %s", f, err)
-		eerror.ThrowWithCode(msg, eerror.ExitConfigFileFS)
+		eerror.ThrowWithCode(msg, eerror.ExitConfigFile)
 	}
 
 	return ret
@@ -38,7 +34,7 @@ func ReadJsonStrict(f string) map[string]any {
 // Read json
 func ReadJson(f string) (map[string]any, error) {
 	var ret map[string]any
-	data, err := StaticFS.ReadFile(f)
+	data, err := os.ReadFile(f)
 	if nil != err {
 		return nil, err
 	}

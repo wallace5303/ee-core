@@ -1,9 +1,6 @@
 package econfig
 
 import (
-	"encoding/json"
-	"fmt"
-	"os"
 	"path/filepath"
 
 	"ee-go/eerror"
@@ -30,23 +27,23 @@ func Init() {
 		defaultConfigPath := filepath.Join(eruntime.BaseDir, "go", "config", "config.default.json")
 		devConfigPath := filepath.Join(eruntime.BaseDir, "go", "config", "config.local.json")
 		if eutil.FileIsExist(defaultConfigPath) && eutil.FileIsExist(devConfigPath) {
-			defaultCfg = ReadJson(defaultConfigPath)
-			envCfg = ReadJson(devConfigPath)
+			defaultCfg = eutil.ReadJsonStrict(defaultConfigPath)
+			envCfg = eutil.ReadJsonStrict(devConfigPath)
 		}
 	}
 
 	if len(defaultCfg) == 0 || len(envCfg) == 0 {
 		// 读 嵌入的StaticFS
 		if estatic.FileIsExist(defaultCfgName) && estatic.FileIsExist(envCfgName) {
-			defaultCfg = estatic.ReadConfigJson(defaultCfgName)
-			envCfg = estatic.ReadConfigJson(envCfgName)
+			defaultCfg = estatic.ReadJsonStrict(defaultCfgName)
+			envCfg = estatic.ReadJsonStrict(envCfgName)
 		} else {
 			// 读 外部的 （config 没有被嵌入）
 			defaultConfigPath := filepath.Join(eruntime.BaseDir, defaultCfgName)
 			devConfigPath := filepath.Join(eruntime.BaseDir, envCfgName)
 			if eutil.FileIsExist(defaultConfigPath) && eutil.FileIsExist(devConfigPath) {
-				defaultCfg = ReadJson(defaultConfigPath)
-				envCfg = ReadJson(devConfigPath)
+				defaultCfg = eutil.ReadJsonStrict(defaultConfigPath)
+				envCfg = eutil.ReadJsonStrict(devConfigPath)
 			}
 		}
 	}
@@ -101,27 +98,4 @@ func GetStatic() map[string]any {
 		eerror.ThrowWithCode("Get static config error !", eerror.ExitConfigStaticErr)
 	}
 	return staticCfg
-}
-
-// Read config json
-func ReadJson(f string) map[string]any {
-	if !eutil.FileIsExist(f) {
-		msg := fmt.Sprintf("File: %s is not exist !", f)
-		eerror.ThrowWithCode(msg, eerror.ExitConfigFileNotExist)
-	}
-
-	data, err := os.ReadFile(f)
-	if nil != err {
-		msg := fmt.Sprintf("Read file: %s failed: %s", f, err)
-		eerror.ThrowWithCode(msg, eerror.ExitConfigFile)
-	}
-
-	var ret map[string]any
-	err = json.Unmarshal(data, &ret)
-	if nil != err {
-		msg := fmt.Sprintf("unmarshal file: %s failed: %s", f, err)
-		eerror.ThrowWithCode(msg, eerror.ExitConfigFile)
-	}
-
-	return ret
 }
