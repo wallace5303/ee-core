@@ -16,8 +16,6 @@ import (
 	"ee-go/eserver"
 	"ee-go/estatic"
 	"ee-go/eutil"
-
-	figure "github.com/common-nighthawk/go-figure"
 )
 
 var (
@@ -28,11 +26,8 @@ var (
 )
 
 func New(staticFS embed.FS) {
-	banner := figure.NewColorFigure("ElectronEgg", "standard", "green", true)
-	fmt.Println("\n" + banner.String())
-
 	environment := flag.String("env", "prod", "dev/prod")
-	baseDir := flag.String("basedir", "", "base directory")
+	baseDir := flag.String("basedir", "./", "base directory")
 	goport := flag.String("port", "0", "service port")
 	flag.Parse()
 	fmt.Println("cmdENV:", *environment)
@@ -40,7 +35,7 @@ func New(staticFS embed.FS) {
 	fmt.Println("HttpPort:", *goport)
 
 	eruntime.ENV = *environment
-	eruntime.BaseDir = *baseDir
+	eruntime.BaseDir = filepath.Join(eruntime.BaseDir, *baseDir)
 	eruntime.HttpPort = *goport
 
 	// static "./public"
@@ -126,7 +121,7 @@ func initUserDir() {
 	}
 	elog.SetLogDir(logDir)
 
-	eruntime.TmpDir = filepath.Join(eruntime.WorkDir, "tmp")
+	eruntime.TmpDir = filepath.Join(eruntime.DataDir, "tmp")
 	os.RemoveAll(eruntime.TmpDir)
 	if !eutil.FileIsExist(eruntime.TmpDir) {
 		if err := os.MkdirAll(eruntime.TmpDir, 0755); err != nil && !os.IsExist(err) {

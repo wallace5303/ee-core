@@ -108,6 +108,14 @@ class EeApp extends BaseApp {
       return;
     }
 
+    const mainServer = this.config.mainServer;
+
+    // cross service takeover web
+    if (mainServer.takeover && mainServer.takeover != "") {
+      await this._crossTakeover(mainServer)
+      return
+    }
+
     // 开发环境
     if (Ps.isDev()) {
       let modeInfo;
@@ -168,7 +176,6 @@ class EeApp extends BaseApp {
     }
 
     // 生产环境
-    const mainServer = this.config.mainServer;
     if (Conf.isFileProtocol(mainServer)) {
       url = path.join(this.config.homeDir, mainServer.indexPath);
       this.loadMainUrl('spa', url, 'file');
@@ -176,6 +183,52 @@ class EeApp extends BaseApp {
       this.loadLocalWeb('spa');
     }
   }
+
+  /**
+   * cross service takeover web
+   */
+  async _crossTakeover(mainCfg = {}) {
+    const crossConfig = this.config.cross;
+
+    // loading page
+    this._loadingPage(mainCfg);
+
+    // cross service url
+    const servicesCfg = crossConfig[mainCfg.takeover];
+    const url = servicesCfg.protocol + servicesCfg.hostname + ':' + servicesCfg.port;
+    console.log("----- cross url:", url)
+
+    let count = 0;
+    let serviceReady = false;
+    const hc = new HttpClient();
+
+    // 循环检查
+    const times = Ps.isDev() ? 20 : 100;
+    const sleeptime = Ps.isDev() ? 1000 : 100;
+    while(!serviceReady && count < times){
+      await UtilsHelper.sleep(sleeptime);
+      try {
+        await hc.request(url, {
+          method: 'GET',
+          timeout: 1000,
+        });
+        serviceReady = true;
+      } catch(err) {
+        console.log('The cross service is starting');
+      }
+
+      count++;
+    }
+
+    if (serviceReady == false) {
+      const bootFailurePage = path.join(__dirname, '..', 'html', 'cross-failure.html');
+      this.mainWindow.loadFile(bootFailurePage);
+      Log.coreLogger.error(`[ee-core] Please check cross service ${url} !`);
+      return;
+    }
+    
+    this.loadMainUrl('spa', url);
+  }  
 
   /**
    * 加载本地前端资源
@@ -242,6 +295,19 @@ class EeApp extends BaseApp {
         Log.coreLogger.error(`[ee-core] Please check the ${url} !`);
       });
     }
+  }
+
+  /**
+   * loading page
+   */  
+  _loadingPage(mainCfg = {}) {
+    const p = mainCfg.loadingPage ? mainCfg.loadingPage : '';
+    const lp = path.join(this.config.homeDir, p);
+    if (!fs.existsSync(lp)) {
+      return
+    }
+
+    this.mainWindow.loadFile(lp);
   }
 
   /**

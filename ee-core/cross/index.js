@@ -29,15 +29,14 @@ const CrossLanguageService = {
     // boot services
     const servicesCfg = Conf.getValue('cross');
     console.log("------------------- servicesCfg: ", servicesCfg)
+    await UtilsHelper.sleep(5 * 1000);
 
     for (let key of Object.keys(servicesCfg)) {
       let cfg = servicesCfg[key];
-      if (cfg.auto == true) {
+      if (cfg.enable == true) {
         this.run(cfg)
       }
     }
-  
-
   },
 
   /**
@@ -69,7 +68,6 @@ const CrossLanguageService = {
     });
     this.execProcess[cmdName] = coreProcess
 
-
     // 使用 go 的 http 服务
     // const goServer = this.getServer() + "/build/app/index.html?v=" + new Date().getTime();
     // win.loadURL(goServer);
@@ -87,7 +85,6 @@ const CrossLanguageService = {
   _initPath() {
     try {
       const pathname = Ps.getUserHomeConfigDir();
-      console.log("------------------- pathname: ", pathname)
       if (!fs.existsSync(pathname)) {
         UtilsHelper.mkdir(pathname, {mode: 0o755});
       }
