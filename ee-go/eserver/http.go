@@ -63,7 +63,7 @@ func CreateHttpServer(cfg map[string]any) {
 	if network == true {
 		hostname = "0.0.0.0"
 	}
-	portStr := eruntime.HttpPort
+	portStr := eruntime.Port
 	cfgPort := int(Conf["port"].(float64))
 	if cfgPort > 0 {
 		portStr = strconv.Itoa(cfgPort)

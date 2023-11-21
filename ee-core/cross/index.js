@@ -22,13 +22,15 @@ const CrossLanguageService = {
    * create
    */
   async create() {
+    if (!Ps.isProd()) {
+      return
+    }
 
     // init dir
     this._initPath();
 
     // boot services
     const servicesCfg = Conf.getValue('cross');
-    console.log("------------------- servicesCfg: ", servicesCfg)
     await UtilsHelper.sleep(5 * 1000);
 
     for (let key of Object.keys(servicesCfg)) {
@@ -58,8 +60,8 @@ const CrossLanguageService = {
 
     // Launch executable program
     const coreProcess = crossSpawn(cmdPath, cmdArgs, { stdio: 'inherit', detached: false });
-    coreProcess.on('close', (code) => {
-      Log.coreLogger.info(`[ee-core] [cross/run] [pid=${coreProcess.pid}, port=${port}] exited with code [${code}]`);
+    coreProcess.on('close', (code, signal) => {
+      Log.coreLogger.info(`[ee-core] [cross/run] [pid=${coreProcess.pid}, port=${port}] exited with code: ${code}, signal: ${signal}`);
       if (0 !== code) {
         // 弹错误窗口
       }

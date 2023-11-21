@@ -110,12 +110,6 @@ class EeApp extends BaseApp {
 
     const mainServer = this.config.mainServer;
 
-    // cross service takeover web
-    if (mainServer.takeover && mainServer.takeover != "") {
-      await this._crossTakeover(mainServer)
-      return
-    }
-
     // 开发环境
     if (Ps.isDev()) {
       let modeInfo;
@@ -176,6 +170,13 @@ class EeApp extends BaseApp {
     }
 
     // 生产环境
+    // cross service takeover web
+    if (mainServer.takeover && mainServer.takeover != "") {
+      await this._crossTakeover(mainServer)
+      return
+    }
+
+    // 主进程
     if (Conf.isFileProtocol(mainServer)) {
       url = path.join(this.config.homeDir, mainServer.indexPath);
       this.loadMainUrl('spa', url, 'file');

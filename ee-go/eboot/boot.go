@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"ee-go/eapp"
 	"ee-go/econfig"
@@ -26,20 +27,36 @@ var (
 )
 
 func New(staticFS embed.FS) {
+	// args
 	environment := flag.String("env", "prod", "dev/prod")
 	baseDir := flag.String("basedir", "./", "base directory")
-	goport := flag.String("port", "0", "service port")
+	port := flag.String("port", "", "service port")
+	ssl := flag.String("ssl", "false", "https/wss service")
+	url := flag.String("url", "", "a complete http/ws address")
+
 	flag.Parse()
+
 	fmt.Println("cmdENV:", *environment)
 	fmt.Println("baseDir:", *baseDir)
-	fmt.Println("HttpPort:", *goport)
+	fmt.Println("goport:", *port)
+	fmt.Println("ssl:", *ssl)
+	fmt.Println("url:", *url)
 
 	eruntime.ENV = *environment
 	eruntime.BaseDir = filepath.Join(eruntime.BaseDir, *baseDir)
-	eruntime.HttpPort = *goport
+	cmdGoPort, err := strconv.Atoi(*port)
+	if err == nil && cmdGoPort > 0 {
+		eruntime.Port = *port
+	}
+	eruntime.SSL, _ = strconv.ParseBool(*ssl)
 
 	// static "./public"
 	estatic.StaticFS = staticFS
+
+	fmt.Println("ENV:", eruntime.ENV)
+	fmt.Println("BaseDir:", eruntime.BaseDir)
+	fmt.Println("Port:", eruntime.Port)
+	fmt.Println("SSL:", eruntime.SSL)
 
 	initApp()
 }
