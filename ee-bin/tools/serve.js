@@ -8,36 +8,12 @@ const crossSpawn = require('cross-spawn');
 
 module.exports = {
 
-  devProcess: {},
-
   execProcess: {},
 
   /**
    * 启动前端、主进程服务
    */  
   dev(options = {}) {
-    // const { config, serve } = options;
-    // const binCfg = Utils.loadConfig(config);
-
-    // let cmd = serve;
-    // if (!cmd) {
-    //   cmd = Object.keys(binCfg.dev).join();
-    // }
-
-
-    // todo 后续要不要统一用exec
-    // if (cmd == 'frontend') {
-    //   this.frontendServe(binCfg.dev[cmd]);
-    //   return;
-    // }
-    // if (cmd == 'electron') {
-    //   this.electronServe(binCfg.dev[cmd]);
-    //   return;
-    // }
-
-    // this.frontendServe(frontend);
-    // this.electronServe(electron);
-
     const { config, serve } = options;
     const binCmd = 'dev';
     const binCfg = Utils.loadConfig(config);
@@ -68,107 +44,66 @@ module.exports = {
 
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  },
+  }, 
 
   /**
-   * start frontend serve
-   */  
-  frontendServe(cfg) {
-    // 如果是 file:// 协议，则不启动
-    if (cfg.protocol == 'file://') {
-      return
-    }
-    // 模拟前端启动慢
-    // await this.sleep(5 * 1000);
-    console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('Start the frontend serve...'));
-    console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('config:'), JSON.stringify(cfg));
-
-    const frontendDir = path.join(process.cwd(), cfg.directory);
-    const frontendArgs = is.string(cfg.args) ? [cfg.args] : cfg.args;
-    const frontendProcess = crossSpawn(
-      cfg.cmd, 
-      frontendArgs,
-      { stdio: 'inherit', cwd: frontendDir, maxBuffer: 1024 * 1024 * 1024 },
-    );
-    frontendProcess.on('exit', () => {
-      console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('frontend serve exit'));
-    });
-
-    this.devProcess['frontend'] = frontendProcess;
-  },
-
-  /**
-   * start electron serve
-   */  
-  electronServe(cfg) {
-    console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('Start the electron serve...'));
-    console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('config:'), JSON.stringify(cfg));
-
-    const electronDir = path.join(process.cwd(), cfg.directory);
-    const electronArgs = is.string(cfg.args) ? [cfg.args] : cfg.args;
-    
-    const electronProcess = crossSpawn(
-      cfg.cmd, 
-      electronArgs, 
-      {stdio: 'inherit', cwd: electronDir, maxBuffer: 1024 * 1024 * 1024 }
-    );
-
-    electronProcess.on('exit', () => {
-      console.log(chalk.blue('[ee-bin] [dev] ') + chalk.green('Press "CTRL+C" to exit'));
-    });
-
-    this.devProcess['electron'] = electronProcess;
-  },  
-
-  /**
-   * 构建前端 dist 
+   * 构建
    */  
   build(options = {}) {
-    const { config } = options;
-    const binCfg = Utils.loadConfig(config);
-    const cfg = binCfg.build;
-
-    // start build frontend dist
-    console.log(chalk.blue('[ee-bin] [build] ') + chalk.green('Build frontend dist'));
-    console.log(chalk.blue('[ee-bin] [build] ') + chalk.green('config:'), cfg);
-    
-    const frontendDir = path.join(process.cwd(), cfg.directory);
-    const buildArgs = is.string(cfg.args) ? [cfg.args] : cfg.args;
-
-    const buildProcess = crossSpawn(
-      cfg.cmd, 
-      buildArgs,
-      { stdio: 'inherit', cwd: frontendDir, maxBuffer: 1024 * 1024 * 1024 },
-    );
-    buildProcess.on('exit', () => {
-      console.log(chalk.blue('[ee-bin] [build] ') + chalk.green('End'));
-    }); 
-  },
-
-  /**
-   * 执行自定义命令
-   * 支持多个命令
-   */  
-  exec(options = {}) {
-    const { config, command } = options;
-    const binCmd = 'exec';
+    const { config, cmds } = options;
+    const binCmd = 'build';
     const binCfg = Utils.loadConfig(config);
     const binCmdConfig = binCfg[binCmd];
+
+    if (!cmds || cmds == "") {
+      // [todo]
+      let tip = chalk.bgYellow('Warning') + ' Please modify the ' + chalk.blue('build') + ' config, See: ';
+      tip += chalk.underline('https://www.kaka996.com/pages/e1816f/');
+      console.log(tip);
+      return
+    }
 
     const opt = {
       binCmd,
       binCmdConfig,
-      command,
+      command: cmds,
     }
     this.multiExec(opt);
   },
 
   /**
    * 执行自定义命令
+   */  
+  exec(options = {}) {
+    let { config, command, cmds } = options;
+    const binCmd = 'exec';
+    const binCfg = Utils.loadConfig(config);
+    const binCmdConfig = binCfg[binCmd];
+
+    if (typeof command !== "string" || !cmds) {
+      console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.red(`Error: Please specify parameters for --cmds` ));
+      return
+    }
+
+    // 兼容
+    if (typeof command === "string") {
+      console.log("dd:", typeof command)
+      cmds = command;
+    }
+
+    const opt = {
+      binCmd,
+      binCmdConfig,
+      command: cmds,
+    }
+    this.multiExec(opt);
+  },
+
+  /**
    * 支持多个命令
    */  
   multiExec(opt = {}) {
-    console.log('multiExec opt:', opt)
+    // console.log('multiExec opt:', opt)
     const { binCmd, binCmdConfig, command } = opt;
     
     let cmds;
@@ -184,7 +119,7 @@ module.exports = {
       let cfg = binCmdConfig[cmd];
 
       if (!cfg) {
-        console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.red(`Error: ${cmd} config does not exist` ));
+        console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.red(`Error: [${binCmd} ${cmd}] config does not exist` ));
         continue;
       }
 
@@ -193,7 +128,7 @@ module.exports = {
         continue;
       }
   
-      console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.green(`Run [${cmd}] command`));
+      console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + "Run " + chalk.green(`[${binCmd} ${cmd}]` + " command"));
       console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.green('config:'), JSON.stringify(cfg));
       
       let execDir = path.join(process.cwd(), cfg.directory);
@@ -204,14 +139,14 @@ module.exports = {
         execArgs,
         { stdio: 'inherit', cwd: execDir, maxBuffer: 1024 * 1024 * 1024 },
       );
-      console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`${cmd}`) + ' command is running');
+      console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`[${binCmd} ${cmd}]`) + ' command is running');
 
       this.execProcess[cmd].on('exit', () => {
         if (cmd == 'electron') {
           console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.green('Press "CTRL+C" to exit'));
           return
         }
-        console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`${cmd}`) + ' command is executed and exits');
+        console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`[${binCmd} ${cmd}]`) + ' command is executed and exits');
       });
     }
   },  

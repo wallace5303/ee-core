@@ -83,8 +83,9 @@ program
  */
 program
   .command('build')
-  .description('build frontend dist')
+  .description('building multiple resources')
   .option('--config <folder>', 'config file', './electron/config/bin.js')
+  .option('--cmds <flag>', 'custom commands')
   .action(function() {
     const serve = require('./tools/serve');
     serve.build(this.opts());
@@ -110,7 +111,9 @@ program
   .description('create frontend-serve and electron-serve')
   .option('--config <folder>', 'config file', './electron/config/bin.js')
   .option('--command <command>', 'Custom command')
+  .option('--cmds <flag>', 'custom commands')
   .action(function() {
+    // command 选项是关键字，不再使用，改为 cmds
     const serve = require('./tools/serve');
     serve.exec(this.opts());
   });

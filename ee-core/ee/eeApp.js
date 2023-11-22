@@ -197,7 +197,6 @@ class EeApp extends BaseApp {
     // cross service url
     const servicesCfg = crossConfig[mainCfg.takeover];
     const url = servicesCfg.protocol + servicesCfg.hostname + ':' + servicesCfg.port;
-    console.log("----- cross url:", url)
 
     let count = 0;
     let serviceReady = false;
