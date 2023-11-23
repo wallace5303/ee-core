@@ -37,9 +37,18 @@ module.exports = {
    */  
   start(options = {}) {
     const { config } = options;
+    const binCmd = 'start';
     const binCfg = Utils.loadConfig(config);
+    const binCmdConfig = {
+      start: binCfg[binCmd]
+    };
 
-    this.electronServe(binCfg.start);
+    const opt = {
+      binCmd,
+      binCmdConfig,
+      command: binCmd,
+    }
+    this.multiExec(opt);
   },
 
   sleep(ms) {
@@ -103,7 +112,7 @@ module.exports = {
    * 支持多个命令
    */  
   multiExec(opt = {}) {
-    // console.log('multiExec opt:', opt)
+    //console.log('multiExec opt:', opt)
     const { binCmd, binCmdConfig, command } = opt;
     
     let cmds;

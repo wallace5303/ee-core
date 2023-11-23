@@ -89,6 +89,8 @@ class Appliaction extends EeApp {
 
     await this.startSocket();
 
+    await this.crossService();
+    
     await this.ready();
 
     await this.createElectronApp();
