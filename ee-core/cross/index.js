@@ -46,7 +46,6 @@ const CrossLanguageService = {
    * run
    */
   async run(conf = {}) {
-
     const cmdName = conf.name;
     const cmdPath = this._getCmdPath(cmdName);
     let cmdArgs = is.string(conf.args) ? [conf.args] : conf.args;

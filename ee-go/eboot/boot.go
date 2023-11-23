@@ -32,7 +32,6 @@ func New(staticFS embed.FS) {
 	baseDir := flag.String("basedir", "./", "base directory")
 	port := flag.String("port", "", "service port")
 	ssl := flag.String("ssl", "false", "https/wss service")
-	url := flag.String("url", "", "a complete http/ws address")
 
 	flag.Parse()
 
@@ -40,7 +39,6 @@ func New(staticFS embed.FS) {
 	fmt.Println("baseDir:", *baseDir)
 	fmt.Println("goport:", *port)
 	fmt.Println("ssl:", *ssl)
-	fmt.Println("url:", *url)
 
 	eruntime.ENV = *environment
 	eruntime.BaseDir = filepath.Join(eruntime.BaseDir, *baseDir)

@@ -295,11 +295,6 @@ module.exports = appInfo => {
   };
 
   /**
-   * loading页（废弃）
-   */
-  config.loadingPage = false;
-
-  /**
    * addons
    */
   config.addons = {
@@ -317,5 +312,19 @@ module.exports = appInfo => {
     rendererExit: true,
   };
 
+  /**
+   * Cross-language service
+   * 跨语言服务
+   * 例如：执行go的二进制程序
+   */
+  config.cross = {};   
+  
+  /**
+   * jobs
+   */
+  config.jobs = {
+    messageLog: true
+  };  
+  
   return config;
 };
