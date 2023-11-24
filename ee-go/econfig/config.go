@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 
 	"ee-go/eerror"
+	"ee-go/ehelper"
 	"ee-go/eruntime"
 	"ee-go/estatic"
 	"ee-go/eutil"
@@ -26,7 +27,7 @@ func Init() {
 		// 优先读项目中的（构建后，项目中的是不存在的）
 		defaultConfigPath := filepath.Join(eruntime.BaseDir, "go", "config", "config.default.json")
 		devConfigPath := filepath.Join(eruntime.BaseDir, "go", "config", "config.local.json")
-		if eutil.FileIsExist(defaultConfigPath) && eutil.FileIsExist(devConfigPath) {
+		if ehelper.FileIsExist(defaultConfigPath) && ehelper.FileIsExist(devConfigPath) {
 			defaultCfg = eutil.ReadJsonStrict(defaultConfigPath)
 			envCfg = eutil.ReadJsonStrict(devConfigPath)
 		}
@@ -41,7 +42,7 @@ func Init() {
 			// 读 外部的 （config 没有被嵌入）
 			defaultConfigPath := filepath.Join(eruntime.BaseDir, defaultCfgName)
 			devConfigPath := filepath.Join(eruntime.BaseDir, envCfgName)
-			if eutil.FileIsExist(defaultConfigPath) && eutil.FileIsExist(devConfigPath) {
+			if ehelper.FileIsExist(defaultConfigPath) && ehelper.FileIsExist(devConfigPath) {
 				defaultCfg = eutil.ReadJsonStrict(defaultConfigPath)
 				envCfg = eutil.ReadJsonStrict(devConfigPath)
 			}
@@ -54,7 +55,7 @@ func Init() {
 	}
 
 	// merge
-	eutil.Mapserge(envCfg, defaultCfg, nil)
+	ehelper.Mapserge(envCfg, defaultCfg, nil)
 
 	Vip = viper.New()
 	for key, value := range defaultCfg {

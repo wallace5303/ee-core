@@ -20,7 +20,6 @@ import (
 	"ee-go/elog"
 	"ee-go/eruntime"
 	"ee-go/estatic"
-	"ee-go/eutil"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-contrib/sessions"
@@ -160,7 +159,7 @@ func loadViews() {
 
 		// append random string
 		queryParams := ctx.Request.URL.Query()
-		queryParams.Set("f", eutil.GetRandomString(8))
+		queryParams.Set("f", ehelper.GetRandomString(8))
 		location.RawQuery = queryParams.Encode()
 
 		ctx.Redirect(302, location.String())

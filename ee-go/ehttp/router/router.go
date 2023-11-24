@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"time"
 
+	"ee-go/elog"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,7 +15,7 @@ type HandlerFunc func(*Ctx)
 type Ctx struct {
 	GinCtx *gin.Context // gin context
 	Err    any          // 请求错误
-	timed  int64        // 执行时间
+	Timed  int64        // 执行时间
 }
 
 var (
@@ -30,10 +32,12 @@ func Handle(httpMethod, path string, handler HandlerFunc) {
 		ctx := &Ctx{GinCtx: gc}
 		begin := time.Now()
 		defer func() {
-			ctx.timed = time.Since(begin).Milliseconds()
+			ctx.Timed = time.Since(begin).Milliseconds()
 			if err := recover(); err != nil {
 				ctx.Err = err
 			}
+			// 增加开关
+			elog.Logger.Infof("execution time:%d", ctx.Timed)
 		}()
 		handler(ctx)
 	})

@@ -1,16 +1,16 @@
 package eutil
 
 import (
+	"ee-go/eerror"
+	"ee-go/ehelper"
 	"encoding/json"
 	"fmt"
 	"os"
-
-	"ee-go/eerror"
 )
 
 // Read json strict
 func ReadJsonStrict(f string) map[string]any {
-	if !FileIsExist(f) {
+	if !ehelper.FileIsExist(f) {
 		msg := fmt.Sprintf("File: %s is not exist !", f)
 		eerror.ThrowWithCode(msg, eerror.ExitConfigFileNotExist)
 	}

@@ -5,6 +5,7 @@ import (
 
 	"ee-go/econfig"
 	"ee-go/eerror"
+	"ee-go/ehelper"
 	"ee-go/eruntime"
 	"ee-go/estatic"
 	"ee-go/eutil"
@@ -17,7 +18,7 @@ func ReadPackage() map[string]any {
 	if eruntime.IsDev() {
 		// 优先读项目中的 (构建后，不嵌入是没有的)
 		pkgPath := filepath.Join(eruntime.BaseDir, "package.json")
-		if eutil.FileIsExist(pkgPath) {
+		if ehelper.FileIsExist(pkgPath) {
 			ret = eutil.ReadJsonStrict(pkgPath)
 		}
 	}
@@ -30,7 +31,7 @@ func ReadPackage() map[string]any {
 		} else {
 			// 读外部的
 			pkgPath := filepath.Join(eruntime.BaseDir, "public/package.json")
-			if eutil.FileIsExist(pkgPath) {
+			if ehelper.FileIsExist(pkgPath) {
 				ret = eutil.ReadJsonStrict(pkgPath)
 			}
 		}

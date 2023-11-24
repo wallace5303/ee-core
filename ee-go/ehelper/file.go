@@ -1,4 +1,4 @@
-package eutil
+package ehelper
 
 import "os"
 

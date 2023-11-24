@@ -11,12 +11,12 @@ import (
 	"ee-go/eapp"
 	"ee-go/econfig"
 	"ee-go/eerror"
+	"ee-go/ehelper"
 	"ee-go/ehttp"
 	"ee-go/elog"
 	"ee-go/eos"
 	"ee-go/eruntime"
 	"ee-go/estatic"
-	"ee-go/eutil"
 )
 
 var (
@@ -100,7 +100,7 @@ func initApp() {
 func initUserDir() {
 	eruntime.UserHomeDir, _ = eos.GetUserHomeDir()
 	eruntime.UserHomeConfDir = filepath.Join(eruntime.UserHomeDir, ".config", eruntime.AppName)
-	if !eutil.FileIsExist(eruntime.UserHomeConfDir) {
+	if !ehelper.FileIsExist(eruntime.UserHomeConfDir) {
 		if err := os.MkdirAll(eruntime.UserHomeConfDir, 0755); err != nil && !os.IsExist(err) {
 			errMsg := fmt.Sprintf("create user home conf folder [%s] failed: %s", eruntime.UserHomeConfDir, err)
 			eerror.ThrowWithCode(errMsg, eerror.ExitCreateUserHomeConfDir)
@@ -120,7 +120,7 @@ func initUserDir() {
 			}
 		}
 	}
-	if !eutil.FileIsExist(eruntime.WorkDir) {
+	if !ehelper.FileIsExist(eruntime.WorkDir) {
 		if err := os.MkdirAll(eruntime.WorkDir, 0755); err != nil && !os.IsExist(err) {
 			errMsg := fmt.Sprintf("create work folder [%s] failed: %s", eruntime.WorkDir, err)
 			eerror.ThrowWithCode(errMsg, eerror.ExitCreateWorkDir)
@@ -128,7 +128,7 @@ func initUserDir() {
 	}
 
 	eruntime.DataDir = filepath.Join(eruntime.WorkDir, "data")
-	if !eutil.FileIsExist(eruntime.DataDir) {
+	if !ehelper.FileIsExist(eruntime.DataDir) {
 		if err := os.MkdirAll(eruntime.DataDir, 0755); err != nil && !os.IsExist(err) {
 			errMsg := fmt.Sprintf("create data folder [%s] failed: %s", eruntime.DataDir, err)
 			eerror.ThrowWithCode(errMsg, eerror.ExitCreateDataDir)
@@ -136,7 +136,7 @@ func initUserDir() {
 	}
 
 	logDir := filepath.Join(eruntime.WorkDir, "logs")
-	if !eutil.FileIsExist(logDir) {
+	if !ehelper.FileIsExist(logDir) {
 		if err := os.MkdirAll(logDir, 0755); err != nil && !os.IsExist(err) {
 			errMsg := fmt.Sprintf("create logs folder [%s] failed: %s", logDir, err)
 			eerror.ThrowWithCode(errMsg, eerror.ExitCreateLogDir)
@@ -146,7 +146,7 @@ func initUserDir() {
 
 	eruntime.TmpDir = filepath.Join(eruntime.DataDir, "tmp")
 	os.RemoveAll(eruntime.TmpDir)
-	if !eutil.FileIsExist(eruntime.TmpDir) {
+	if !ehelper.FileIsExist(eruntime.TmpDir) {
 		if err := os.MkdirAll(eruntime.TmpDir, 0755); err != nil && !os.IsExist(err) {
 			errMsg := fmt.Sprintf("create tmp folder [%s] failed: %s", eruntime.TmpDir, err)
 			eerror.ThrowWithCode(errMsg, eerror.ExitCreateTmpDir)
