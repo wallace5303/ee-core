@@ -1,4 +1,4 @@
-package eserver
+package ehttp
 
 import (
 	"fmt"
@@ -15,6 +15,8 @@ import (
 
 	"ee-go/econfig"
 	"ee-go/eerror"
+	"ee-go/ehelper"
+	"ee-go/ehttp/router"
 	"ee-go/elog"
 	"ee-go/eruntime"
 	"ee-go/estatic"
@@ -33,21 +35,25 @@ var (
 	PlatformBrowser = "browser"
 	PlatformPhone   = "phone"
 	PlatformPad     = "pad"
-
-	Router *gin.Engine
 	//Context *gin.Context
 
 	Conf map[string]any
 )
 
-func CreateHttpServer(cfg map[string]any) {
+var (
+	ginRouter *gin.Engine
+)
+
+func CreateServer(cfg map[string]any) {
+	elog.Logger.Infof("[ee-go] load http service")
 	Conf = cfg
 	//fmt.Printf("http config: %#v\n", cfg)
 
 	gin.SetMode(gin.ReleaseMode)
-	Router = gin.New()
-	Router.MaxMultipartMemory = 1024 * 1024 * 64
-	Router.Use(
+	ginRouter = gin.New()
+	router.SetGinRouter(ginRouter)
+	ginRouter.MaxMultipartMemory = 1024 * 1024 * 64
+	ginRouter.Use(
 		setCors(),
 		setSession(),
 		setGzip(),
@@ -60,7 +66,7 @@ func CreateHttpServer(cfg map[string]any) {
 	protocol := Conf["protocol"].(string)
 	hostname := Conf["hostname"].(string)
 	network := Conf["network"].(bool)
-	if network == true {
+	if network {
 		hostname = "0.0.0.0"
 	}
 	portStr := eruntime.Port
@@ -85,7 +91,7 @@ func CreateHttpServer(cfg map[string]any) {
 }
 
 func run(ln net.Listener) {
-	if err := http.Serve(ln, Router); nil != err {
+	if err := http.Serve(ln, ginRouter); nil != err {
 		elog.Logger.Errorf("[ee-go] http server startup failure: %s", err)
 		eerror.ThrowWithCode("", eerror.ExitHttpStartupErr)
 	}
@@ -131,17 +137,17 @@ func setSession() gin.HandlerFunc {
 }
 
 func loadDebug() {
-	Router.GET("/debug/pprof/", gin.WrapF(pprof.Index))
-	Router.GET("/debug/pprof/cmdline", gin.WrapF(pprof.Cmdline))
-	Router.GET("/debug/pprof/symbol", gin.WrapF(pprof.Symbol))
-	Router.GET("/debug/pprof/trace", gin.WrapF(pprof.Trace))
-	Router.GET("/debug/pprof/profile", gin.WrapF(pprof.Profile))
+	ginRouter.GET("/debug/pprof/", gin.WrapF(pprof.Index))
+	ginRouter.GET("/debug/pprof/cmdline", gin.WrapF(pprof.Cmdline))
+	ginRouter.GET("/debug/pprof/symbol", gin.WrapF(pprof.Symbol))
+	ginRouter.GET("/debug/pprof/trace", gin.WrapF(pprof.Trace))
+	ginRouter.GET("/debug/pprof/profile", gin.WrapF(pprof.Profile))
 }
 
 func loadViews() {
 
 	// home page
-	Router.GET("/", func(ctx *gin.Context) {
+	ginRouter.GET("/", func(ctx *gin.Context) {
 		location := url.URL{}
 
 		if GetPlatform(ctx) == PlatformPC {
@@ -161,8 +167,8 @@ func loadViews() {
 	})
 
 	// 404
-	Router.NoRoute(func(ctx *gin.Context) {
-		ret := NewJson()
+	ginRouter.NoRoute(func(ctx *gin.Context) {
+		ret := ehelper.GetJson()
 		ret.Code = http.StatusNotFound
 		ret.Msg = fmt.Sprintf("not found '%s:%s'", ctx.Request.Method, ctx.Request.URL.Path)
 
@@ -180,20 +186,20 @@ func loadAssets() {
 		distHttpFS := http.FS(distFsys)
 		// fileServer := http.FileServer(http.FS(fsys))
 
-		Router.StaticFileFS("favicon.ico", "public/images/logo-32.png", HttpFS)
+		ginRouter.StaticFileFS("favicon.ico", "public/images/logo-32.png", HttpFS)
 
 		// [todo] 后续可以考虑做成多目录
-		Router.StaticFS("/app/", distHttpFS)
-		Router.StaticFS("/browser/", distHttpFS)
-		Router.StaticFS("/mobile/", distHttpFS)
+		ginRouter.StaticFS("/app/", distHttpFS)
+		ginRouter.StaticFS("/browser/", distHttpFS)
+		ginRouter.StaticFS("/mobile/", distHttpFS)
 
 	} else {
-		Router.StaticFile("favicon.ico", filepath.Join(eruntime.PublicDir, "images", "logo-32.png"))
+		ginRouter.StaticFile("favicon.ico", filepath.Join(eruntime.PublicDir, "images", "logo-32.png"))
 
 		// [todo] 后续可以考虑做成多目录
-		Router.Static("/app/", filepath.Join(eruntime.PublicDir, "dist"))
-		Router.Static("/browser/", filepath.Join(eruntime.PublicDir, "dist"))
-		Router.Static("/mobile/", filepath.Join(eruntime.PublicDir, "dist"))
+		ginRouter.Static("/app/", filepath.Join(eruntime.PublicDir, "dist"))
+		ginRouter.Static("/browser/", filepath.Join(eruntime.PublicDir, "dist"))
+		ginRouter.Static("/mobile/", filepath.Join(eruntime.PublicDir, "dist"))
 	}
 
 }

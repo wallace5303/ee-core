@@ -11,10 +11,10 @@ import (
 	"ee-go/eapp"
 	"ee-go/econfig"
 	"ee-go/eerror"
+	"ee-go/ehttp"
 	"ee-go/elog"
 	"ee-go/eos"
 	"ee-go/eruntime"
-	"ee-go/eserver"
 	"ee-go/estatic"
 	"ee-go/eutil"
 )
@@ -22,11 +22,16 @@ import (
 var (
 // cmdENV  = "prod" // 'dev' 'prod'
 // cmdPort = "0"
-// progressBar  float64 // 0 ~ 100
-// progressDesc string  // description
 )
 
-func New(staticFS embed.FS) {
+type Ego struct {
+}
+
+func (ego *Ego) Run() {
+	eapp.Run()
+}
+
+func New(staticFS embed.FS) *Ego {
 	// args
 	environment := flag.String("env", "prod", "dev/prod")
 	baseDir := flag.String("basedir", "./", "base directory")
@@ -57,6 +62,9 @@ func New(staticFS embed.FS) {
 	fmt.Println("SSL:", eruntime.SSL)
 
 	initApp()
+
+	ego := &Ego{}
+	return ego
 }
 
 func initApp() {
@@ -84,7 +92,7 @@ func initApp() {
 	// http server
 	httpCfg := econfig.GetHttp()
 	if httpCfg["enable"] == true {
-		eserver.Init("http", httpCfg)
+		ehttp.CreateServer(httpCfg)
 	}
 
 }
@@ -153,8 +161,4 @@ func initUserDir() {
 	fmt.Println("WorkDir:", eruntime.WorkDir)
 	fmt.Println("DataDir:", eruntime.DataDir)
 	fmt.Println("TmpDir:", eruntime.TmpDir)
-}
-
-func Run() {
-	eapp.Run()
 }
