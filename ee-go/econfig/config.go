@@ -23,7 +23,7 @@ func Init() {
 	envCfgName := "public/config/config.prod.json"
 
 	// dev
-	if eruntime.IsDev() {
+	if eruntime.IsDev() || eruntime.IsDebug() {
 		// 优先读项目中的（构建后，项目中的是不存在的）
 		defaultConfigPath := filepath.Join(eruntime.BaseDir, "go", "config", "config.default.json")
 		devConfigPath := filepath.Join(eruntime.BaseDir, "go", "config", "config.local.json")

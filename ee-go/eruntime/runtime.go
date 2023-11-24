@@ -1,7 +1,6 @@
 package eruntime
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -17,6 +16,7 @@ var (
 	AppName    = ""
 	Platform   = "pc" // pc | mobile | web
 	IsExiting  = false
+	Debug      = false
 )
 
 var (
@@ -37,9 +37,6 @@ var (
 
 func InitDir() {
 	PublicDir = filepath.Join(BaseDir, "public")
-
-	fmt.Println("BaseDir:", BaseDir)
-	fmt.Println("PublicDir:", PublicDir)
 }
 
 // Pwd gets the path of current working directory.
@@ -49,6 +46,10 @@ func IsPord() bool {
 
 func IsDev() bool {
 	return (ENV == "dev")
+}
+
+func IsDebug() bool {
+	return Debug
 }
 
 func Pwd() string {

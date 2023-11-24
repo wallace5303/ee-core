@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"ee-go/eapp"
 	"ee-go/econfig"
@@ -17,6 +18,7 @@ import (
 	"ee-go/eos"
 	"ee-go/eruntime"
 	"ee-go/estatic"
+	"ee-go/test"
 )
 
 var (
@@ -37,15 +39,16 @@ func New(staticFS embed.FS) *Ego {
 	baseDir := flag.String("basedir", "./", "base directory")
 	port := flag.String("port", "", "service port")
 	ssl := flag.String("ssl", "false", "https/wss service")
-
+	debug := flag.String("debug", "false", "debug")
 	flag.Parse()
 
-	fmt.Println("cmdENV:", *environment)
-	fmt.Println("baseDir:", *baseDir)
-	fmt.Println("goport:", *port)
-	fmt.Println("ssl:", *ssl)
+	// fmt.Println("cmdENV:", *environment)
+	// fmt.Println("baseDir:", *baseDir)
+	// fmt.Println("goport:", *port)
+	// fmt.Println("ssl:", *ssl)
 
 	eruntime.ENV = *environment
+	eruntime.Debug, _ = strconv.ParseBool(*debug)
 	eruntime.BaseDir = filepath.Join(eruntime.BaseDir, *baseDir)
 	cmdGoPort, err := strconv.Atoi(*port)
 	if err == nil && cmdGoPort > 0 {
@@ -56,12 +59,10 @@ func New(staticFS embed.FS) *Ego {
 	// static "./public"
 	estatic.StaticFS = staticFS
 
-	fmt.Println("ENV:", eruntime.ENV)
-	fmt.Println("BaseDir:", eruntime.BaseDir)
-	fmt.Println("Port:", eruntime.Port)
-	fmt.Println("SSL:", eruntime.SSL)
-
 	initApp()
+
+	// debug
+	test.Info()
 
 	ego := &Ego{}
 	return ego
@@ -111,14 +112,19 @@ func initUserDir() {
 
 	eruntime.WorkDir = eruntime.BaseDir
 	if eruntime.IsPord() {
+		// userhome/appname
 		eruntime.WorkDir = filepath.Join(eruntime.UserHomeDir, eruntime.AppName)
-		// windows
+		// windows, userhome/Documents/appname
 		if eos.IsWindows() {
-			// [todo] 判断一下userProfile路径中 有没有 Documents
 			userProfile := os.Getenv("USERPROFILE")
-			//fmt.Println("userProfile:", userProfile)
+			// fmt.Println("userProfile:", userProfile)
 			if userProfile != "" {
-				eruntime.WorkDir = filepath.Join(userProfile, "Documents", eruntime.AppName)
+				// 判断一下userProfile路径中 有没有 Documents
+				if strings.Contains(userProfile, "Documents") {
+					eruntime.WorkDir = filepath.Join(userProfile, eruntime.AppName)
+				} else {
+					eruntime.WorkDir = filepath.Join(userProfile, "Documents", eruntime.AppName)
+				}
 			}
 		}
 	}
@@ -157,10 +163,4 @@ func initUserDir() {
 	os.Setenv("TMPDIR", eruntime.TmpDir)
 	os.Setenv("TEMP", eruntime.TmpDir)
 	os.Setenv("TMP", eruntime.TmpDir)
-
-	fmt.Println("UserHomeDir:", eruntime.UserHomeDir)
-	fmt.Println("UserHomeConfDir:", eruntime.UserHomeConfDir)
-	fmt.Println("WorkDir:", eruntime.WorkDir)
-	fmt.Println("DataDir:", eruntime.DataDir)
-	fmt.Println("TmpDir:", eruntime.TmpDir)
 }

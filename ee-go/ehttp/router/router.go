@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -36,7 +37,8 @@ func Handle(httpMethod, path string, handler HandlerFunc) {
 			if err := recover(); err != nil {
 				ctx.Err = err
 			}
-			elog.CoreLogger.Infof("execution time:%d", ctx.Timed)
+			record := fmt.Sprintf("[ee-go] http-method:%s, path:%s, exec-time:%dms", httpMethod, path, ctx.Timed)
+			elog.CoreLogger.Infof(record)
 		}()
 		handler(ctx)
 	})

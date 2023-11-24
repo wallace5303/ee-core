@@ -89,14 +89,13 @@ module.exports = {
     const binCfg = Utils.loadConfig(config);
     const binCmdConfig = binCfg[binCmd];
 
-    if (typeof command !== "string" || !cmds) {
-      console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.red(`Error: Please specify parameters for --cmds` ));
-      return
-    }
+    // if (typeof command !== "string" || !cmds) {
+    //   console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.red(`Error: Please specify parameters for --cmds` ));
+    //   return
+    // }
 
     // 兼容
     if (typeof command === "string") {
-      console.log("dd:", typeof command)
       cmds = command;
     }
 
