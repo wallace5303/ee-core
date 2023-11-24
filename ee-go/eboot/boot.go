@@ -86,8 +86,10 @@ func initApp() {
 	initUserDir()
 
 	// init logger
+	coreLogCfg := econfig.GetCoreLogger()
 	logCfg := econfig.GetLogger()
-	elog.Init(logCfg)
+	elog.InitCoreLog(coreLogCfg)
+	elog.InitLog(logCfg)
 
 	// http server
 	httpCfg := econfig.GetHttp()

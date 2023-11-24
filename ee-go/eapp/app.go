@@ -20,7 +20,7 @@ func Run() {
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	sig := <-sigCh
 
-	elog.Logger.Infof("[ee-go] received signal: %s", sig)
+	elog.CoreLogger.Infof("[ee-go] received signal: %s", sig)
 	Close()
 }
 
@@ -29,13 +29,13 @@ func Close() {
 	exitLock.Lock()
 	defer exitLock.Unlock()
 	eruntime.IsExiting = true
-	elog.Logger.Infof("[ee-go] process is exiting...")
+	elog.CoreLogger.Infof("[ee-go] process is exiting...")
 
 	// [todo] wait other
 	go func() {
 		time.Sleep(500 * time.Millisecond)
 		eruntime.IsExiting = false
-		elog.Logger.Infof("[ee-go] process has exited!")
+		elog.CoreLogger.Infof("[ee-go] process has exited!")
 		os.Exit(0)
 	}()
 }

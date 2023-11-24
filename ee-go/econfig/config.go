@@ -82,6 +82,15 @@ func GetLogger() map[string]any {
 	return logCfg
 }
 
+func GetCoreLogger() map[string]any {
+	cfg := Vip.Get("core_logger")
+	logCfg, ok := cfg.(map[string]any)
+	if !ok {
+		eerror.ThrowWithCode("Get core_logger config error !", eerror.ExitConfigCoreLogErr)
+	}
+	return logCfg
+}
+
 func GetHttp() map[string]any {
 	cfg := Vip.Get("http")
 	httpCfg, ok := cfg.(map[string]any)

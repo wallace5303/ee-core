@@ -44,7 +44,7 @@ var (
 )
 
 func CreateServer(cfg map[string]any) {
-	elog.Logger.Infof("[ee-go] load http service")
+	elog.CoreLogger.Infof("[ee-go] load http service")
 	Conf = cfg
 	//fmt.Printf("http config: %#v\n", cfg)
 
@@ -77,13 +77,13 @@ func CreateServer(cfg map[string]any) {
 	address := hostname + ":" + portStr
 	ln, err := net.Listen("tcp", address)
 	if nil != err {
-		elog.Logger.Errorf("[ee-go] http server startup failure : %s", err)
+		elog.CoreLogger.Errorf("[ee-go] http server startup failure : %s", err)
 		eerror.ThrowWithCode("", eerror.ExitListenPortErr)
 	}
 
 	url := protocol + address
 	pid := os.Getpid()
-	elog.Logger.Infof("[ee-go] http server %s, pid:%d", url, pid)
+	elog.CoreLogger.Infof("[ee-go] http server %s, pid:%d", url, pid)
 	eruntime.HttpServerIsRunning = true
 
 	go run(ln)
@@ -91,7 +91,7 @@ func CreateServer(cfg map[string]any) {
 
 func run(ln net.Listener) {
 	if err := http.Serve(ln, ginRouter); nil != err {
-		elog.Logger.Errorf("[ee-go] http server startup failure: %s", err)
+		elog.CoreLogger.Errorf("[ee-go] http server startup failure: %s", err)
 		eerror.ThrowWithCode("", eerror.ExitHttpStartupErr)
 	}
 }

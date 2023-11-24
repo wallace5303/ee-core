@@ -17,7 +17,8 @@ const (
 	ExitConfigFileNotExist = -13
 	ExitConfigStaticErr    = -14
 	ExitConfigLogErr       = -15
-	ExitConfigHttpErr      = -16
+	ExitConfigCoreLogErr   = -16
+	ExitConfigHttpErr      = -17
 
 	// log
 	ExitConfigGenerate = -21

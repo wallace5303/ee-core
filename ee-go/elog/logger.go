@@ -14,10 +14,10 @@ import (
 )
 
 var (
-	LogDir  string // electron-egg logs directory
-	LogName = "ee-go.log"
-	zlogger *zap.Logger
-	Logger  *zap.SugaredLogger
+	LogDir     string // electron-egg logs directory
+	LogName    = "ee-go.log"
+	Logger     *zap.SugaredLogger
+	CoreLogger *zap.SugaredLogger
 )
 
 // var (
@@ -42,7 +42,17 @@ func init() {
 }
 
 // [todo] 跨天情况待测试
-func Init(cfg map[string]any) *zap.SugaredLogger {
+func InitLog(cfg map[string]any) {
+	zlog := GetZLog(cfg)
+	Logger = zlog.Sugar()
+}
+
+func InitCoreLog(cfg map[string]any) {
+	zlog := GetZLog(cfg)
+	CoreLogger = zlog.Sugar()
+}
+
+func GetZLog(cfg map[string]any) *zap.Logger {
 	// log abs path
 	fileFullPath := filepath.Join(LogDir, LogName)
 
@@ -73,16 +83,18 @@ func Init(cfg map[string]any) *zap.SugaredLogger {
 	}
 	//fmt.Printf("lc:%#v\n", lc)
 
-	errInit := generateLogger(lc)
+	zlog, errInit := generateLogger(lc)
 	if errInit != nil {
 		errMsg := fmt.Sprintf("Generate logger error: %s", errInit)
 		eerror.ThrowWithCode(errMsg, eerror.ExitConfigGenerate)
 	}
 
-	lg := zap.L()
-	Logger = lg.Sugar()
+	// lg := zap.L()
+	// Logger = lg.Sugar()
+	// Logger = zlogger.Sugar()
+	// CoreLogger = zlogger.Sugar()
 
-	return Logger
+	return zlog
 }
 
 func SetLogDir(path string) {
@@ -124,7 +136,7 @@ func getLogWriter(filename string, maxsize, maxAge int) (ioWS zapcore.WriteSynce
 }
 
 // generate Logger
-func generateLogger(lCfg LogConfig) (err error) {
+func generateLogger(lCfg LogConfig) (zlogger *zap.Logger, err error) {
 	writeSyncer := getLogWriter(lCfg.FileName, lCfg.MaxSize, lCfg.MaxAge)
 	encoder := getEncoder(lCfg.OutputJSON)
 
@@ -139,79 +151,15 @@ func generateLogger(lCfg LogConfig) (err error) {
 	zlogger = zap.New(core, zap.AddCaller())
 
 	// Replace the global logger instance in the zap package, and then only use the Zap.l () call in other packages
-	zap.ReplaceGlobals(zlogger)
+	//zap.ReplaceGlobals(zlogger)
 	return
 }
 
 // Get Logger
-func GetLogger() *zap.SugaredLogger {
-	if Logger != nil {
-		return Logger
-	}
-	Logger := Init(nil)
-	return Logger
-}
-
-// // Logger Debug
-// func Debug(args ...interface{}) {
-// 	if Logger == nil {
-// 		Logger = CreateLogger(nil)
+// func GetLogger() *zap.SugaredLogger {
+// 	if Logger != nil {
+// 		return Logger
 // 	}
-// 	Logger.Debug(args...)
-// }
-
-// // Logger Debugf
-// func Debugf(template string, args ...interface{}) {
-// 	if Logger == nil {
-// 		Logger = CreateLogger(nil)
-// 	}
-// 	Logger.Debugf(template, args...)
-// }
-
-// // Logger Error
-// func Error(args ...interface{}) {
-// 	if Logger == nil {
-// 		Logger = CreateLogger(nil)
-// 	}
-// 	Logger.Error(args...)
-// }
-
-// // Logger Errorf
-// func Errorf(template string, args ...interface{}) {
-// 	if Logger == nil {
-// 		Logger = CreateLogger(nil)
-// 	}
-// 	Logger.Errorf(template, args...)
-// }
-
-// // Logger Fatal
-// func Fatal(args ...interface{}) {
-// 	if Logger == nil {
-// 		Logger = CreateLogger(nil)
-// 	}
-// 	Logger.Fatal(args...)
-// }
-
-// // Logger Fatalf
-// func Fatalf(template string, args ...interface{}) {
-// 	if Logger == nil {
-// 		Logger = CreateLogger(nil)
-// 	}
-// 	Logger.Fatalf(template, args...)
-// }
-
-// // Logger Info
-// func Info(args ...interface{}) {
-// 	if Logger == nil {
-// 		Logger = CreateLogger(nil)
-// 	}
-// 	Logger.Info(args...)
-// }
-
-// Logger Infof
-// func Infof(template string, args ...interface{}) func() {
-// 	if Logger == nil {
-// 		Logger = InitLogger(nil)
-// 	}
-// 	return Logger.Infof(template, args...)
+// 	Logger := Init(nil)
+// 	return Logger
 // }

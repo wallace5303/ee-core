@@ -36,8 +36,7 @@ func Handle(httpMethod, path string, handler HandlerFunc) {
 			if err := recover(); err != nil {
 				ctx.Err = err
 			}
-			// 增加开关
-			elog.Logger.Infof("execution time:%d", ctx.Timed)
+			elog.CoreLogger.Infof("execution time:%d", ctx.Timed)
 		}()
 		handler(ctx)
 	})
