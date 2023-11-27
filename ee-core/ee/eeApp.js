@@ -121,12 +121,13 @@ class EeApp extends BaseApp {
       let url;
       let load = 'url';
       const configFile = './electron/config/bin.js';
+      let electronCfg = {};
 
       const isBin = UtilsHelper.checkConfig(configFile);
       if (isBin) {
         const binConfig = UtilsHelper.loadConfig(configFile);
-        const { frontend } = binConfig.dev;
-        modeInfo = frontend;
+        modeInfo = binConfig.dev.frontend;
+        electronCfg = binConfig.dev.electron;
       } else {
         // 兼容旧的 developmentMode
         const developmentModeConfig = this.config.developmentMode;
@@ -142,8 +143,13 @@ class EeApp extends BaseApp {
 
       // 检查 UI serve是否启动，先加载一个boot page
       if (load == 'url') {
-        const bootPage = path.join(__dirname, '..', 'html', 'boot.html');
-        this.mainWindow.loadFile(bootPage);
+        // loading page
+        let lp = path.join(__dirname, '..', 'html', 'boot.html');
+        if (electronCfg.hasOwnProperty('loadingPage') && electronCfg.loadingPage != '') {
+          lp = path.join(this.config.homeDir, electronCfg.loadingPage);
+        }
+        this._loadingPage(lp);
+
         let count = 0;
         let frontendReady = false;
         const hc = new HttpClient();
@@ -197,14 +203,22 @@ class EeApp extends BaseApp {
     const crossConfig = this.config.cross;
 
     // loading page
-    this._loadingPage(mainCfg);
+    if (mainCfg.hasOwnProperty('loadingPage')) {
+      const lp = path.join(this.config.homeDir, mainCfg.loadingPage);
+      this._loadingPage(lp);
+    }
 
     // cross service url
-    if (!crossConfig.hasOwnProperty(mainCfg.takeover)) {
-      Log.coreLogger.error(`[ee-core] Please check cross config !`);
+    const service = mainCfg.takeover;
+    if (!crossConfig.hasOwnProperty(service)) {
       throw new Error(`[ee-core] Please Check the value of mainServer.takeover in the config file !`);
     }
-    const url = Cross.getUrl(mainCfg.takeover);
+    // check service
+    if (crossConfig[service].enable != true) {
+      throw new Error(`[ee-core] Please Check the value of cross.${service} enable is true !`);
+    }
+
+    const url = Cross.getUrl(service);
 
     let count = 0;
     let serviceReady = false;
@@ -230,11 +244,10 @@ class EeApp extends BaseApp {
     if (serviceReady == false) {
       const bootFailurePage = path.join(__dirname, '..', 'html', 'cross-failure.html');
       this.mainWindow.loadFile(bootFailurePage);
-      Log.coreLogger.error(`[ee-core] Please check cross service [${mainCfg.takeover}] ${url} !`);
-      return;
+      throw new Error(`[ee-core] Please check cross service [${service}] ${url} !`)
     }
 
-    Log.coreLogger.info(`[ee-core] cross service [${mainCfg.takeover}] is started successfully`);
+    Log.coreLogger.info(`[ee-core] cross service [${service}] is started successfully`);
     this.loadMainUrl('spa', url);
   }  
 
@@ -308,14 +321,12 @@ class EeApp extends BaseApp {
   /**
    * loading page
    */  
-  _loadingPage(mainCfg = {}) {
-    const p = mainCfg.hasOwnProperty('loadingPage') ? mainCfg.loadingPage : 'unknown';
-    const lp = path.join(this.config.homeDir, p);
-    if (!fs.existsSync(lp)) {
+  _loadingPage(name) {
+    if (!fs.existsSync(name)) {
       return
     }
 
-    this.mainWindow.loadFile(lp);
+    this.mainWindow.loadFile(name);
   }
 
   /**
