@@ -2,7 +2,7 @@ const fs = require('fs');
 const crossSpawn = require('cross-spawn');
 const path = require('path');
 const is = require('is-type-of');
-const Conf = require('../config');
+const Conf = require('../config/cache');
 const UtilsHelper = require('../utils/helper');
 const UtilsIs = require('../utils/is');
 const UtilsPargv = require('../utils/pargv');
@@ -97,8 +97,11 @@ const CrossLanguageService = {
     return arr;
   },
 
-  getUrl(argv) {
-    const args = this.getArgs(argv);
+  getUrl(service) {
+    const cfg = Conf.getValue('cross');
+    const servicesCfg = cfg[service];
+
+    const args = this.getArgs(servicesCfg.args);
     let protocol = 'http://';
     if (args.hasOwnProperty('ssl') && (args.ssl == 'true' || args.ssl == '1')) {
       protocol = 'https://';

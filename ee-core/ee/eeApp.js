@@ -204,8 +204,7 @@ class EeApp extends BaseApp {
       Log.coreLogger.error(`[ee-core] Please check cross config !`);
       throw new Error(`[ee-core] Please Check the value of mainServer.takeover in the config file !`);
     }
-    const servicesCfg = crossConfig[mainCfg.takeover];
-    const url = Cross.getUrl(servicesCfg.args);
+    const url = Cross.getUrl(mainCfg.takeover);
 
     let count = 0;
     let serviceReady = false;
