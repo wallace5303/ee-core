@@ -65,7 +65,7 @@ const CrossLanguageService = {
     // Launch executable program
     const coreProcess = crossSpawn(cmdPath, cmdArgs, { stdio: 'inherit', detached: false });
     coreProcess.on('close', (code, signal) => {
-      Log.coreLogger.info(`[ee-core] [cross/run] [pid=${coreProcess.pid}, port=${port}] exited with code: ${code}, signal: ${signal}`);
+      Log.coreLogger.info(`[ee-core] [cross/run] [pid=${coreProcess.pid}, port=${confPort}] exited with code: ${code}, signal: ${signal}`);
       if (0 !== code) {
         // 弹错误窗口
       }
