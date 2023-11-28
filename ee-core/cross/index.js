@@ -70,7 +70,10 @@ const CrossLanguageService = {
         // 弹错误窗口
       }
 
-      CoreElectronApp.quit();
+      setTimeout(() => {
+        // 延迟退出，进程退出前的一些处理
+        CoreElectronApp.quit();
+      }, 1500)
     });
     this.execProcess[cmdName] = coreProcess;
   },
