@@ -63,7 +63,7 @@ const CrossLanguageService = {
     Log.coreLogger.info(`[ee-core] [cross/run] cmd: ${cmdPath}, args: ${cmdArgs}`);
 
     // Launch executable program
-    const coreProcess = crossSpawn(cmdPath, cmdArgs, { stdio: 'inherit', detached: false });
+    const coreProcess = crossSpawn(cmdPath, cmdArgs, { stdio: 'ignore', detached: false });
     coreProcess.on('close', (code, signal) => {
       Log.coreLogger.info(`[ee-core] [cross/run] [pid=${coreProcess.pid}, port=${confPort}] exited with code: ${code}, signal: ${signal}`);
       if (0 !== code) {
@@ -73,9 +73,9 @@ const CrossLanguageService = {
       setTimeout(() => {
         // 延迟退出，进程退出前的一些处理
         CoreElectronApp.quit();
-      }, 1500)
+      }, 1000)
     });
-    this.execProcess[cmdName] = coreProcess;
+    // this.execProcess[cmdName] = coreProcess;
   },
 
   getArgs(argv, key) {
