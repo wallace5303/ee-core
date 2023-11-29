@@ -77,6 +77,8 @@ class EeApp extends BaseApp {
       return
     }
 
+    await this.crossService();
+    
     await this.electronAppReady();
   }
     

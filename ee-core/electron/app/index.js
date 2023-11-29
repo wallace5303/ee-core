@@ -3,6 +3,7 @@ const EE = require('../../ee');
 const Log = require('../../log');
 const Electron = require('../index');
 const UtilsIs = require('../../utils/is');
+const Cross = require('../../cross');
 
 /**
  * CoreElectronApp (框架封装的electron app对象)
@@ -34,6 +35,9 @@ const CoreElectronApp = {
 
     app.on('before-quit', () => {
       Electron.extra.closeWindow = true;
+
+      // kill cross services
+      Cross.kill();
     })
 
     if (CoreApp.config.hardGpu.enable == false) {

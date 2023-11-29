@@ -88,8 +88,6 @@ class Appliaction extends EeApp {
     await this.createPorts();
 
     await this.startSocket();
-
-    await this.crossService();
     
     await this.ready();
 

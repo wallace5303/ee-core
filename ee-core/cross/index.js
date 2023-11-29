@@ -9,7 +9,7 @@ const UtilsPargv = require('../utils/pargv');
 const Ps = require('../ps');
 const Log = require('../log');
 const GetPort = require('../utils/get-port');
-const CoreElectronApp = require('../electron/app');
+const { app: electronApp } = require('electron');
 
 /**
  * Cross-language service
@@ -17,7 +17,7 @@ const CoreElectronApp = require('../electron/app');
  */
 const CrossLanguageService = {
 
-  execProcess: {},
+  children: {},
 
   /**
    * create
@@ -63,6 +63,7 @@ const CrossLanguageService = {
     Log.coreLogger.info(`[ee-core] [cross/run] cmd: ${cmdPath}, args: ${cmdArgs}`);
 
     // Launch executable program
+    //ignore inherit
     const coreProcess = crossSpawn(cmdPath, cmdArgs, { stdio: 'ignore', detached: false });
     coreProcess.on('close', (code, signal) => {
       Log.coreLogger.info(`[ee-core] [cross/run] [pid=${coreProcess.pid}, port=${confPort}] exited with code: ${code}, signal: ${signal}`);
@@ -70,12 +71,28 @@ const CrossLanguageService = {
         // 弹错误窗口
       }
 
-      setTimeout(() => {
-        // 延迟退出，进程退出前的一些处理
-        CoreElectronApp.quit();
-      }, 1000)
+      // electron quit
+      if (conf.appExit) {
+        setTimeout(() => {
+          // 进程退出前的一些清理工作
+          electronApp.quit();
+        }, 1000)
+      }
     });
-    // this.execProcess[cmdName] = coreProcess;
+    this.children[cmdName] = coreProcess;
+  },
+
+  kill() {
+    Object.keys(this.children).forEach(key => {
+      let proc = this.children[key];
+      if (proc) {
+        proc.kill('SIGINT');
+        setTimeout(() => {
+          if (proc.killed) return;
+          proc.kill('SIGKILL');
+        }, 500)
+      }
+    });
   },
 
   getArgs(argv, key) {
