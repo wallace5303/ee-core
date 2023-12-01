@@ -67,7 +67,7 @@ module.exports = {
     if (!cmds || cmds == "") {
       // [todo]
       let tip = chalk.bgYellow('Warning') + ' Please modify the ' + chalk.blue('build') + ' config, See: ';
-      tip += chalk.underline('https://www.kaka996.com/pages/e1816f/');
+      tip += chalk.underline('https://www.kaka996.com/pages/c492f8/');
       console.log(tip);
       return
     }

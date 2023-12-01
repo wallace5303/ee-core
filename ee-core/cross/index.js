@@ -64,11 +64,12 @@ const CrossLanguageService = {
 
     // Launch executable program
     //ignore inherit
-    const coreProcess = crossSpawn(cmdPath, cmdArgs, { stdio: 'ignore', detached: false });
+    const coreProcess = crossSpawn(cmdPath, cmdArgs, { stdio: 'inherit', detached: false });
     coreProcess.on('close', (code, signal) => {
       Log.coreLogger.info(`[ee-core] [cross/run] [pid=${coreProcess.pid}, port=${confPort}] exited with code: ${code}, signal: ${signal}`);
       if (0 !== code) {
         // 弹错误窗口
+        Log.coreLogger.error(`[ee-core] [cross/run] Please check [${cmdName}] service log !!!`);
       }
 
       // electron quit
