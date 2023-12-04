@@ -63,8 +63,11 @@ const CrossLanguageService = {
     Log.coreLogger.info(`[ee-core] [cross/run] cmd: ${cmdPath}, args: ${cmdArgs}`);
 
     // Launch executable program
-    //ignore inherit
-    const coreProcess = crossSpawn(cmdPath, cmdArgs, { stdio: 'inherit', detached: false });
+    let standardOutput = 'ignore';
+    if (!Ps.isPackaged()) {
+      standardOutput = 'inherit'
+    }
+    const coreProcess = crossSpawn(cmdPath, cmdArgs, { stdio: standardOutput, detached: false });
     coreProcess.on('close', (code, signal) => {
       Log.coreLogger.info(`[ee-core] [cross/run] [pid=${coreProcess.pid}, port=${confPort}] exited with code: ${code}, signal: ${signal}`);
       if (0 !== code) {
