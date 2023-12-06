@@ -13,6 +13,7 @@ exports.initMode = function(mode) {
  * 当前模式 - framework | module
  */
 exports.mode = function() {
+  if(process.env.EE_MODE !== undefined)return
   return process.env.EE_MODE;
 }
 
