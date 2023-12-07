@@ -6,6 +6,7 @@ const eis = require('../utils/is');
  */
 exports.initMode = function(mode) {
   // process.env.EE_MODE === undefined
+  if(process.env.EE_MODE !== undefined)return
   return process.env.EE_MODE = mode ? mode : 'framework';
 }
 
