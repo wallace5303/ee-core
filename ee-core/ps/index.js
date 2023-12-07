@@ -5,7 +5,6 @@ const eis = require('../utils/is');
  * 初始化模式
  */
 exports.initMode = function(mode) {
-  // process.env.EE_MODE === undefined
   if(process.env.EE_MODE !== undefined)return
   return process.env.EE_MODE = mode ? mode : 'framework';
 }

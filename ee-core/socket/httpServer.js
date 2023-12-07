@@ -11,8 +11,6 @@ const path = require('path');
 const _ = require('lodash');
 const Log = require('../log');
 const Ps = require('../ps');
-const koaStatic = require('koa-static');
-
 
 /**
  * http server
@@ -31,13 +29,13 @@ class HttpServer {
       throw new Error('[ee-core] [socket/HttpServer] http port required, and must be a number !');
     }
 
-    this.create();
+    this._create();
   }
 
   /**
    * 创建服务
    */
-  create () {
+  _create () {
     const app = this.app;
     const httpServer = this.options;
     const isHttps = httpServer?.https?.enable ?? false;
@@ -60,12 +58,11 @@ class HttpServer {
     koaApp
       .use(cors(corsOptions))
       .use(koaBody(httpServer.body))
-      .use(koaStatic(httpServer.static.path, httpServer.static.options))
       .use(async (ctx, next) => {
         ctx.eeApp = app;
         await next();
       })
-      .use(this.dispatch);
+      .use(this._dispatch);
 
     let msg = '[ee-core] [socket/http] server is: ' + url;
 
@@ -89,7 +86,7 @@ class HttpServer {
   /**
    * 路由分发
    */
-  async dispatch (ctx, next) {
+  async _dispatch (ctx, next) {
     const config = ctx.eeApp.config.httpServer;
     let uriPath = ctx.request.path;
     const method = ctx.request.method;
