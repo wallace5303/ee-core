@@ -11,6 +11,8 @@ const path = require('path');
 const _ = require('lodash');
 const Log = require('../log');
 const Ps = require('../ps');
+const koaStatic = require('koa-static');
+
 
 /**
  * http server
@@ -58,6 +60,7 @@ class HttpServer {
     koaApp
       .use(cors(corsOptions))
       .use(koaBody(httpServer.body))
+      .use(koaStatic(httpServer.static.path, httpServer.static.options))
       .use(async (ctx, next) => {
         ctx.eeApp = app;
         await next();
@@ -93,6 +96,7 @@ class HttpServer {
     let params = ctx.request.query;
     params = is.object(params) ? JSON.parse(JSON.stringify(params)) : {};
     const body = ctx.request.body;
+    const files = ctx.request.files;
 
     // 默认
     ctx.response.status = 200;
@@ -117,7 +121,10 @@ class HttpServer {
         uriPath = 'controller/' + uriPath;
       }
       const cmd = uriPath.split('/').join('.');
-      const args = (method == 'POST') ? body : params;
+      const args = (method == 'POST') ? (ctx.request.header['content-type'] && ctx.request.header['content-type'].startsWith('multipart/form-data;') ? files : body) : params;
+      args.files = ctx.request.files;
+      args.body = ctx.request.body;
+      args.query = ctx.request.query;
       let fn = null;
       if (is.string(cmd)) {
         const actions = cmd.split('.');
