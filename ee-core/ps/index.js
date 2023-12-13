@@ -242,7 +242,7 @@ exports.getUserHomeDir = function() {
 }
 
 /**
- * 获取用户目录配置数据目录
+ * 获取用户配置数据目录
  */
 exports.getUserHomeConfigDir = function() {
   // const filePath = path.join(this.getHomeDir(), 'package.json');
