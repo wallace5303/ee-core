@@ -262,7 +262,7 @@ module.exports = appInfo => {
 
   /* 主进程加载的地址 */
   config.mainServer = {
-    protocol: 'http://', // http:// | https:// | file://
+    protocol: 'file://', // http:// | https:// | file://
     indexPath: '/public/dist/index.html',
     host: 'localhost',
     port: 7072, // 默认端口（如果端口被使用，则随机获取一个）
