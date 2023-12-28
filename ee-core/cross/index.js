@@ -1,5 +1,5 @@
 const fs = require('fs');
-const crossSpawn = require('cross-spawn');
+const EventEmitter = require('events');
 const path = require('path');
 const is = require('is-type-of');
 const Conf = require('../config/cache');
@@ -9,13 +9,16 @@ const UtilsPargv = require('../utils/pargv');
 const Ps = require('../ps');
 const Log = require('../log');
 const GetPort = require('../utils/get-port');
-const { app: electronApp } = require('electron');
+const SpawnProcess = require('./spawnProcess');
+const Channel = require('../const/channel');
 
 /**
  * Cross-language service
  * 跨语言服务
  */
 const CrossLanguageService = {
+
+  crossEE: undefined,
 
   children: {},
 
@@ -37,15 +40,38 @@ const CrossLanguageService = {
     for (let key of Object.keys(servicesCfg)) {
       let cfg = servicesCfg[key];
       if (cfg.enable == true) {
-        this.run(cfg)
+        this.run(key)
       }
     }
   },
 
   /**
+   * _initEventEmitter
+   * [todo] 理论上不需要，如果某个服务崩了，最好重启整个应用
+   */
+  async _initEventEmitter() {
+    if (this.crossEE) {
+      return
+    }
+    this.crossEE = new EventEmitter();  
+    this.crossEE.on(Channel.events.childProcessExit, (data) => {
+      delete this.children[data.pid];
+    });
+    this.crossEE.on(Channel.events.childProcessError, (data) => {
+      delete this.children[data.pid];
+    });
+  },
+
+  /**
    * run
    */
-  async run(conf = {}) {
+  async run(name) {
+    const allConfig = Conf.all();
+    const conf = allConfig.cross[name];
+
+    // eventEmitter
+    this._initEventEmitter();
+  
     const cmdName = conf.name;
     const cmdPath = this._getCmdPath(cmdName);
     let cmdArgs = is.string(conf.args) ? [conf.args] : conf.args;
@@ -59,31 +85,15 @@ const CrossLanguageService = {
     confPort = await GetPort({ port: confPort });
     // 替换port
     cmdArgs = this.replaceValue(cmdArgs, "--port=", confPort)
+    conf.args = cmdArgs;
 
     Log.coreLogger.info(`[ee-core] [cross/run] cmd: ${cmdPath}, args: ${cmdArgs}`);
 
-    // Launch executable program
-    let standardOutput = 'ignore';
-    if (!Ps.isPackaged()) {
-      standardOutput = 'inherit'
-    }
-    const coreProcess = crossSpawn(cmdPath, cmdArgs, { stdio: standardOutput, detached: false });
-    coreProcess.on('close', (code, signal) => {
-      Log.coreLogger.info(`[ee-core] [cross/run] [pid=${coreProcess.pid}, port=${confPort}] exited with code: ${code}, signal: ${signal}`);
-      if (0 !== code) {
-        // 弹错误窗口
-        Log.coreLogger.error(`[ee-core] [cross/run] Please check [${cmdName}] service log !!!`);
-      }
-
-      // electron quit
-      if (conf.appExit) {
-        setTimeout(() => {
-          // 进程退出前的一些清理工作
-          electronApp.quit();
-        }, 1000)
-      }
-    });
-    this.children[cmdName] = coreProcess;
+    const subProcess = new SpawnProcess(this, {cmdName, cmdPath, cmdArgs, conf});
+    this.children[proc.pid] = {
+      name: cmdName,
+      proc: subProcess
+    };
   },
 
   kill() {
@@ -134,6 +144,11 @@ const CrossLanguageService = {
     const url = protocol + hostname + ":" + args.port;
 
     return url;
+  },
+
+  // 获取
+  getApp(name) {
+
   },
 
   _getCmdPath(name) {
