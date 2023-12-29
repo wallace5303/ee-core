@@ -37,7 +37,7 @@ const CoreElectronApp = {
       Electron.extra.closeWindow = true;
 
       // kill cross services
-      Cross.kill();
+      Cross.killAll();
     })
 
     if (CoreApp.config.hardGpu.enable == false) {

@@ -5,7 +5,7 @@ const { app: electronApp } = require('electron');
 const Log = require('../log');
 const Ps = require('../ps');
 const Channel = require('../const/channel');
-const Conf = require('../config/cache');
+const Helper = require('../utils/helper');
 
 class SpawnProcess {
   constructor(host, opt = {}) {
@@ -13,6 +13,7 @@ class SpawnProcess {
     this.host = host;
     this.child = undefined;
     this.pid = 0;
+    this.name = "";
     this._init(opt);
   }
 
@@ -30,6 +31,7 @@ class SpawnProcess {
 
     const coreProcess = crossSpawn(cmdPath, cmdArgs, { stdio: standardOutput, detached: false });
     this.child = coreProcess;
+    this.pid = coreProcess.pid;
     coreProcess.on('close', (code, signal) => {
       Log.coreLogger.info(`[ee-core] [cross/process] [pid=${coreProcess.pid}, exited with code: ${code}, signal: ${signal}`);
       if (0 !== code) {
@@ -49,13 +51,22 @@ class SpawnProcess {
     coreProcess.on('message', (m) => {
       Log.coreLogger.info(`[ee-core] [corss/process] received a message from child-process, message: ${serialize(m)}`);
       
+      if (!m || !m.id) {
+        return;
+      }
+
+      if (msg.type === 'establish') {
+        Log.coreLogger.info('-----establish------');
+        return;
+      }
+
       // 先注释，如果是开发环境，inherit 应该可以直接显示
       // if (m.channel == Channel.process.showException) {
       //   Log.coreLogger.error(`${m.data}`);
       // }
 
       // 收到子进程消息，转发到 event 
-      this.emitter.emit(m.event, m.data);
+      //this.emitter.emit(m.event, m.data);
     });
 
     coreProcess.on('exit', (code, signal) => {
@@ -86,6 +97,30 @@ class SpawnProcess {
     }, timeout)
   }
 
+  send(message) {
+    return this.sendByType(message, 'message');
+  }
+
+  close() {
+    return this.sendByType('close', 'close');
+  }
+
+  generateId() {
+    const rid = Helper.getRandomString();
+    return `node:${this.pid}:${rid}`;
+  }
+
+  async sendByType(message, type) {
+    const msg = typeof message === 'string' ? message : JSON.stringify(message);
+    const id = this.generateId();
+
+    this.child.send({
+        id,
+        type,
+        data: msg,
+    });
+    return;
+  }
 }
 
 module.exports = SpawnProcess;

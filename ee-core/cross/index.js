@@ -20,7 +20,17 @@ const CrossLanguageService = {
 
   crossEE: undefined,
 
+  /**
+   * pid唯一
+   * {pid:{}, pid:{}, ...}
+   */
   children: {},
+
+  /**
+   * name唯一
+   * {name:pid, name:pid, ...}
+   */
+  childrenMap: {},
 
   /**
    * create
@@ -47,7 +57,6 @@ const CrossLanguageService = {
 
   /**
    * _initEventEmitter
-   * [todo] 理论上不需要，如果某个服务崩了，最好重启整个应用
    */
   async _initEventEmitter() {
     if (this.crossEE) {
@@ -55,9 +64,13 @@ const CrossLanguageService = {
     }
     this.crossEE = new EventEmitter();  
     this.crossEE.on(Channel.events.childProcessExit, (data) => {
+      const child = this.children[data.pid];
+      delete this.childrenMap[child.name];
       delete this.children[data.pid];
     });
     this.crossEE.on(Channel.events.childProcessError, (data) => {
+      const child = this.children[data.pid];
+      delete this.childrenMap[child.name];
       delete this.children[data.pid];
     });
   },
@@ -89,14 +102,23 @@ const CrossLanguageService = {
 
     Log.coreLogger.info(`[ee-core] [cross/run] cmd: ${cmdPath}, args: ${cmdArgs}`);
 
+    // 创建进程
     const subProcess = new SpawnProcess(this, {cmdName, cmdPath, cmdArgs, conf});
-    this.children[proc.pid] = {
-      name: cmdName,
-      proc: subProcess
+    let uniqueName = cmdName;
+    if (this.childrenMap.hasOwnProperty(uniqueName)) {
+      uniqueName = uniqueName + "-" + String(subProcess.pid);
+    }
+    this.childrenMap[uniqueName] = subProcess.pid;
+    subProcess.name = uniqueName;
+    this.children[subProcess.pid] = {
+      name: uniqueName,
+      entity: subProcess
     };
+
+    return subProcess;
   },
 
-  kill() {
+  killAll() {
     Object.keys(this.children).forEach(key => {
       let proc = this.children[key];
       if (proc) {
@@ -131,9 +153,9 @@ const CrossLanguageService = {
     return arr;
   },
 
-  getUrl(service) {
+  getUrl(name) {
     const cfg = Conf.getValue('cross');
-    const servicesCfg = cfg[service];
+    const servicesCfg = cfg[name];
 
     const args = this.getArgs(servicesCfg.args);
     let protocol = 'http://';
@@ -146,10 +168,37 @@ const CrossLanguageService = {
     return url;
   },
 
-  // 获取
-  getApp(name) {
+  // 获取 proc
+  getProcByName(name) {
+    const pid = this.childrenMap[name];
+    if (!pid) {
+      throw new Error(`[ee-core] [cross] The process named [${name}] does not exit`);
+    }
+    const child = this.children[pid];
+    if (!pid) {
+      throw new Error(`[ee-core] [cross] The process pid [${pid}] does not exit`);
+    }
 
+    return child.entity;
   },
+
+  // 获取 proc
+  getProc(pid) {
+    const child = this.children[pid];
+    if (!pid) {
+      throw new Error(`[ee-core] [cross] The process pid [${pid}] does not exit`);
+    }
+
+    return child.entity;
+  },  
+
+  /**
+   * 获取pids
+   */  
+  getPids() {
+    let pids = Object.keys(this.children);
+    return pids;
+  },  
 
   _getCmdPath(name) {
     const coreName =  UtilsIs.windows() ? name + ".exe" : name;
