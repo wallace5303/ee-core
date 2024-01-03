@@ -36,12 +36,6 @@ const CrossLanguageService = {
    * create
    */
   async create() {
-    if (!Ps.isProd()) {
-      return
-    }
-
-    // init dir
-    this._initPath();
 
     // boot services
     const servicesCfg = Conf.getValue('cross');
@@ -79,32 +73,35 @@ const CrossLanguageService = {
    * run
    */
   async run(name) {
+    // init dir
+    this._initPath();
+
     const allConfig = Conf.all();
-    const conf = allConfig.cross[name];
+    const targetConf = Object.assign({}, allConfig.cross[name]);
 
     // eventEmitter
     this._initEventEmitter();
-  
-    const cmdName = conf.name;
-    const cmdPath = this._getCmdPath(cmdName);
-    let cmdArgs = is.string(conf.args) ? [conf.args] : conf.args;
-
-    // 动态生成port
-    // if (Ps.isProd() || this.workspaces.length > 0) {
-    let confPort = this.getArgs(cmdArgs, 'port');
-    if (!confPort) {
-      throw new Error(`[ee-core] [cross/run]  --port parameter does not exist!`);
+    
+    let cmdPath = this._getCmdPath(targetConf.name);
+    let cmdArgs = is.string(targetConf.args) ? [targetConf.args] : targetConf.args;
+    if (targetConf.hasOwnProperty('cmd')) {
+      cmdPath = targetConf.cmd;
     }
-    confPort = await GetPort({ port: confPort });
-    // 替换port
-    cmdArgs = this.replaceValue(cmdArgs, "--port=", confPort)
-    conf.args = cmdArgs;
+
+    let confPort = this.getValueFromArgs(cmdArgs, 'port');
+    if (UtilsHelper.validValue(confPort)) {
+      // 动态生成port
+      confPort = await GetPort({ port: confPort });
+      // 替换port
+      cmdArgs = this.replaceValue(cmdArgs, "--port=", confPort)
+      targetConf.args = cmdArgs;
+    }
 
     Log.coreLogger.info(`[ee-core] [cross/run] cmd: ${cmdPath}, args: ${cmdArgs}`);
 
     // 创建进程
-    const subProcess = new SpawnProcess(this, {cmdName, cmdPath, cmdArgs, conf});
-    let uniqueName = cmdName;
+    const subProcess = new SpawnProcess(this, { cmdPath, cmdArgs, targetConf });
+    let uniqueName = targetConf.name;
     if (this.childrenMap.hasOwnProperty(uniqueName)) {
       uniqueName = uniqueName + "-" + String(subProcess.pid);
     }
@@ -131,12 +128,10 @@ const CrossLanguageService = {
     });
   },
 
-  getArgs(argv, key) {
+  getValueFromArgs(argv, key) {
     // parse args
-    let value = UtilsPargv(argv);
-    if (key) {
-      value = value[key];
-    }
+    const argsObj = UtilsPargv(argv);
+    const value = argsObj[key];
 
     return value;
   },
@@ -154,10 +149,8 @@ const CrossLanguageService = {
   },
 
   getUrl(name) {
-    const cfg = Conf.getValue('cross');
-    const servicesCfg = cfg[name];
-
-    const args = this.getArgs(servicesCfg.args);
+    const entity = this.getProcByName(name);
+    const args = entity.getArgsObj();
     let protocol = 'http://';
     if (args.hasOwnProperty('ssl') && (args.ssl == 'true' || args.ssl == '1')) {
       protocol = 'https://';
@@ -174,12 +167,9 @@ const CrossLanguageService = {
     if (!pid) {
       throw new Error(`[ee-core] [cross] The process named [${name}] does not exit`);
     }
-    const child = this.children[pid];
-    if (!pid) {
-      throw new Error(`[ee-core] [cross] The process pid [${pid}] does not exit`);
-    }
+    const entity = this.getProc(pid);
 
-    return child.entity;
+    return entity;
   },
 
   // 获取 proc
@@ -210,14 +200,9 @@ const CrossLanguageService = {
    * init path
    */  
   _initPath() {
-    try {
-      const pathname = Ps.getUserHomeConfigDir();
-      if (!fs.existsSync(pathname)) {
-        UtilsHelper.mkdir(pathname, {mode: 0o755});
-      }
-    } catch (e) {
-      Log.coreLogger.error(e);
-      throw new Error(`[ee-core] [cross] mkdir ${pathname} failed !`);
+    const pathname = Ps.getUserHomeConfigDir();
+    if (!fs.existsSync(pathname)) {
+      UtilsHelper.mkdir(pathname, {mode: 0o755});
     }
   }    
 }

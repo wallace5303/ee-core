@@ -1,4 +1,5 @@
 const EventEmitter = require('events');
+const path = require('path');
 const crossSpawn = require('cross-spawn');
 const serialize = require('serialize-javascript');
 const { app: electronApp } = require('electron');
@@ -6,6 +7,7 @@ const Log = require('../log');
 const Ps = require('../ps');
 const Channel = require('../const/channel');
 const Helper = require('../utils/helper');
+const UtilsPargv = require('../utils/pargv');
 
 class SpawnProcess {
   constructor(host, opt = {}) {
@@ -14,6 +16,7 @@ class SpawnProcess {
     this.child = undefined;
     this.pid = 0;
     this.name = "";
+    this.config = {};
     this._init(opt);
   }
 
@@ -22,25 +25,37 @@ class SpawnProcess {
    * 初始化子进程
    */
   _init(options = {}) {
-    const { cmdName, cmdPath, cmdArgs, conf } = options;
+    const { cmdPath, cmdArgs, targetConf } = options;
+    this.config = targetConf;
+    this.name = this.config.name;
+
     // Launch executable program
     let standardOutput = ['ignore', 'ignore', 'ignore', 'ipc'];
     if (!Ps.isPackaged()) {
       standardOutput = ['inherit', 'inherit', 'inherit', 'ipc'];
     }
+    let execDir = Ps.getExtraResourcesDir();
+    if (this.config.hasOwnProperty('directory')) {
+      execDir = path.join(process.cwd(), this.config.directory);
+    }
 
-    const coreProcess = crossSpawn(cmdPath, cmdArgs, { stdio: standardOutput, detached: false });
+    const coreProcess = crossSpawn(cmdPath, cmdArgs, { 
+      stdio: standardOutput, 
+      detached: false,
+      cwd: execDir, 
+      maxBuffer: 1024 * 1024 * 1024
+    });
     this.child = coreProcess;
     this.pid = coreProcess.pid;
     coreProcess.on('close', (code, signal) => {
       Log.coreLogger.info(`[ee-core] [cross/process] [pid=${coreProcess.pid}, exited with code: ${code}, signal: ${signal}`);
       if (0 !== code) {
         // 弹错误窗口
-        Log.coreLogger.error(`[ee-core] [cross/process] Please check [${cmdName}] service log !!!`);
+        Log.coreLogger.error(`[ee-core] [cross/process] Please check [${cmdPath}] service log !!!`);
       }
 
       // electron quit
-      if (conf.appExit) {
+      if (this.config.appExit) {
         setTimeout(() => {
           // 进程退出前的一些清理工作
           electronApp.quit();
@@ -120,6 +135,11 @@ class SpawnProcess {
         data: msg,
     });
     return;
+  }
+
+  getArgsObj() {
+    const obj = UtilsPargv(this.config.args);
+    return obj;
   }
 }
 
