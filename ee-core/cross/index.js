@@ -18,11 +18,11 @@ const Channel = require('../const/channel');
  */
 const CrossLanguageService = {
 
-  crossEE: undefined,
+  emitter: undefined,
 
   /**
    * pid唯一
-   * {pid:{}, pid:{}, ...}
+   * {pid:{name,entity}, pid:{name,entity}, ...}
    */
   children: {},
 
@@ -53,16 +53,18 @@ const CrossLanguageService = {
    * _initEventEmitter
    */
   async _initEventEmitter() {
-    if (this.crossEE) {
+    if (this.emitter) {
       return
     }
-    this.crossEE = new EventEmitter();  
-    this.crossEE.on(Channel.events.childProcessExit, (data) => {
+    this.emitter = new EventEmitter();  
+    this.emitter.on(Channel.events.childProcessExit, (data) => {
+      console.log("------childProcessExit:", data)
       const child = this.children[data.pid];
       delete this.childrenMap[child.name];
       delete this.children[data.pid];
     });
-    this.crossEE.on(Channel.events.childProcessError, (data) => {
+    this.emitter.on(Channel.events.childProcessError, (data) => {
+      console.log("------childProcessError:", data)
       const child = this.children[data.pid];
       delete this.childrenMap[child.name];
       delete this.children[data.pid];
@@ -88,12 +90,12 @@ const CrossLanguageService = {
       cmdPath = targetConf.cmd;
     }
 
-    let confPort = this.getValueFromArgs(cmdArgs, 'port');
+    let confPort = this._getValueFromArgs(cmdArgs, 'port');
     if (UtilsHelper.validValue(confPort)) {
       // 动态生成port
       confPort = await GetPort({ port: confPort });
       // 替换port
-      cmdArgs = this.replaceValue(cmdArgs, "--port=", confPort)
+      cmdArgs = this._replaceValue(cmdArgs, "--port=", confPort)
       targetConf.args = cmdArgs;
     }
 
@@ -116,19 +118,27 @@ const CrossLanguageService = {
   },
 
   killAll() {
-    Object.keys(this.children).forEach(key => {
-      let proc = this.children[key];
-      if (proc) {
-        proc.kill('SIGINT');
-        setTimeout(() => {
-          if (proc.killed) return;
-          proc.kill('SIGKILL');
-        }, 500)
-      }
+    Object.keys(this.children).forEach(pid => {
+      console.log("-----killAll: ", pid);
+      this.kill(pid)
     });
   },
 
-  getValueFromArgs(argv, key) {
+  kill(pid) {
+    const entity = this.getProc(pid);
+    if (entity) {
+      entity.kill();
+    }
+  },
+
+  killByName(name) {
+    const entity = this.getProcByName(name);
+    if (entity) {
+      entity.kill();
+    }
+  },
+
+  _getValueFromArgs(argv, key) {
     // parse args
     const argsObj = UtilsPargv(argv);
     const value = argsObj[key];
@@ -136,7 +146,7 @@ const CrossLanguageService = {
     return value;
   },
 
-  replaceValue(arr, key, value) {
+  _replaceValue(arr, key, value) {
     arr = arr.map(item => {
       if (item.startsWith(key)) {
           let newItem = key + value;

@@ -48,11 +48,7 @@ class SpawnProcess {
     this.child = coreProcess;
     this.pid = coreProcess.pid;
     coreProcess.on('close', (code, signal) => {
-      Log.coreLogger.info(`[ee-core] [cross/process] [pid=${coreProcess.pid}, exited with code: ${code}, signal: ${signal}`);
-      if (0 !== code) {
-        // 弹错误窗口
-        Log.coreLogger.error(`[ee-core] [cross/process] Please check [${cmdPath}] service log !!!`);
-      }
+      Log.coreLogger.info(`[ee-core] [cross/process] received a close from child-process, code:${code}, signal:${signal}, pid:${this.pid}`);
 
       // electron quit
       if (this.config.appExit) {
@@ -70,16 +66,6 @@ class SpawnProcess {
         return;
       }
 
-      if (msg.type === 'establish') {
-        Log.coreLogger.info('-----establish------');
-        return;
-      }
-
-      // 先注释，如果是开发环境，inherit 应该可以直接显示
-      // if (m.channel == Channel.process.showException) {
-      //   Log.coreLogger.error(`${m.data}`);
-      // }
-
       // 收到子进程消息，转发到 event 
       //this.emitter.emit(m.event, m.data);
     });
@@ -88,7 +74,7 @@ class SpawnProcess {
       let data = {
         pid: this.pid
       }
-      this.host.emit(Channel.events.childProcessExit, data);
+      this.host.emitter.emit(Channel.events.childProcessExit, data);
       Log.coreLogger.info(`[ee-core] [corss/process] received a exit from child-process, code:${code}, signal:${signal}, pid:${this.pid}`);
     });
 
@@ -96,7 +82,7 @@ class SpawnProcess {
       let data = {
         pid: this.pid
       }
-      this.host.emit(Channel.events.childProcessError, data);
+      this.host.emitter.emit(Channel.events.childProcessError, data);
       Log.coreLogger.error(`[ee-core] [corss/process] received a error from child-process, error: ${err}, pid:${this.pid}`);
     });
   }
@@ -105,6 +91,7 @@ class SpawnProcess {
    * kill
    */
   kill(timeout = 1000) {
+    console.log("----- spawnProcess kill ----  ");
     this.child.kill('SIGINT');
     setTimeout(() => {
       if (this.child.killed) return;
@@ -120,14 +107,14 @@ class SpawnProcess {
     return this.sendByType('close', 'close');
   }
 
-  generateId() {
+  _generateId() {
     const rid = Helper.getRandomString();
     return `node:${this.pid}:${rid}`;
   }
 
   async sendByType(message, type) {
     const msg = typeof message === 'string' ? message : JSON.stringify(message);
-    const id = this.generateId();
+    const id = this._generateId();
 
     this.child.send({
         id,
