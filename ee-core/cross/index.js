@@ -74,12 +74,16 @@ const CrossLanguageService = {
   /**
    * run
    */
-  async run(name) {
+  async run(service) {
     // init dir
     this._initPath();
 
     const allConfig = Conf.all();
-    const targetConf = Object.assign({}, allConfig.cross[name]);
+    if (!allConfig.cross.hasOwnProperty(service)) {
+      throw new Error(`[ee-core] [cross] The service [${service}] config does not exit`);
+    }
+
+    const targetConf = Object.assign({}, allConfig.cross[service]);
 
     // eventEmitter
     this._initEventEmitter();
