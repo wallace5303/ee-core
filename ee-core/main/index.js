@@ -30,8 +30,6 @@ class ElectronEgg {
     if ( argsObj['env'] == 'development' || argsObj['env'] === 'dev' || argsObj['env'] === 'local' ) {
       isDev = true;
     }
-    console.log("argsObj env:", argsObj)
-    console.log("isDev:", isDev)
 
     // module mode
     if (Ps.isModuleMode()) {

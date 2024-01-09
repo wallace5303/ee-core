@@ -70,7 +70,6 @@ class SpawnProcess {
    * kill
    */
   kill(timeout = 1000) {
-    console.log("----- spawnProcess kill ----  ");
     this.child.kill('SIGINT');
     setTimeout(() => {
       if (this.child.killed) return;

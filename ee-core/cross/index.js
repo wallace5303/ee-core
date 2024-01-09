@@ -58,13 +58,11 @@ const CrossLanguageService = {
     }
     this.emitter = new EventEmitter();  
     this.emitter.on(Channel.events.childProcessExit, (data) => {
-      console.log("------childProcessExit:", data)
       const child = this.children[data.pid];
       delete this.childrenMap[child.name];
       delete this.children[data.pid];
     });
     this.emitter.on(Channel.events.childProcessError, (data) => {
-      console.log("------childProcessError:", data)
       const child = this.children[data.pid];
       delete this.childrenMap[child.name];
       delete this.children[data.pid];
@@ -123,7 +121,6 @@ const CrossLanguageService = {
 
   killAll() {
     Object.keys(this.children).forEach(pid => {
-      console.log("-----killAll: ", pid);
       this.kill(pid)
     });
   },
