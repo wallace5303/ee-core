@@ -6,6 +6,7 @@ const Ps = require('../ps');
 const EE = require('../ee');
 const UtilsCore = require('../core/lib/utils');
 const Loader = require('../loader');
+const UtilsPargv = require('../utils/pargv');
 
 class ElectronEgg {
 
@@ -23,6 +24,15 @@ class ElectronEgg {
     }
     Ps.initMode(this.mode);
 
+    // env 可能为空
+    const argsObj = UtilsPargv(process.argv);
+    let isDev = false;
+    if ( argsObj['env'] == 'development' || argsObj['env'] === 'dev' || argsObj['env'] === 'local' ) {
+      isDev = true;
+    }
+    console.log("argsObj env:", argsObj)
+    console.log("isDev:", isDev)
+
     // module mode
     if (Ps.isModuleMode()) {
       const { Application } = EE;
@@ -31,7 +41,7 @@ class ElectronEgg {
     }
 
     let baseDir = path.join(app.getAppPath(), 'electron');
-    if (Utils.isEncrypt(app.getAppPath())) {
+    if (!isDev && Utils.isEncrypt(app.getAppPath())) {
       baseDir = Ps.getEncryptDir(app.getAppPath());
     }
 
@@ -42,7 +52,7 @@ class ElectronEgg {
     }
 
     const EEApp = UtilsCore.loadFile(indexFile);
-    EE.app = new EEApp(this.env);
+    EE.app = new EEApp();
   }
 }
 
