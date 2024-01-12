@@ -5,6 +5,7 @@ const is = require('is-type-of');
 const co = require('./co');
 const path = require('path');
 const chalk = require('chalk');
+const Pargv = require('./pargv');
 
 const _basePath = process.cwd();
 
@@ -172,4 +173,58 @@ exports.loadConfig = function(prop) {
 
 exports.sleep = function(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+exports.replaceArgsValue = function(argv, key, value) {
+  key = key + "=";
+  for (let i = 0; i < argv.length; i++) {
+    let item = argv[i];
+    let pos = item.indexOf(key);
+    if (pos !== -1) {
+      pos = pos + key.length;
+      console.log("pos2:", pos)
+      let tmpStr = item.substring(0, pos);
+      console.log("tmpStr:", tmpStr)
+      argv[i] = tmpStr + value;
+      break;
+    }
+  }
+
+  return argv;
+};
+
+// exports.replaceValue = function(arr, key, value) {
+//   arr = arr.map(item => {
+//     if (item.startsWith(key)) {
+//         let newItem = key + value;
+//         return newItem;
+//     } else {
+//         return item;
+//     }
+//   });
+//   return arr;
+// };
+
+exports.getValueFromArgv = function(argv, key) {
+  const argvObj = Pargv(argv);
+  if (argvObj.hasOwnProperty(key)) {
+    return argvObj[key];
+  }
+
+  // match search
+  key = key + "=";
+  let value;
+  for (let i = 0; i < argv.length; i++) {
+    let item = argv[i];
+    let pos = item.indexOf(key);
+    if (pos !== -1) {
+      pos = pos + key.length;
+      console.log("pos2:", pos)
+      value = item.substring(pos);
+      console.log("value:", value)
+      break;
+    }
+  }
+
+  return value;
 };

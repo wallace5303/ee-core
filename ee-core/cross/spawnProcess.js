@@ -4,9 +4,10 @@ const crossSpawn = require('cross-spawn');
 const Log = require('../log');
 const Ps = require('../ps');
 const Channel = require('../const/channel');
-const Helper = require('../utils/helper');
-const UtilsPargv = require('../utils/pargv');
 const EE = require('../ee');
+const Helper = require('../utils/helper');
+const UtilsIs = require('../utils/is');
+const UtilsPargv = require('../utils/pargv');
 
 class SpawnProcess {
   constructor(host, opt = {}) {
@@ -14,30 +15,73 @@ class SpawnProcess {
     this.host = host;
     this.child = undefined;
     this.pid = 0;
+    this.port = 0;
     this.name = "";
     this.config = {};
     this._init(opt);
   }
 
-
   /**
    * 初始化子进程
    */
   _init(options = {}) {
-    const { cmdPath, cmdArgs, targetConf } = options;
+    const { targetConf, port } = options;
     this.config = targetConf;
-    this.name = this.config.name;
+    this.port = port;
+    // 该名称如果在childrenMap重复，会被重写
+    this.name = targetConf.name;
 
     // Launch executable program
-    let standardOutput = ['ignore', 'ignore', 'ignore', 'ipc'];
-    if (!Ps.isPackaged()) {
-      standardOutput = ['inherit', 'inherit', 'inherit', 'ipc'];
-    }
+    let cmdPath = '';
+    let cmdArgs = targetConf.args;
+    console.log("targetConf.args:", targetConf.args);
     let execDir = Ps.getExtraResourcesDir();
-    if (this.config.hasOwnProperty('directory')) {
-      execDir = path.join(process.cwd(), this.config.directory);
+    let standardOutput = ['inherit', 'inherit', 'inherit', 'ipc'];
+    if (Ps.isPackaged()) {
+      standardOutput = ['ignore', 'ignore', 'ignore', 'ipc'];
+    }
+    
+    const { cmd, directory } = targetConf;
+    // use cmd first
+    if (cmd) {
+      console.log("cmd:", cmd)
+      console.log("cmd isAbsolute :", path.isAbsolute(cmd))
+      if (!directory) {
+        throw new Error(`[ee-core] [cross] The config [directory] attribute does not exist`);
+      }
+      cmdPath = cmd;
+      if (!path.isAbsolute(cmd) && !Ps.isDev()) {
+        cmdPath = path.join(Ps.getExtraResourcesDir(), cmd);
+      }
+    } else {
+      cmdPath = path.join(Ps.getExtraResourcesDir(), targetConf.name);
     }
 
+    // windonw
+    if (UtilsIs.windows() && path.extname(cmdPath) != '.exe') {
+      cmdPath += ".exe";
+    }
+
+    console.log("cmdPath:", cmdPath)
+
+    // executable program directory
+    console.log("directory:", directory)
+    if (directory && path.isAbsolute(directory)) {
+      console.log("directory isAbsolute :", path.isAbsolute(directory))
+      execDir = directory;
+    } else if (directory && !path.isAbsolute(directory)) {
+      console.log("directory isAbsolute :", path.isAbsolute(directory))
+      if (Ps.isDev()) {
+        execDir = path.join(Ps.getHomeDir(), directory);
+      } else {
+        execDir = path.join(Ps.getExtraResourcesDir(), directory);
+      }
+    } else {
+      execDir = Ps.getExtraResourcesDir();
+    }
+    console.log("execDir:", execDir)
+
+    Log.coreLogger.info(`[ee-core] [cross/run] cmd: ${cmdPath}, args: ${cmdArgs}`);
     const coreProcess = crossSpawn(cmdPath, cmdArgs, { 
       stdio: standardOutput, 
       detached: false,
@@ -85,11 +129,6 @@ class SpawnProcess {
     return this.sendByType('close', 'close');
   }
 
-  _generateId() {
-    const rid = Helper.getRandomString();
-    return `node:${this.pid}:${rid}`;
-  }
-
   async sendByType(message, type) {
     const msg = typeof message === 'string' ? message : JSON.stringify(message);
     const id = this._generateId();
@@ -102,9 +141,27 @@ class SpawnProcess {
     return;
   }
 
+  getUrl() {
+    const ssl = Helper.getValueFromArgv(this.config.args, 'ssl');
+    let hostname = Helper.getValueFromArgv(this.config.args, 'hostname')
+    let protocol = 'http://';
+    if (ssl && (ssl == 'true' || ssl == '1')) {
+      protocol = 'https://';
+    }
+    hostname = hostname ? hostname : '127.0.0.1';
+    const url = protocol + hostname + ":" + this.port;
+
+    return url;
+  }
+
   getArgsObj() {
     const obj = UtilsPargv(this.config.args);
     return obj;
+  }
+
+  _generateId() {
+    const rid = Helper.getRandomString();
+    return `node:${this.pid}:${rid}`;
   }
 
   /**

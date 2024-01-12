@@ -32,19 +32,19 @@ class EeApp extends BaseApp {
    */
   async createPorts() {
     if (Ps.isFrameworkMode() && Conf.isWebProtocol(this.config.mainServer)) {
-      const mainPort = await GetPort({port: this.config.mainServer.port});
+      const mainPort = await GetPort({port: parseInt(this.config.mainServer.port)});
       process.env.EE_MAIN_PORT = mainPort;
       this.config.mainServer.port = mainPort;
     }
 
     if (this.config.socketServer.enable) {
-      const socketPort = await GetPort({port: this.config.socketServer.port});
+      const socketPort = await GetPort({port: parseInt(this.config.socketServer.port)});
       process.env.EE_SOCKET_PORT = socketPort;
       this.config.socketServer.port = socketPort;
     }
     
     if (this.config.httpServer.enable) {
-      const httpPort = await GetPort({port: this.config.httpServer.port});
+      const httpPort = await GetPort({port: parseInt(this.config.httpServer.port)});
       process.env.EE_HTTP_PORT = httpPort;
       this.config.httpServer.port = httpPort;
     }

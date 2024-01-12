@@ -1,16 +1,12 @@
 const fs = require('fs');
 const EventEmitter = require('events');
-const path = require('path');
-const is = require('is-type-of');
 const Conf = require('../config/cache');
-const UtilsHelper = require('../utils/helper');
-const UtilsIs = require('../utils/is');
-const UtilsPargv = require('../utils/pargv');
+const Helper = require('../utils/helper');
 const Ps = require('../ps');
-const Log = require('../log');
-const GetPort = require('../utils/get-port');
 const SpawnProcess = require('./spawnProcess');
 const Channel = require('../const/channel');
+const extend = require('../utils/extend');
+const GetPort = require('../utils/get-port');
 
 /**
  * Cross-language service
@@ -39,7 +35,7 @@ const CrossLanguageService = {
 
     // boot services
     const servicesCfg = Conf.getValue('cross');
-    //await UtilsHelper.sleep(5 * 1000);
+    //await Helper.sleep(5 * 1000);
 
     for (let key of Object.keys(servicesCfg)) {
       let cfg = servicesCfg[key];
@@ -52,7 +48,7 @@ const CrossLanguageService = {
   /**
    * _initEventEmitter
    */
-  async _initEventEmitter() {
+  _initEventEmitter() {
     if (this.emitter) {
       return
     }
@@ -72,39 +68,37 @@ const CrossLanguageService = {
   /**
    * run
    */
-  async run(service) {
+  async run(service, opt = {}) {
     // init dir
     this._initPath();
 
     const allConfig = Conf.all();
-    if (!allConfig.cross.hasOwnProperty(service)) {
+    const defaultOpt = allConfig.cross[service] || {};
+    console.log("defaultOpt:", defaultOpt);
+    //const targetConf = Object.assign({}, defaultOpt, opt);
+    const targetConf = extend(true, {}, defaultOpt, opt);
+    if (Object.keys(targetConf).length == 0) {
       throw new Error(`[ee-core] [cross] The service [${service}] config does not exit`);
     }
-
-    const targetConf = Object.assign({}, allConfig.cross[service]);
+    console.log("targetConf:", targetConf);
 
     // eventEmitter
     this._initEventEmitter();
     
-    let cmdPath = this._getCmdPath(targetConf.name);
-    let cmdArgs = is.string(targetConf.args) ? [targetConf.args] : targetConf.args;
-    if (targetConf.hasOwnProperty('cmd')) {
-      cmdPath = targetConf.cmd;
-    }
-
-    let confPort = this._getValueFromArgs(cmdArgs, 'port');
-    if (UtilsHelper.validValue(confPort)) {
-      // 动态生成port
+    // format params
+    let tmpArgs = targetConf.args;
+    let confPort = parseInt(Helper.getValueFromArgv(tmpArgs, 'port'));
+    console.log("confPort1:", confPort);
+    if (confPort > 0) {
+      // 动态生成port，传入的端口必须为int
       confPort = await GetPort({ port: confPort });
+      console.log("confPort2:", confPort);
       // 替换port
-      cmdArgs = this._replaceValue(cmdArgs, "--port=", confPort)
-      targetConf.args = cmdArgs;
+      targetConf.args = Helper.replaceArgsValue(tmpArgs, "port", String(confPort));
     }
-
-    Log.coreLogger.info(`[ee-core] [cross/run] cmd: ${cmdPath}, args: ${cmdArgs}`);
 
     // 创建进程
-    const subProcess = new SpawnProcess(this, { cmdPath, cmdArgs, targetConf });
+    const subProcess = new SpawnProcess(this, { targetConf, port: confPort });
     let uniqueName = targetConf.name;
     if (this.childrenMap.hasOwnProperty(uniqueName)) {
       uniqueName = uniqueName + "-" + String(subProcess.pid);
@@ -139,35 +133,9 @@ const CrossLanguageService = {
     }
   },
 
-  _getValueFromArgs(argv, key) {
-    // parse args
-    const argsObj = UtilsPargv(argv);
-    const value = argsObj[key];
-
-    return value;
-  },
-
-  _replaceValue(arr, key, value) {
-    arr = arr.map(item => {
-      if (item.startsWith(key)) {
-          let newItem = key + value;
-          return newItem;
-      } else {
-          return item;
-      }
-    });
-    return arr;
-  },
-
   getUrl(name) {
     const entity = this.getProcByName(name);
-    const args = entity.getArgsObj();
-    let protocol = 'http://';
-    if (args.hasOwnProperty('ssl') && (args.ssl == 'true' || args.ssl == '1')) {
-      protocol = 'https://';
-    }
-    const hostname = args.hostname ? args.hostname : '127.0.0.1';
-    const url = protocol + hostname + ":" + args.port;
+    const url = entity.getUrl();
 
     return url;
   },
@@ -201,21 +169,16 @@ const CrossLanguageService = {
     return pids;
   },  
 
-  _getCmdPath(name) {
-    const coreName =  UtilsIs.windows() ? name + ".exe" : name;
-    const p = path.join(Ps.getExtraResourcesDir(), coreName);
-    return p;
-  },
-
   /**
    * init path
    */  
   _initPath() {
     const pathname = Ps.getUserHomeConfigDir();
     if (!fs.existsSync(pathname)) {
-      UtilsHelper.mkdir(pathname, {mode: 0o755});
+      Helper.mkdir(pathname, {mode: 0o755});
     }
-  }    
+  },
+
 }
 
 module.exports = CrossLanguageService;
