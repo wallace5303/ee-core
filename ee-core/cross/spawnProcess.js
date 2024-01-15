@@ -34,7 +34,6 @@ class SpawnProcess {
     // Launch executable program
     let cmdPath = '';
     let cmdArgs = targetConf.args;
-    console.log("targetConf.args:", targetConf.args);
     let execDir = Ps.getExtraResourcesDir();
     let standardOutput = ['inherit', 'inherit', 'inherit', 'ipc'];
     if (Ps.isPackaged()) {
@@ -44,8 +43,6 @@ class SpawnProcess {
     const { cmd, directory } = targetConf;
     // use cmd first
     if (cmd) {
-      console.log("cmd:", cmd)
-      console.log("cmd isAbsolute :", path.isAbsolute(cmd))
       if (!directory) {
         throw new Error(`[ee-core] [cross] The config [directory] attribute does not exist`);
       }
@@ -62,15 +59,10 @@ class SpawnProcess {
       cmdPath += ".exe";
     }
 
-    console.log("cmdPath:", cmdPath)
-
     // executable program directory
-    console.log("directory:", directory)
     if (directory && path.isAbsolute(directory)) {
-      console.log("directory isAbsolute :", path.isAbsolute(directory))
       execDir = directory;
     } else if (directory && !path.isAbsolute(directory)) {
-      console.log("directory isAbsolute :", path.isAbsolute(directory))
       if (Ps.isDev()) {
         execDir = path.join(Ps.getHomeDir(), directory);
       } else {
@@ -79,7 +71,6 @@ class SpawnProcess {
     } else {
       execDir = Ps.getExtraResourcesDir();
     }
-    console.log("execDir:", execDir)
 
     Log.coreLogger.info(`[ee-core] [cross/run] cmd: ${cmdPath}, args: ${cmdArgs}`);
     const coreProcess = crossSpawn(cmdPath, cmdArgs, { 
@@ -121,25 +112,25 @@ class SpawnProcess {
     }, timeout)
   }
 
-  send(message) {
-    return this.sendByType(message, 'message');
-  }
+  // send(message) {
+  //   return this.sendByType(message, 'message');
+  // }
 
-  close() {
-    return this.sendByType('close', 'close');
-  }
+  // close() {
+  //   return this.sendByType('close', 'close');
+  // }
 
-  async sendByType(message, type) {
-    const msg = typeof message === 'string' ? message : JSON.stringify(message);
-    const id = this._generateId();
+  // async sendByType(message, type) {
+  //   const msg = typeof message === 'string' ? message : JSON.stringify(message);
+  //   const id = this._generateId();
 
-    this.child.send({
-        id,
-        type,
-        data: msg,
-    });
-    return;
-  }
+  //   this.child.send({
+  //       id,
+  //       type,
+  //       data: msg,
+  //   });
+  //   return;
+  // }
 
   getUrl() {
     const ssl = Helper.getValueFromArgv(this.config.args, 'ssl');

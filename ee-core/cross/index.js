@@ -74,13 +74,10 @@ const CrossLanguageService = {
 
     const allConfig = Conf.all();
     const defaultOpt = allConfig.cross[service] || {};
-    console.log("defaultOpt:", defaultOpt);
-    //const targetConf = Object.assign({}, defaultOpt, opt);
     const targetConf = extend(true, {}, defaultOpt, opt);
     if (Object.keys(targetConf).length == 0) {
       throw new Error(`[ee-core] [cross] The service [${service}] config does not exit`);
     }
-    console.log("targetConf:", targetConf);
 
     // eventEmitter
     this._initEventEmitter();
@@ -88,11 +85,9 @@ const CrossLanguageService = {
     // format params
     let tmpArgs = targetConf.args;
     let confPort = parseInt(Helper.getValueFromArgv(tmpArgs, 'port'));
-    console.log("confPort1:", confPort);
     if (confPort > 0) {
       // 动态生成port，传入的端口必须为int
       confPort = await GetPort({ port: confPort });
-      console.log("confPort2:", confPort);
       // 替换port
       targetConf.args = Helper.replaceArgsValue(tmpArgs, "port", String(confPort));
     }

@@ -182,9 +182,7 @@ exports.replaceArgsValue = function(argv, key, value) {
     let pos = item.indexOf(key);
     if (pos !== -1) {
       pos = pos + key.length;
-      console.log("pos2:", pos)
       let tmpStr = item.substring(0, pos);
-      console.log("tmpStr:", tmpStr)
       argv[i] = tmpStr + value;
       break;
     }
@@ -192,18 +190,6 @@ exports.replaceArgsValue = function(argv, key, value) {
 
   return argv;
 };
-
-// exports.replaceValue = function(arr, key, value) {
-//   arr = arr.map(item => {
-//     if (item.startsWith(key)) {
-//         let newItem = key + value;
-//         return newItem;
-//     } else {
-//         return item;
-//     }
-//   });
-//   return arr;
-// };
 
 exports.getValueFromArgv = function(argv, key) {
   const argvObj = Pargv(argv);
@@ -219,9 +205,7 @@ exports.getValueFromArgv = function(argv, key) {
     let pos = item.indexOf(key);
     if (pos !== -1) {
       pos = pos + key.length;
-      console.log("pos2:", pos)
       value = item.substring(pos);
-      console.log("value:", value)
       break;
     }
   }
