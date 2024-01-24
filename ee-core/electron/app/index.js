@@ -27,7 +27,7 @@ const CoreElectronApp = {
     })
     
     app.on('window-all-closed', () => {
-      if (!UtilsIs.macOS) {
+      if (!UtilsIs.macOS()) {
         Log.coreLogger.info('[ee-core] [lib/eeApp] window-all-closed quit');
         CoreApp.appQuit();
       }
