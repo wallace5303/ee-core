@@ -220,7 +220,8 @@ class EeApp extends BaseApp {
       throw new Error(`[ee-core] Please Check the value of cross.${service} enable is true !`);
     }
 
-    const url = Cross.getUrl(service);
+    const entityName = crossConfig[service].name;
+    const url = Cross.getUrl(entityName);
 
     let count = 0;
     let serviceReady = false;
