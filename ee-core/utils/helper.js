@@ -212,3 +212,10 @@ exports.getValueFromArgv = function(argv, key) {
 
   return value;
 };
+
+exports.fileIsExist = function(filepath) {
+  if (fs.existsSync(filepath) && fs.statSync(filepath).isFile()) {
+    return true;
+  }
+  return false;
+};
