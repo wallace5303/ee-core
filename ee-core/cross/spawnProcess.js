@@ -1,5 +1,4 @@
 const EventEmitter = require('events');
-const fs = require('fs');
 const path = require('path');
 const crossSpawn = require('cross-spawn');
 const Log = require('../log');
@@ -9,9 +8,6 @@ const EE = require('../ee');
 const Helper = require('../utils/helper');
 const UtilsIs = require('../utils/is');
 const UtilsPargv = require('../utils/pargv');
-const CoreElectronWindow = require('../electron/window');
-const HttpClient = require('../httpclient');
-const Html = require('../html');
 
 class SpawnProcess {
   constructor(host, opt = {}) {
@@ -162,60 +158,6 @@ class SpawnProcess {
     const obj = UtilsPargv(this.config.args);
     return obj;
   }
-
-  /**
-   * load web
-   */
-  async loadWeb(opt = {}) {
-    const cfg = this.config;
-    const mainWin = CoreElectronWindow.getMainWindow();
-
-    // loading page
-    if (cfg.hasOwnProperty('loadingPage')) {
-      const lp = path.join(Ps.getHomeDir(), cfg.loadingPage);
-      if (fs.existsSync(lp)) {
-        mainWin.loadFile(lp);
-      }
-    }
-
-    const url = this.getUrl();
-    let count = 0;
-    let serviceReady = false;
-    const hc = new HttpClient();
-
-    // 循环检查
-    const times = Ps.isDev() ? 20 : 100;
-    const sleeptime = Ps.isDev() ? 1000 : 100;
-    while(!serviceReady && count < times){
-      await Helper.sleep(sleeptime);
-      try {
-        await hc.request(url, {
-          method: 'GET',
-          timeout: 100,
-        });
-        serviceReady = true;
-      } catch(err) {
-        //console.log('The cross service is starting');
-      }
-      count++;
-    }
-    //console.log('count:', count)
-    if (serviceReady == false) {
-      const failurePage = Html.getFilepath('cross-failure.html');
-      mainWin.loadFile(failurePage);
-      throw new Error(`[ee-core] Please check cross service [${service}] ${url} !`)
-    }
-
-    console.log('loadURL :', url)
-    mainWin.loadURL(url, opt)
-    if (!mainWin.isVisible()) {
-      if (mainWin.isMinimized()) {
-        mainWin.restore();
-      }
-      mainWin.show();
-      mainWin.focus();
-    }
-  }  
 
   _generateId() {
     const rid = Helper.getRandomString();

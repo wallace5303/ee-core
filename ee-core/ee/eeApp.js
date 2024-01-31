@@ -190,6 +190,9 @@ class EeApp extends BaseApp {
     }
 
     // 主进程
+    if (mainServer.protocol == "") {
+      return
+    }
     if (Conf.isFileProtocol(mainServer)) {
       url = path.join(this.config.homeDir, mainServer.indexPath);
       this.loadMainUrl('spa', url, 'file');
@@ -325,7 +328,7 @@ class EeApp extends BaseApp {
    * loading page
    */  
   _loadingPage(name) {
-    if (!fs.existsSync(name)) {
+    if (!UtilsHelper.fileIsExist(name)) {
       return
     }
 
