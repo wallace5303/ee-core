@@ -153,10 +153,11 @@ class EeApp extends BaseApp {
         }
         this._loadingPage(lp);
 
+        const retryTimes = modeInfo.force === true ? 3 : 60;
         let count = 0;
         let frontendReady = false;
         const hc = new HttpClient();
-        while(!frontendReady && count < 60){
+        while(!frontendReady && count < retryTimes){
           await UtilsHelper.sleep(1 * 1000);
           try {
             await hc.request(url, {
