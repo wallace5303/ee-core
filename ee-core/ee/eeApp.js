@@ -171,7 +171,7 @@ class EeApp extends BaseApp {
           count++;
         }
 
-        if (frontendReady == false) {
+        if (frontendReady == false && modeInfo.force !== true) {
           const bootFailurePage = Html.getFilepath('failure.html');
           this.mainWindow.loadFile(bootFailurePage);
           Log.coreLogger.error(`[ee-core] Please check the ${url} !`);
