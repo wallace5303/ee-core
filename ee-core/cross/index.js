@@ -85,6 +85,10 @@ const CrossLanguageService = {
     // format params
     let tmpArgs = targetConf.args;
     let confPort = parseInt(Helper.getValueFromArgv(tmpArgs, 'port'));
+    // 某些程序给它传入不存在的参数时会报错
+    if (isNaN(confPort) && targetConf.port > 0) {
+      confPort = targetConf.port;
+    }
     if (confPort > 0) {
       // 动态生成port，传入的端口必须为int
       confPort = await GetPort({ port: confPort });

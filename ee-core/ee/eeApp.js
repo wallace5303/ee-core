@@ -17,6 +17,7 @@ const GetPort = require('../utils/get-port');
 const UtilsHelper = require('../utils/helper');
 const HttpClient = require('../httpclient');
 const Cross = require('../cross');
+const Html = require('../html');
 
 class EeApp extends BaseApp {
   constructor(options = {}) {
@@ -146,7 +147,7 @@ class EeApp extends BaseApp {
       // 检查 UI serve是否启动，先加载一个boot page
       if (load == 'url') {
         // loading page
-        let lp = path.join(__dirname, '..', 'html', 'boot.html');
+        let lp = Html.getFilepath('boot.html');
         if (electronCfg.hasOwnProperty('loadingPage') && electronCfg.loadingPage != '') {
           lp = path.join(this.config.homeDir, electronCfg.loadingPage);
         }
@@ -171,7 +172,7 @@ class EeApp extends BaseApp {
         }
 
         if (frontendReady == false) {
-          const bootFailurePage = path.join(__dirname, '..', 'html', 'failure.html');
+          const bootFailurePage = Html.getFilepath('failure.html');
           this.mainWindow.loadFile(bootFailurePage);
           Log.coreLogger.error(`[ee-core] Please check the ${url} !`);
           return;
@@ -248,7 +249,7 @@ class EeApp extends BaseApp {
     }
     //console.log('count:', count)
     if (serviceReady == false) {
-      const bootFailurePage = path.join(__dirname, '..', 'html', 'cross-failure.html');
+      const bootFailurePage = Html.getFilepath('cross-failure.html');
       this.mainWindow.loadFile(bootFailurePage);
       throw new Error(`[ee-core] Please check cross service [${service}] ${url} !`)
     }
@@ -331,7 +332,6 @@ class EeApp extends BaseApp {
     if (!UtilsHelper.fileIsExist(name)) {
       return
     }
-
     this.mainWindow.loadFile(name);
   }
 

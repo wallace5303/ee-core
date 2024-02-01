@@ -27,12 +27,7 @@ class SpawnProcess {
   _init(options = {}) {
     const { targetConf, port } = options;
     this.config = targetConf;
-
     this.port = port;
-    // 某些程序给它传入不存在的参数时会报错
-    if (isNaN(port) && targetConf.port > 0) {
-      this.port = targetConf.port;
-    }
 
     // 该名称如果在childrenMap重复，会被重写
     this.name = targetConf.name;
@@ -157,6 +152,10 @@ class SpawnProcess {
   getArgsObj() {
     const obj = UtilsPargv(this.config.args);
     return obj;
+  }
+
+  setPort(port) {
+    this.port = parseInt(port);
   }
 
   _generateId() {
