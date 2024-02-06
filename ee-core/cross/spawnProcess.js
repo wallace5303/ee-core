@@ -58,9 +58,13 @@ class SpawnProcess {
       cmdPath = path.join(Ps.getExtraResourcesDir(), targetConf.name);
     }
 
-    // windonw
+    // windows
     if (UtilsIs.windows() && path.extname(cmdPath) != '.exe') {
-      cmdPath += ".exe";
+      // Complete the executable program extension
+      // notice: python.exe may bring up the App Store
+      if (targetConf.windowsExtname === true || !Ps.isDev()) {
+        cmdPath += ".exe";
+      }
     }
 
     // executable program directory
