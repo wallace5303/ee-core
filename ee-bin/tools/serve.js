@@ -141,11 +141,12 @@ module.exports = {
       
       let execDir = path.join(process.cwd(), cfg.directory);
       let execArgs = is.string(cfg.args) ? [cfg.args] : cfg.args;
+      let stdio = cfg.stdio ? cfg.stdio: 'inherit';
   
       this.execProcess[cmd] = crossSpawn(
         cfg.cmd, 
         execArgs,
-        { stdio: 'inherit', cwd: execDir, maxBuffer: 1024 * 1024 * 1024 },
+        { stdio: stdio, cwd: execDir, maxBuffer: 1024 * 1024 * 1024 },
       );
       console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`[${binCmd} ${cmd}]`) + ' command is running');
 
