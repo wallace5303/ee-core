@@ -13,6 +13,7 @@ const Channel = require('../const/channel');
 class SocketServer {
   constructor (app) {
     this.app = app;
+    this.socket = undefined;
     const options = Conf.getValue('socketServer');
 
     if (options.enable == false) {
@@ -34,6 +35,7 @@ class SocketServer {
     const app = this.app;
     this.io.on('connection', (socket) => {
       const channel = Channel.socketIo.partySoftware;
+      this.socket = socket;
       socket.on(channel, async (message, callback) => {
         Log.coreLogger.info('[ee-core] [socket/socketServer] socket id:' + socket.id + ' message cmd: ' + message.cmd);
 
