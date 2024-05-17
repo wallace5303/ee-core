@@ -12,7 +12,7 @@ module.exports = {
 
   /**
    * 启动前端、主进程服务
-   */  
+   */
   dev(options = {}) {
     const { config, serve } = options;
     const binCmd = 'dev';
@@ -34,7 +34,7 @@ module.exports = {
 
   /**
    * 启动主进程服务
-   */  
+   */
   start(options = {}) {
     const { config } = options;
     const binCmd = 'start';
@@ -53,11 +53,11 @@ module.exports = {
 
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }, 
+  },
 
   /**
    * 构建
-   */  
+   */
   build(options = {}) {
     const { config, cmds } = options;
     const binCmd = 'build';
@@ -82,7 +82,7 @@ module.exports = {
 
   /**
    * 执行自定义命令
-   */  
+   */
   exec(options = {}) {
     let { config, command, cmds } = options;
     const binCmd = 'exec';
@@ -109,11 +109,11 @@ module.exports = {
 
   /**
    * 支持多个命令
-   */  
+   */
   multiExec(opt = {}) {
     //console.log('multiExec opt:', opt)
     const { binCmd, binCmdConfig, command } = opt;
-    
+
     let cmds;
     const cmdString = command.trim();
     if (cmdString.indexOf(',') !== -1) {
@@ -135,29 +135,33 @@ module.exports = {
       if (cmd == 'frontend' && cfg.protocol == 'file://') {
         continue;
       }
-  
+
       console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + "Run " + chalk.green(`[${binCmd} ${cmd}]` + " command"));
       console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.green('config:'), JSON.stringify(cfg));
-      
+
       let execDir = path.join(process.cwd(), cfg.directory);
       let execArgs = is.string(cfg.args) ? [cfg.args] : cfg.args;
       let stdio = cfg.stdio ? cfg.stdio: 'inherit';
-  
-      this.execProcess[cmd] = crossSpawn(
-        cfg.cmd, 
+
+      const handler = cfg.sync ? crossSpawn.sync : crossSpawn;
+
+      this.execProcess[cmd] = handler(
+        cfg.cmd,
         execArgs,
         { stdio: stdio, cwd: execDir, maxBuffer: 1024 * 1024 * 1024 },
       );
-      console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`[${binCmd} ${cmd}]`) + ' command is running');
+      console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`[${binCmd} ${cmd}]`) + ` command is ${cfg.sync ? 'run completed' : 'running'}`);
 
-      this.execProcess[cmd].on('exit', () => {
-        if (cmd == 'electron') {
-          console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.green('Press "CTRL+C" to exit'));
-          return
-        }
-        console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`[${binCmd} ${cmd}]`) + ' command is executed and exits');
-      });
+      if(!cfg.sync) {
+        this.execProcess[cmd].on('exit', () => {
+          if (cmd == 'electron') {
+            console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.green('Press "CTRL+C" to exit'));
+            return
+          }
+          console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`[${binCmd} ${cmd}]`) + ' command is executed and exits');
+        });
+      }
     }
-  },  
+  },
 
 }
