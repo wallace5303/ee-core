@@ -292,9 +292,9 @@ class EeApp extends BaseApp {
         this.loadMainUrl(mode, url);
       });
     } else {
-      // 使用 host port 避免绑定到0.0.0.0
+      // 使用 host port 
       const koaOpt = {
-        host: mainServer.host,
+        host: mainServer.open ? undefined : mainServer.host, // 根据配置是否开放0.0.0.0，默认关闭，避免绑定到0.0.0.0
         port: mainServer.port
       }
       koaApp.listen(koaOpt, () => {

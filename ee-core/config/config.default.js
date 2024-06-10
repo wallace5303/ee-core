@@ -266,6 +266,7 @@ module.exports = appInfo => {
     indexPath: '/public/dist/index.html',
     host: 'localhost',
     port: 7072, // 默认端口（如果端口被使用，则随机获取一个）
+    open: false, // 是否开放0.0.0.0，默认关闭
     options: {},
     ssl: {
       key: '',
