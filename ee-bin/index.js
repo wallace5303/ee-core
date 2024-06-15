@@ -60,6 +60,8 @@ program
 program
   .command('icon')
   .description('Generate logo')
+  .option('-i, --input <file>', 'image file default /public/images/logo.png')
+  .option('-o, --output <folder>', 'output directory default /build/icons/')
   .action(function() {
     const iconGen = require('./tools/iconGen');
     iconGen.run();
