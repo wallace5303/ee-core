@@ -42,7 +42,7 @@ class SocketServer {
         try {
           // 找函数
           const cmd = message.cmd;
-          const args = message.params;
+          const args = message.args || message.params;
           let fn = null;
           if (is.string(cmd)) {
             const actions = cmd.split('.');
