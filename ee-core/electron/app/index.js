@@ -4,6 +4,7 @@ const Log = require('../../log');
 const Electron = require('../index');
 const UtilsIs = require('../../utils/is');
 const Cross = require('../../cross');
+const Window = require('../window');
 
 /**
  * CoreElectronApp (框架封装的electron app对象)
@@ -26,9 +27,9 @@ const CoreElectronApp = {
     })
 
     // 显示首次打开的窗口
-    app.on('second-instance', (event, argv, workingDirectory) => {
+    app.on('second-instance', () => {
       Log.coreLogger.info('[ee-core] [lib/eeApp] second-instance');
-      CoreApp.mainWindow.show();
+      Window.restoreMainWindow();
     });
 
     app.on('window-all-closed', () => {
