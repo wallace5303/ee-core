@@ -13,16 +13,28 @@ class FileSync extends Base {
   read() {
     if (fs.existsSync(this.source)) {
       // Read database
-      const data = fs.readFileSync(this.source, {encoding: 'utf8'}).trim();
-      
-      const canDeserialized = this._canDeserialized(data);
-      if (!canDeserialized) {
-        const errMessage = `Malformed JSON in file: ${this.source}\n${data}`;
-        console.error(errMessage)
+      let data = fs.readFileSync(this.source, {encoding: 'utf8'}).trim();
 
-        //  reset system.json
-        if (this.isSysDB) {
-          this._fsWrite(this.defaultValue);
+      // 是否可以正常解析
+      let canDeserialized = this._canDeserialized(data);
+      if (!canDeserialized) {
+        let errMessage = `[ee-core] [storage/jsondb] malformed json in file: ${this.source}\n${data}`;
+        Log.coreLogger.error(errMessage);
+
+        // 是否文件结尾多一个括号，尝试处理
+        data = data.trim().slice(0, -1);
+        canDeserialized = this._canDeserialized(data);
+        if (canDeserialized) {
+          // 转换为对象，并写入
+          const newData = JSON.parse(data);
+          this._fsWrite(newData);
+        } else {
+          //  [todo] 重置 system.json ，不处理用户数据
+          if (this.isSysDB) {
+            this._fsWrite(this.defaultValue);
+          }
+          errMessage = '[ee-core] [storage/jsondb] malformed json that cannot be handled!';
+          Log.coreLogger.error(errMessage);
         }
       }
       const value = canDeserialized ? this.deserialize(data) : this.defaultValue;

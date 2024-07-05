@@ -1,8 +1,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
-const Jsondb = require('./jsondb/main');
-const FileSync = require('./jsondb/adapters/FileSync');
+const JsonDBMain = require('./jsondb/main');
 const _ = require('lodash');
 const Constants = require('../const');
 const Helper = require('../utils/helper');
@@ -33,8 +32,9 @@ class JsondbStorage {
       source: dbFile,
       isSysDB: isSysDB
     }
-    const adapter = new FileSync(opt);
-    const db = Jsondb(adapter);
+
+    const jdbMain = new JsonDBMain(opt);
+    const db = jdbMain.create();
 
     assert(fs.existsSync(dbFile), `error: storage ${dbFile} not exists`);
 
