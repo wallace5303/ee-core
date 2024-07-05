@@ -4,7 +4,8 @@ const path = require('path');
 const fs = require('fs');
 const chalk = require('chalk');
 const is = require('is-type-of');
-const {loadTsConfig} = require('config-file-ts');
+const { loadTsConfig } = require('config-file-ts');
+const JsonLib = require('json5');
 
 const _basePath = process.cwd();
 
@@ -27,7 +28,7 @@ function loadConfig(prop) {
   let result;
   if (configFile.endsWith(".json5") || configFile.endsWith(".json")) {
     const data = fs.readFileSync(configFile, 'utf8');
-    return  require("json5").parse(data);
+    return JsonLib.parse(data);
   }
   if (configFile.endsWith(".js") || configFile.endsWith(".cjs")) {
     result = require(configFile);
