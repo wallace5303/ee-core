@@ -5,10 +5,13 @@ const conf = {
   /**
    * 获取 内存中的config
    */
-  _getConfig() {
+  _getConfig(withError = true) {
     const { CoreApp } = EE;
-    if (!CoreApp) {
+    if (!CoreApp && withError) {
       throw new Error(`[ee-core] [config] Frame initialization is not complete !`);
+    }
+    if (!CoreApp) {
+      return null;
     }
 
     return CoreApp.config;
@@ -17,8 +20,8 @@ const conf = {
   /**
    * all
    */
-  all() {
-    return this._getConfig();
+  all(withError = true) {
+    return this._getConfig(withError);
   },
 
   /**

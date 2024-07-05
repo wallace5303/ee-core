@@ -16,7 +16,8 @@ class BaseApp extends EeAppCore {
 
     this.loader.loadConfig();
     
-    // 缓存配置
+    
+    // [todo] 缓存配置
     Conf.setAll(this.config);
 
     this.loader.load();

@@ -2,7 +2,7 @@ const EventEmitter = require('events');
 const ForkProcess = require('./forkProcess');
 const Loader = require('../../loader');
 const Channel = require('../../const/channel');
-const Conf = require('../../config');
+const Conf = require('../../config/cache');
 
 class ChildJob extends EventEmitter {
 

@@ -2,7 +2,7 @@ const Agent = require('agentkeepalive');
 const HttpsAgent = require('agentkeepalive').HttpsAgent;
 const urllib = require('urllib');
 const { FrameworkBaseError } = require('egg-errors');
-const Conf = require('../config');
+const Conf = require('../config/cache');
 const Log = require('../log');
 const Time = require('../utils/time');
 

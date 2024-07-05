@@ -1,4 +1,5 @@
 const Storage = require('../storage');
+var SystemDb = undefined;
 
 const Cfg = {
 
@@ -6,8 +7,9 @@ const Cfg = {
    * 获取 coredb
    */
   _getCoreDB() {
-    const coreDB = Storage.connection('system');
-    return coreDB;
+    // [todo] 要么每次new对象，要么所有地方都用同一个实例，否则会出现数据无法刷新的情况
+    SystemDb = Storage.connection('system');
+    return SystemDb;
   },
 
   /**

@@ -1,6 +1,6 @@
 const Log = require('../log');
 const Ps = require('../ps');
-const Conf = require('../config');
+const Conf = require('../config/cache');
 const Message = require('../message');
 
 /**

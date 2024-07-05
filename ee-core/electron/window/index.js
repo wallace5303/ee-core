@@ -1,6 +1,6 @@
 const is = require('is-type-of');
 const { BrowserWindow, Menu } = require('electron');
-const Conf = require('../../config');
+const Conf = require('../../config/cache');
 const Ps = require('../../ps');
 const EEMainWindow = Symbol('Ee#electron#mainWindow');
 

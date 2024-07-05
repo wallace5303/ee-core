@@ -4,6 +4,7 @@ const dayjs = require('dayjs');
 const path = require('path');
 const Ps = require('../ps');
 const Conf = require('../config');
+const ConfCache = require('../config/cache');
 let LogDate = 0;
 
 module.exports = {
@@ -37,7 +38,12 @@ module.exports = {
         },
         customLogger: {}
       }
-      const sysConfig = Conf.all();
+
+      // 先从 cache 中读配置，如果没有从文件中读（子进程无法获取 cache）
+      let sysConfig = ConfCache.all(false);
+      if (!sysConfig) {
+        sysConfig = Conf.all();
+      }
       opt = Object.assign(defaultConfig, {
         logger: sysConfig.logger,
         customLogger: sysConfig.customLogger || {}

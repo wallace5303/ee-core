@@ -3,7 +3,7 @@
 const { Server } = require('socket.io');
 const is = require('is-type-of');
 const Log = require('../log');
-const Conf = require('../config');
+const Conf = require('../config/cache');
 const Ps = require('../ps');
 const Channel = require('../const/channel');
 
