@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const chalk = require('chalk');
 const is = require('is-type-of');
+const {loadTsConfig} = require('config-file-ts');
 
 const _basePath = process.cwd();
 
@@ -12,26 +13,34 @@ function checkConfig(prop) {
   if (fs.existsSync(filepath)) {
     return true;
   }
-  
+
   return false;
 }
 
 function loadConfig(prop) {
-  const configFile = prop;
-  const filepath = path.join(_basePath, configFile);
-  if (!fs.existsSync(filepath)) {
-    const errorTips = 'config file ' + chalk.blue(`${filepath}`) + ' does not exist !';
+  const configFile = path.join(_basePath, prop);
+  if (!fs.existsSync(configFile)) {
+    const errorTips = 'config file ' + chalk.blue(`${configFile}`) + ' does not exist !';
     throw new Error(errorTips)
   }
-  const obj = require(filepath);
-  if (!obj) return obj;
 
-  let ret = obj;
-  if (is.function(obj) && !is.class(obj)) {
-    ret = obj();
+  let result;
+  if (configFile.endsWith(".json5") || configFile.endsWith(".json")) {
+    const data = fs.readFileSync(configFile, 'utf8');
+    return  require("json5").parse(data);
   }
-
-  return ret || {};
+  if (configFile.endsWith(".js") || configFile.endsWith(".cjs")) {
+    result = require(configFile);
+    if (result.default != null) {
+      result = result.default;
+    }
+  } else if (configFile.endsWith(".ts")) {
+    result = loadTsConfig(configFile);
+  }
+  if (is.function(result) && !is.class(result)) {
+    result = result();
+  }
+  return result || {}
 };
 
 function loadEncryptConfig() {
@@ -54,7 +63,7 @@ function loadEncryptConfig() {
 
 /**
  * get electron program
- */   
+ */
 function getElectronProgram() {
   let electronPath
   const electronModulePath = path.dirname(require.resolve('electron'))
@@ -82,7 +91,7 @@ function compareVersion(v1, v2) {
   while (v2.length < len) {
     v2.push('0')
   }
-  
+
   for (let i = 0; i < len; i++) {
     const num1 = parseInt(v1[i])
     const num2 = parseInt(v2[i])
