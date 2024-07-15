@@ -5,13 +5,6 @@ const Loader = require('ee-core/loader');
 const Log = require('ee-core/log');
 const UtilsCore = require('ee-core/core/lib/utils');
 
-// 开发环境下，ee-core是soft link
-// /node_modules[\\/]electron[\\/]/.test(process.execPath)
-// const Exception = require('../../exception');
-// const Loader = require('../../loader');
-// const Log = require('../../log');
-// const UtilsCore = require('../../core/lib/utils');
-
 Exception.start();
 const commands = ['run'];
 

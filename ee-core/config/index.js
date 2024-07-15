@@ -1,4 +1,5 @@
 const Storage = require('../storage');
+const ConfigCache = require('./cache');
 var SystemDb = undefined;
 
 const Cfg = {
@@ -15,7 +16,12 @@ const Cfg = {
   /**
    * all
    */
-  all() {
+  all(fromCache = true) {
+    if (fromCache === true) {
+      // 如果子进程
+      const cacheValue = ConfigCache.all();
+      return cacheValue;
+    }
     const cdb = this._getCoreDB();
     const config = cdb.getItem('config');
   
@@ -45,7 +51,12 @@ const Cfg = {
   /**
    * getValue
    */
-  getValue(key) {
+  getValue(key, fromCache = true) {
+    if (fromCache === true) {
+      const cacheValue = ConfigCache.getValue(key);
+      return cacheValue;
+    }
+
     const cdb = this._getCoreDB();
     let v = cdb.getConfigItem(key);
   
