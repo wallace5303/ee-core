@@ -6,6 +6,11 @@ const Ps = require('../ps');
 const Conf = require('../config');
 const ConfigCache = require('../config/cache');
 let LogDate = 0;
+const TmpFileName = {
+  appLogName: '',
+  coreLogName: '',
+  errorLogName: '',
+}
 
 module.exports = {
 
@@ -73,9 +78,20 @@ module.exports = {
     let now = parseInt(dayjs().format('YYYYMMDD'));
     if (LogDate != now) {
       LogDate = now;
-      let appLogName = logOpt.logger.appLogName;
-      let coreLogName = logOpt.logger.coreLogName;
-      let errorLogName = logOpt.logger.errorLogName;
+
+      // 保存一个临时文件名，防止文件名按日期累加
+      if (TmpFileName.appLogName.length == 0) {
+        TmpFileName.appLogName = logOpt.logger.appLogName;
+      }
+      if (TmpFileName.coreLogName.length == 0) {
+        TmpFileName.coreLogName = logOpt.logger.coreLogName;
+      }
+      if (TmpFileName.errorLogName.length == 0) {
+        TmpFileName.errorLogName = logOpt.logger.errorLogName;
+      }
+      let appLogName = TmpFileName.appLogName;
+      let coreLogName = TmpFileName.coreLogName;
+      let errorLogName = TmpFileName.errorLogName;
       let appLogExtname = path.extname(appLogName);
       let coreLogExtname = path.extname(coreLogName);
       let errorLogExtname = path.extname(errorLogName);
