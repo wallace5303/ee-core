@@ -6,6 +6,7 @@ const chalk = require('chalk');
 const is = require('is-type-of');
 const { loadTsConfig } = require('config-file-ts');
 const JsonLib = require('json5');
+const mkdirp = require('mkdirp');
 
 const _basePath = process.cwd();
 
@@ -111,11 +112,63 @@ function isWindows(prop) {
   return process.platform === 'win32'
 }
 
+/**
+ * Delete a file or folder
+ */
+function rm(name) {
+  // check
+  if (!fs.existsSync(name)) {
+    return
+  }
+
+  const nodeVersion = (process.versions && process.versions.node) || null;
+  if (nodeVersion && compareVersion(nodeVersion, '14.14.0') == 1) {
+    fs.rmSync(name, {recursive: true});
+  } else {
+    fs.rmdirSync(name, {recursive: true});
+  }
+}
+
+/**
+ * 获取项目根目录package.json
+ */
+function getPackage () {
+  const homeDir = process.cwd();
+  const content = readJsonSync(path.join(homeDir, 'package.json'));
+  
+  return content;
+}
+
+function readJsonSync (filepath) {
+  if (!fs.existsSync(filepath)) {
+    throw new Error(filepath + ' is not found');
+  }
+  return JSON.parse(fs.readFileSync(filepath));
+}
+
+function writeJsonSync (filepath, str, options) {
+  options = options || {};
+  if (!('space' in options)) {
+    options.space = 2;
+  }
+
+  mkdirp.sync(path.dirname(filepath));
+  if (typeof str === 'object') {
+    str = JSON.stringify(str, options.replacer, options.space) + '\n';
+  }
+
+  fs.writeFileSync(filepath, str);
+};
+
 module.exports = {
   loadConfig,
   checkConfig,
   loadEncryptConfig,
   getElectronProgram,
   compareVersion,
-  isWindows
+  isWindows,
+  rm,
+  getPackage,
+  readJsonSync,
+  writeJsonSync
 }

@@ -120,4 +120,16 @@ program
     serve.exec(this.opts());
   });
 
+/**
+ * updater
+ */
+program
+  .command('updater')
+  .description('updater commands')
+  .option('--config <folder>', 'config file', './electron/config/bin.js')
+  .action(function() {
+    const updater = require('./tools/incrUpdater');
+    updater.run(this.opts());
+  });
+
 program.parse();
