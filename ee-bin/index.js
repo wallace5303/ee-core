@@ -127,6 +127,7 @@ program
   .command('updater')
   .description('updater commands')
   .option('--config <folder>', 'config file', './electron/config/bin.js')
+  .option('--asar-file <file>', 'asar file path')
   .action(function() {
     const updater = require('./tools/incrUpdater');
     updater.run(this.opts());

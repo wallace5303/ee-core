@@ -18,7 +18,7 @@ module.exports = {
    */  
   run(options = {}) {
     console.log('[ee-bin] [updater] Start');
-    const { config } = options;
+    const { config, asarFile } = options;
     const binCfg = Utils.loadConfig(config);
     const cfg = binCfg.updater;
 
@@ -28,15 +28,30 @@ module.exports = {
     }
     console.log(chalk.blue('[ee-bin] [updater] ') + chalk.green('config:'), cfg);
 
-    this.generateFile(cfg);
+    this.generateFile(cfg, asarFile);
 
     console.log('[ee-bin] [updater] End');
   },
 
-  generateFile(cfg) {
+  generateFile(cfg, asarFile) {
     const latestVersionInfo = {}
     const homeDir = process.cwd();
-    const asarFilePath = path.normalize(path.join(homeDir, cfg.asarFile));
+
+    let asarFilePath = "";
+    if (asarFile) {
+      asarFilePath = path.normalize(path.join(homeDir, asarFile));
+    } else if (Array.isArray(cfg.asarFile)) {  
+      // 检查文件列表，如果存在就跳出
+      for (const filep of cfg.asarFile) {
+        asarFilePath = path.normalize(path.join(homeDir, filep));
+        if (fs.existsSync(asarFilePath)) {
+          break;
+        }
+      }
+    } else {
+      asarFilePath = path.normalize(path.join(homeDir, cfg.asarFile));
+    }
+
     if (!fs.existsSync(asarFilePath)) {
       console.log(chalk.blue('[ee-bin] [updater] ') + chalk.red(`Error: ${asarFilePath} does not exist`));
       return;
