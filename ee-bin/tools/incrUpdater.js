@@ -5,6 +5,7 @@ const fs = require('fs');
 const crypto = require('crypto')
 const chalk = require('chalk');
 const Utils = require('../lib/utils');
+const admZip = require('adm-zip')
 
 /**
  * 增量升级
@@ -57,6 +58,19 @@ module.exports = {
       return;
     }
 
+    // 生成 zip
+    const asarZipPath = path.join(homeDir, cfg.output.directory, cfg.output.zip);
+    if (fs.existsSync(asarZipPath) && cfg.cleanCache) {
+      Utils.rm(asarZipPath);
+    }
+    const zip = new admZip();
+    zip.addLocalFile(asarFilePath); 
+    zip.writeZip(asarZipPath, (err) => {
+      if (err) {
+        console.log(chalk.blue('[ee-bin] [updater] create zip ') + chalk.red(`Error: ${err}`));
+      }
+    });
+
     const sha1 = this.generateSha1(asarFilePath);
     const packageJson = Utils.getPackage();
     const version = packageJson.version;
@@ -66,15 +80,21 @@ module.exports = {
     for (const item of cfg.platform) {
       latestVersionInfo[item] = {
         version: version,
-        file: 'app.zip',
+        file: cfg.output.zip,
         size: fileStat.size,
         sha1: sha1,
         releaseDate: date,
       };
     }
 
-    const updaterJsonFilePath = path.join(homeDir, cfg.outFile);
+    const updaterJsonFilePath = path.join(homeDir, cfg.output.directory, cfg.output.file);
     Utils.writeJsonSync(updaterJsonFilePath, latestVersionInfo);
+
+    // 删除缓存文件，防止生成的 zip 是旧版本
+    if (cfg.cleanCache) {
+      Utils.rm(path.join(homeDir, cfg.output.directory, 'mac'));
+      Utils.rm(path.join(homeDir, cfg.output.directory, 'win-unpacked'));
+    }  
   },
   
   generateSha1(filepath = "") {
