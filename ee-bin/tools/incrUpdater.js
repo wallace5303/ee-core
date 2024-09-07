@@ -58,8 +58,12 @@ module.exports = {
       return;
     }
 
+    const packageJson = Utils.getPackage();
+    const version = packageJson.version;
+
     // 生成 zip
-    const asarZipPath = path.join(homeDir, cfg.output.directory, cfg.output.zip);
+    const zipName = path.basename(cfg.output.zip, '.zip') + `-${version}.zip`;
+    const asarZipPath = path.join(homeDir, cfg.output.directory, zipName);
     if (fs.existsSync(asarZipPath) && cfg.cleanCache) {
       Utils.rm(asarZipPath);
     }
@@ -72,15 +76,13 @@ module.exports = {
     });
 
     const sha1 = this.generateSha1(asarFilePath);
-    const packageJson = Utils.getPackage();
-    const version = packageJson.version;
     const date = this._getFormattedDate();
     const fileStat = fs.statSync(asarFilePath);
 
     for (const item of cfg.platform) {
       latestVersionInfo[item] = {
         version: version,
-        file: cfg.output.zip,
+        file: zipName,
         size: fileStat.size,
         sha1: sha1,
         releaseDate: date,
