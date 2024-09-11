@@ -35,7 +35,7 @@ module.exports = {
   },
 
   generateFile(cfg, asarFile) {
-    const latestVersionInfo = {}
+    var latestVersionInfo = {}
     const homeDir = process.cwd();
 
     let asarFilePath = "";
@@ -60,9 +60,17 @@ module.exports = {
 
     const packageJson = Utils.getPackage();
     const version = packageJson.version;
+    const platformForFilename = Utils.getPlatform("-");
+    const platformForKey = Utils.getPlatform("_");
 
     // 生成 zip
-    const zipName = path.basename(cfg.output.zip, '.zip') + `-${version}.zip`;
+    let zipName = "";
+    if (cfg.output.noPlatform === true) {
+      zipName = path.basename(cfg.output.zip, '.zip') + `-${version}.zip`;
+    } else {
+      zipName = path.basename(cfg.output.zip, '.zip') + `-${platformForFilename}-${version}.zip`;
+    }
+    
     const asarZipPath = path.join(homeDir, cfg.output.directory, zipName);
     if (fs.existsSync(asarZipPath) && cfg.cleanCache) {
       Utils.rm(asarZipPath);
@@ -79,23 +87,36 @@ module.exports = {
     const date = this._getFormattedDate();
     const fileStat = fs.statSync(asarFilePath);
 
-    for (const item of cfg.platform) {
-      latestVersionInfo[item] = {
-        version: version,
-        file: zipName,
-        size: fileStat.size,
-        sha1: sha1,
-        releaseDate: date,
-      };
+    const item = {
+      version: version,
+      file: zipName,
+      size: fileStat.size,
+      sha1: sha1,
+      releaseDate: date,
+    };
+    let jsonName = "";
+    if (cfg.output.noPlatform === true) {
+      jsonName = cfg.output.file;
+      latestVersionInfo = item;
+    } else {
+      // 生成与系统有关的文件
+      jsonName = path.basename(cfg.output.file, '.json') + `-${platformForFilename}.json`;
+      if (platformForKey !== "") {
+        latestVersionInfo[platformForKey] = item;
+      } else {
+        console.log(chalk.blue('[ee-bin] [updater] ') + chalk.red(`Error: ${platformForFilename} is not supported`));
+      }
     }
 
-    const updaterJsonFilePath = path.join(homeDir, cfg.output.directory, cfg.output.file);
+    const updaterJsonFilePath = path.join(homeDir, cfg.output.directory, jsonName);
     Utils.writeJsonSync(updaterJsonFilePath, latestVersionInfo);
 
     // 删除缓存文件，防止生成的 zip 是旧版本
     if (cfg.cleanCache) {
       Utils.rm(path.join(homeDir, cfg.output.directory, 'mac'));
+      Utils.rm(path.join(homeDir, cfg.output.directory, 'mac-arm64'));
       Utils.rm(path.join(homeDir, cfg.output.directory, 'win-unpacked'));
+      Utils.rm(path.join(homeDir, cfg.output.directory, 'linux-unpacked'));
     }  
   },
   
