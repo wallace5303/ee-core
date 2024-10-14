@@ -89,13 +89,12 @@ class SpawnProcess {
         });
         this.child = coreProcess;
         this.pid = coreProcess.pid;
-        //设置自动更新环境变量
-        process.env.ELECTRON_INCR_UPDATER="false"
         coreProcess.on('exit', (code, signal) => {
             //如果是更新中，不退出
-            let electronincrupdater = process.env.ELECTRON_INCR_UPDATER
+            let electronincrupdater = Channel.process.ELECTRON_INCR_UPDATER
+            Log.coreLogger.info("Channel.process.ELECTRON_INCR_UPDATER", Channel.process.ELECTRON_INCR_UPDATER);
             if (electronincrupdater==="true") {
-                Log.coreLogger.info("服务端更新中，不退出");
+                Log.coreLogger.info("exit->服务端更新中，不退出");
                 return
             }
             let data = {
@@ -107,6 +106,13 @@ class SpawnProcess {
         });
 
         coreProcess.on('error', (err) => {
+            //如果是更新中，不退出
+            let electronincrupdater = Channel.process.ELECTRON_INCR_UPDATER
+            Log.coreLogger.info("Channel.process.ELECTRON_INCR_UPDATER", Channel.process.ELECTRON_INCR_UPDATER);
+            if (electronincrupdater==="true") {
+                Log.coreLogger.info("error->服务端更新中，不退出");
+                return
+            }
             let data = {
                 pid: this.pid
             }
