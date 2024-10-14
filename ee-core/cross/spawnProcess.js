@@ -95,35 +95,15 @@ class SpawnProcess {
                 pid: this.pid
             }
             //设置自动更新环境变量
-            process.env.ELECTRON_INCR_UPDATER=true
-            process.env.ELECTRON_INCR_UPDATER_RELAUNCH=false
+            process.env.ELECTRON_INCR_UPDATER="false"
+
             coreProcess.on('exit', (code, signal) => {
                 //如果是更新中，不退出
                 //获取进程环境变量
                 let electronincrupdater = process.env.ELECTRON_INCR_UPDATER
                 Log.coreLogger.info("electronincrupdater", electronincrupdater)
-                if (electronincrupdater=="true") {
+                if (electronincrupdater==="true") {
                     Log.coreLogger.info("服务端更新中，不退出");
-                    //每100ms检查一次process.env.ELECTRON_INCR_UPDATER_RELAUNCH,如果是true那么就重新唤起,表示安装完成了
-                    //防止前端更新完毕用户不愿意重启,导致前端无法使用
-                    //设置尝试次数为10s
-                    let count = 30
-                    let interval = setInterval(() => {
-                        //如果尝试次数超过3s,则退出, 因为能走到这个一步一般来说,下载是成功的,然后处于替换文件阶段,这个节点非常快,一般来说不会超过1s,我这里设置3s保险一点
-                        if (count <= 0) {
-                            clearInterval(interval)
-                            this.host.emitter.emit(Channel.events.childProcessExit, data);
-                            Log.coreLogger.info(`服务端更新失败，退出, code:${code}, signal:${signal}, pid:${this.pid} , cmd:${cmdPath}, args: ${cmdArgs}`);
-                            this._exitElectron();
-                        }
-                        let electronincrupdaterrelaunch = process.env.ELECTRON_INCR_UPDATER_RELAUNCH
-                        if (electronincrupdaterrelaunch=="true") {
-                            clearInterval(interval)
-                            Log.coreLogger.info("服务端更新完成，重新唤起, cmd:${cmdPath}, args: ${cmdArgs}");
-                            serverStart()
-                        }
-                        count--
-                    }, 100)
                     return
                 }
                 this.host.emitter.emit(Channel.events.childProcessExit, data);
