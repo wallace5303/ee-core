@@ -80,48 +80,41 @@ class SpawnProcess {
             execDir = Ps.getExtraResourcesDir();
         }
 
-        const serverStart = () => {
-            Log.coreLogger.info(`[ee-core] [cross/run] cmd: ${cmdPath}, args: ${cmdArgs}`);
-            const coreProcess = crossSpawn(cmdPath, cmdArgs, {
-                stdio: standardOutput,
-                detached: false,
-                cwd: execDir,
-                maxBuffer: 1024 * 1024 * 1024
-            });
-            this.child = coreProcess;
-            this.pid = coreProcess.pid;
+        Log.coreLogger.info(`[ee-core] [cross/run] cmd: ${cmdPath}, args: ${cmdArgs}`);
+        const coreProcess = crossSpawn(cmdPath, cmdArgs, {
+            stdio: standardOutput,
+            detached: false,
+            cwd: execDir,
+            maxBuffer: 1024 * 1024 * 1024
+        });
+        this.child = coreProcess;
+        this.pid = coreProcess.pid;
 
+        let data = {
+            pid: this.pid
+        }
+        //设置自动更新环境变量
+        process.env.ELECTRON_INCR_UPDATER="true"
+        coreProcess.on('exit', (code, signal) => {
+            //如果是更新中，不退出
+            let electronincrupdater = process.env.ELECTRON_INCR_UPDATER
+            if (electronincrupdater==="true") {
+                Log.coreLogger.info("服务端更新中，不退出");
+                return
+            }
+            this.host.emitter.emit(Channel.events.childProcessExit, data);
+            Log.coreLogger.info(`子进程被杀死了,导致应用退出, code:${code}, signal:${signal}, pid:${this.pid}, cmd:${cmdPath}, args: ${cmdArgs}`);
+            this._exitElectron();
+        });
+
+        coreProcess.on('error', (err) => {
             let data = {
                 pid: this.pid
             }
-            //设置自动更新环境变量
-            process.env.ELECTRON_INCR_UPDATER="false"
-
-            coreProcess.on('exit', (code, signal) => {
-                //如果是更新中，不退出
-                //获取进程环境变量
-                let electronincrupdater = process.env.ELECTRON_INCR_UPDATER
-                Log.coreLogger.info("electronincrupdater", electronincrupdater)
-                if (electronincrupdater==="true") {
-                    Log.coreLogger.info("服务端更新中，不退出");
-                    return
-                }
-                this.host.emitter.emit(Channel.events.childProcessExit, data);
-                Log.coreLogger.info(`子进程被杀死了,导致应用退出, code:${code}, signal:${signal}, pid:${this.pid}, cmd:${cmdPath}, args: ${cmdArgs}`);
-                this._exitElectron();
-            });
-
-            coreProcess.on('error', (err) => {
-                let data = {
-                    pid: this.pid
-                }
-                this.host.emitter.emit(Channel.events.childProcessError, data);
-                Log.coreLogger.error(`子进程未知错误,导致应用退出, error: ${err}, pid:${this.pid}, cmd:${cmdPath}, args: ${cmdArgs}`);
-                this._exitElectron();
-            });
-        }
-
-        serverStart()
+            this.host.emitter.emit(Channel.events.childProcessError, data);
+            Log.coreLogger.error(`子进程未知错误,导致应用退出, error: ${err}, pid:${this.pid}, cmd:${cmdPath}, args: ${cmdArgs}`);
+            this._exitElectron();
+        });
 
     }
 
