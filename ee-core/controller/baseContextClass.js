@@ -3,31 +3,22 @@
 /**
  * BaseContextClass is a base class that can be extended,
  * it's instantiated in context level,
- * {@link Helper}, {@link Service} is extending it.
  */
 class BaseContextClass {
 
   /**
    * @class
    * @param {Context} ctx - context instance
-   * @since 1.0.0
+   * @since 1.1.0
    */
   constructor(ctx) {
-    /**
-     * @member {Application} BaseContextClass#app
-     * @since 1.0.0
-     */
-    this.app = ctx;
-    /**
-     * @member {Config} BaseContextClass#config
-     * @since 1.0.0
-     */
-    this.config = ctx.config;
-    /**
-     * @member {Service} BaseContextClass#service
-     * @since 1.0.0
-     */
-    this.service = ctx.service;
+
+    // todo 兼容旧版本，后续废弃ctx
+    if (typeof ctx === 'object') {
+      this.app = ctx;
+      this.config = ctx.config;
+      this.service = ctx.service;
+    }
   }
 }
 
