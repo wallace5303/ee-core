@@ -6,7 +6,7 @@ class ChildMessage {
   }
 
   /**
-   * 向主进程发消息
+   * 向主进程发消息 for ChildJob 实例
    */
   sendToMain(eventName, params = {}) {
     let receiver = Channel.receiver.childJob;
@@ -14,7 +14,7 @@ class ChildMessage {
   }
 
   /**
-   * 向主进程发消息
+   * 向主进程发消息 for task 实例
    */
   send(eventName, params = {}, receiver) {
     let eventReceiver = receiver || Channel.receiver.forkProcess;

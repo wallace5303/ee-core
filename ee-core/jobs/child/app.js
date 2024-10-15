@@ -11,6 +11,7 @@ const commands = ['run'];
 class ChildApp {
   constructor() {
     this._initEvents();
+    this.jobMap = new Map();
   }
 
   /**
@@ -43,15 +44,20 @@ class ChildApp {
    * 运行脚本
    */  
   run(msg = {}) {
-    let filepath = msg.jobPath;
-    let params = msg.jobParams;
-
-    let mod = Loader.loadJsFile(filepath);
+    const {jobPath, jobParams, jobFunc, jobFuncParams} = msg;
+    let mod = Loader.loadJsFile(jobPath);
     if (is.class(mod) || UtilsCore.isBytecodeClass(mod)) {
-      let jobClass = new mod(params);
-      jobClass.handle();
+      if (!this.jobMap.has(jobPath)) {
+        const instance = new mod(...jobParams);
+        instance.handle(...jobParams);
+        this.jobMap.set(jobPath, instance);
+      } else {
+        const instance = this.jobMap.get(jobPath);
+        instance[jobFunc](...jobFuncParams);
+      }
+
     } else if (is.function(mod)) {
-      mod(params);
+      mod(jobParams);
     }
   }
 }
