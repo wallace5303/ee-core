@@ -1,7 +1,8 @@
 module.exports = {
   process: {
     showException: 'ee#showException',
-    sendToMain: 'ee#sendToMain'
+    sendToMain: 'ee#sendToMain',
+    ELECTRON_INCR_UPDATER: 'false'
   },
   socketIo: {
     partySoftware: 'c1',
