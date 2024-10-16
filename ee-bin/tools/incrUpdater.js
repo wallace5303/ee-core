@@ -78,18 +78,27 @@ module.exports = {
         //找到扩展资源文件
         let extraResources = [];
         if (cfg.enables.extraResources === true) {
-            if (Array.isArray(cfg.extraResources)) {
+            let files = [];
+            //获取当前系统的环境
+            if (Utils.isWindows()){
+                files = cfg.extraResources.windows?cfg.extraResources.windows:[];
+            } else if (Utils.isMacOS()) {
+                files = cfg.extraResources.macos?cfg.extraResources.macos:[];
+            }else {
+                files = cfg.extraResources.linux?cfg.extraResources.linux:[];
+            }
+            console.log(chalk.blue('[ee-bin] [updater] ') + chalk.green('extraResources:'), files);
+            if (files.length > 0) {
                 //判断每个文件是否都存在,如果不存在就跳过这个
-                for (const filep of cfg.extraResources) {
+                for (const filep of files) {
                     let extraFilePath = path.normalize(path.join(homeDir, filep));
                     if (fs.existsSync(extraFilePath)) {
                         extraResources.push(extraFilePath);
                     }
                 }
-            }
-            if (cfg.extraResources.length>0 && extraResources.length === 0) {
+            }else{
                 console.log(chalk.blue('[ee-bin] [updater] ') + chalk.red(`Error: extraResources does not exist`));
-                return;
+                return
             }
         }
 
