@@ -101,23 +101,16 @@ class SpawnProcess {
                 pid: this.pid
             }
             this.host.emitter.emit(Channel.events.childProcessExit, data);
-            Log.coreLogger.info(`子进程被杀死了,导致应用退出, code:${code}, signal:${signal}, pid:${this.pid}, cmd:${cmdPath}, args: ${cmdArgs}`);
+            Log.coreLogger.info(`子进程被关闭了: 子进程被外部杀死了或者内部报错导致应用停止,从而导致应用退出, code:${code}, signal:${signal}, pid:${this.pid}, cmd:${cmdPath}, args: ${cmdArgs}`);
             this._exitElectron();
         });
 
         coreProcess.on('error', (err) => {
-            //如果是更新中，不退出
-            let electronincrupdater = Channel.process.ELECTRON_INCR_UPDATER
-            Log.coreLogger.info("Channel.process.ELECTRON_INCR_UPDATER", Channel.process.ELECTRON_INCR_UPDATER);
-            if (electronincrupdater==="true") {
-                Log.coreLogger.info("error->服务端更新中，不退出");
-                return
-            }
             let data = {
                 pid: this.pid
             }
             this.host.emitter.emit(Channel.events.childProcessError, data);
-            Log.coreLogger.error(`子进程未知错误,导致应用退出, error: ${err}, pid:${this.pid}, cmd:${cmdPath}, args: ${cmdArgs}`);
+            Log.coreLogger.error(`进程启动未知错误: 没启动起来导致的(这种错误要不就是没权限,要不就存在了相同的进程...), error: ${err}, pid:${this.pid}, cmd:${cmdPath}, args: ${cmdArgs}`);
             this._exitElectron();
         });
 
