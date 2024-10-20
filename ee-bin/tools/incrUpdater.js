@@ -27,7 +27,6 @@ module.exports = {
       console.log(chalk.blue('[ee-bin] [updater] ') + chalk.red(`Error: ${cfg} config does not exist`));
       return;
     }
-    console.log(chalk.blue('[ee-bin] [updater] ') + chalk.green('config:'), cfg);
 
     if (platform) {
       this.generateFile(cfg, asarFile, platform);
@@ -45,6 +44,7 @@ module.exports = {
     const cfg = config[platform];
     let latestVersionInfo = {}
     const homeDir = process.cwd();
+    console.log(chalk.blue('[ee-bin] [updater] ') + chalk.green(`${platform} config:`), cfg);
 
     let asarFilePath = "";
     if (asarFile) {
@@ -69,7 +69,6 @@ module.exports = {
     const packageJson = Utils.getPackage();
     const version = packageJson.version;
     let platformForFilename = platform;
-    const platformForKey = platform;
     if (platform.indexOf("_") !== -1) {
       const platformArr = platform.split("_");
       platformForFilename = platformArr.join("-");
@@ -133,6 +132,7 @@ module.exports = {
   generateFileOld(cfg, asarFile) {
     var latestVersionInfo = {}
     const homeDir = process.cwd();
+    console.log(chalk.blue('[ee-bin] [updater] ') + chalk.green('config:'), cfg);
 
     let asarFilePath = "";
     if (asarFile) {

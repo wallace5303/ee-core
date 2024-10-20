@@ -95,7 +95,8 @@ class SpawnProcess {
         pid: this.pid
       }
       this.host.emitter.emit(Channel.events.childProcessExit, data);
-      Log.coreLogger.info(`[ee-core] [corss/process] received a exit from child-process, code:${code}, signal:${signal}, pid:${this.pid}`);
+      // Child process closed: The child process was killed externally or an internal error caused the application to stop, resulting in the application exiting
+      Log.coreLogger.info(`[ee-core] [corss/process] received a exit from child-process, code:${code}, signal:${signal}, pid:${this.pid}, cmd:${cmdPath}, args: ${cmdArgs}`);
       this._exitElectron();
     });
 
