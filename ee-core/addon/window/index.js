@@ -1,4 +1,5 @@
 const { BrowserWindow } = require('electron');
+const extend = require('../../utils/extend');
 
 /**
  * 窗口插件
@@ -23,9 +24,8 @@ class WinAddon {
     // if (this.windowContentsIdMap.hasOwnProperty(name)) {
     //   throw new Error(`[addon] [window] Name: ${name} already exists!`);
     // }
-
-    // [todo] 使用 extend, 避免多维对象被覆盖 
-    const options = Object.assign({
+ 
+    const options = extend(true, {}, {
       x: 10,
       y: 10,
       width: 980, 

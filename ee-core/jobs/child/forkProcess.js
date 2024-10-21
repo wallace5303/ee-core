@@ -6,6 +6,7 @@ const Log = require('../../log');
 const Ps = require('../../ps');
 const Channel = require('../../const/channel');
 const Helper = require('../../utils/helper');
+const Loader = require('../../loader');
 
 class ForkProcess {
   constructor(host, opt = {}) {
@@ -98,7 +99,7 @@ class ForkProcess {
   /**
    * 分发任务
    */
-  dispatch(cmd, jobPath = '', params = {}) {
+  dispatch(cmd, jobPath = '', ...params) {
     // 消息对象
     const mid = Helper.getRandomString();
     let msg = {
@@ -110,6 +111,24 @@ class ForkProcess {
 
     // todo 是否会发生监听未完成时，接收不到消息？
     // 发消息到子进程
+    this.child.send(msg);
+  }
+
+  /**
+   * 调用job的方法
+   */
+  callFunc(jobPath = '', funcName = '', ...params) {
+    jobPath = Loader.getFullpath(jobPath);
+
+    // 消息对象
+    const mid = Helper.getRandomString();
+    let msg = {
+      mid,
+      cmd:'run',
+      jobPath,
+      jobFunc: funcName,
+      jobFuncParams: params
+    }
     this.child.send(msg);
   }
 
