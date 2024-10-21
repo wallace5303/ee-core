@@ -68,7 +68,6 @@ module.exports = {
 
     const packageJson = Utils.getPackage();
     const version = packageJson.version;
-
     let platformForFilename = platform;
     if (platform.indexOf("_") !== -1) {
       const platformArr = platform.split("_");
