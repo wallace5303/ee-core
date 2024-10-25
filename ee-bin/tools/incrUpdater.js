@@ -85,7 +85,7 @@ module.exports = {
     // 添加 asar 文件
     zip.addLocalFile(asarFilePath); 
     // 添加 extraResources
-    if (cfg.extraResources.length > 0) {
+    if (cfg.extraResources && cfg.extraResources.length > 0) {
       for (const extraRes of cfg.extraResources) {
         const extraResPath = path.normalize(path.join(homeDir, extraRes));
         if (fs.existsSync(extraResPath)) {
