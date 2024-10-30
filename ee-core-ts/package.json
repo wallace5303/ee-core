@@ -19,16 +19,13 @@
     "README.md"
   ],
   "scripts": {
-    "dev": "vite build --watch",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "dev": "",
+    "build": "tsc "
   },
   "license": "ISC",
   "devDependencies": {
     "@types/electron": "^1.4.38",
     "@types/node": "^20.9.0",
-    "typescript": "^5.4.2",
-    "vite": "^5.4.10",
-    "vite-plugin-dts": "^4.3.0"
+    "typescript": "^5.4.2"
   }
 }

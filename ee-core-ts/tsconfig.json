@@ -2,18 +2,15 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "module": "commonjs",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "nodenext",
+    "lib": ["ES2020"],
     "skipLibCheck": true,
     "sourceMap": true,
-    //"baseUrl": ".",
-
-    /* Bundler mode */
-    // "moduleResolution": "bundler",
-    // "allowImportingTsExtensions": true,
-    // "resolveJsonModule": true,
-    // "isolatedModules": true,
-    // "noEmit": true,
+    "declaration": true,
+    "declarationDir": "./types",
+    "outDir": "dist",
+    //"resolveJsonModule": true,
+    //"noEmit": true,
 
     /* Linting */
     "strict": true,
@@ -23,7 +20,6 @@
   },
   "include": [
     "src/**/*", 
-    // "integration/**/*"
   ],
   "exclude": ["node_modules", "**/*.spec.ts"]
 }
