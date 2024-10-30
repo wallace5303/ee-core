@@ -7,7 +7,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "declaration": true,
-    "declarationDir": "./types",
+    //"declarationDir": "./types",
     "outDir": "dist",
     //"resolveJsonModule": true,
     //"noEmit": true,
