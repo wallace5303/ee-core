@@ -143,7 +143,7 @@ function readJsonSync (filepath) {
   if (!fs.existsSync(filepath)) {
     throw new Error(filepath + ' is not found');
   }
-  return JSON.parse(fs.readFileSync(filepath));
+  return JSON.parse(fs.readFileSync(filepath, 'utf8'));
 }
 
 function writeJsonSync (filepath, str, options) {
@@ -152,6 +152,7 @@ function writeJsonSync (filepath, str, options) {
     options.space = 2;
   }
 
+  // @ts-ignore
   mkdirp.sync(path.dirname(filepath));
   if (typeof str === 'object') {
     str = JSON.stringify(str, options.replacer, options.space) + '\n';

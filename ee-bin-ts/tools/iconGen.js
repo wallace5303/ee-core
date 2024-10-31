@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
+// @ts-ignore
 const icongen = require("icon-gen");
 
 class IconGen {

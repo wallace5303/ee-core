@@ -30,8 +30,8 @@
   "author": "",
   "license": "ISC",
   "bin": {
-    "ee-bin-esm": "./index.mjs",
-    "ee-bin-cjs": "index.js"
+    "ee-bin-tsm": "./index.mjs",
+    "ee-bin-tsc": "index.js"
   },
   "dependencies": {
     "@types/node": "^20.9.0",

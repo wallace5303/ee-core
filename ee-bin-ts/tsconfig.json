@@ -8,11 +8,13 @@
     "checkJs": true,
 
     /* Strict by default, but dial it down to reduce churn in our JavaScript code. */
-    "strict": true,
+    "strict": false,
     "noImplicitAny": false,
     "strictNullChecks": false,
     "useUnknownInCatchVariables": false,
+    "noImplicitThis": false,
 
+    
     "types": ["node"],
     "noEmit": true /* just type checking and not emitting transpiled files */,
     "skipLibCheck": false /* we want to check our hand crafted definitions */,

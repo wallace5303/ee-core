@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "nodenext",
+    "lib": ["ES2020"],
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationDir": "./types",
+    "outDir": "dist",
+    //"resolveJsonModule": true,
+    //"noEmit": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": [
+    "src/**/*", 
+  ],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}
+  

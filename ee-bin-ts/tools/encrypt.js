@@ -283,7 +283,7 @@ class Encrypt {
   };
 
   md5(file) {
-    const buffer = fs.readFileSync(file);
+    const buffer = fs.readFileSync(file, 'utf8');
     const hash = crypto.createHash('md5');
     hash.update(buffer, 'utf8');
     const str = hash.digest('hex');
