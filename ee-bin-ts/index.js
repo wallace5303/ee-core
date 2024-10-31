@@ -2,6 +2,8 @@
 
 const { program } = require('commander');
 
+exports.program = program;
+
 /**
  * move - Moves resources
  */

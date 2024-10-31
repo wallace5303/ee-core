@@ -1,23 +1,20 @@
 {
   "name": "ee-bin-ts",
-  "version": "0.1.0-beta.2",
-  "description": "ee bin for typescript",
+  "version": "0.1.0-beta.3",
+  "description": "ee bin for ts",
   "main": "index.js",
   "type": "commonjs",
   "exports": {
     ".": {
       "require": {
-        "types": "./typings/index.d.ts",
         "default": "./index.js"
       },
       "import": {
-        "types": "./typings/esm.d.mts",
         "default": "./index.mjs"
       },
       "default": "./index.js"
     },
     "./index.mjs": {
-      "types": "./typings/esm.d.mts",
       "import": "./index.mjs"
     }
   },
@@ -30,8 +27,8 @@
   "author": "",
   "license": "ISC",
   "bin": {
-    "ee-bin-tsm": "./index.mjs",
-    "ee-bin-tsc": "index.js"
+    "ee-bin-m": "./index.mjs",
+    "ee-bin-c": "index.js"
   },
   "dependencies": {
     "@types/node": "^20.9.0",
