@@ -7,6 +7,7 @@ const is = require('is-type-of');
 const { loadTsConfig } = require('config-file-ts');
 const JsonLib = require('json5');
 const mkdirp = require('mkdirp');
+const OS = require('os');
 
 const _basePath = process.cwd();
 
@@ -108,8 +109,28 @@ function compareVersion(v1, v2) {
   return 0
 }
 
-function isWindows(prop) {
+function isWindows() {
   return process.platform === 'win32'
+}
+
+function isOSX() {
+  return process.platform === 'darwin'
+}
+
+function isMacOS() {
+  return isOSX()
+}
+
+function isLinux() {
+  return process.platform === 'linux'
+}
+
+function isx86() {
+  return process.arch === 'ia32'
+}
+
+function isx64() {
+  return process.arch === 'x64'
 }
 
 /**
@@ -160,6 +181,32 @@ function writeJsonSync (filepath, str, options) {
   fs.writeFileSync(filepath, str);
 };
 
+function getPlatform(delimiter = "_", isDiffArch = false) {
+  let os = "";
+  if (isWindows()) {
+    os = "windows";
+    if (isDiffArch) {
+      const arch = isx64() ? "64" : "32";
+      os += delimiter + arch;
+    }
+  } else if (isMacOS()) {
+    let isAppleSilicon = false;
+    const cpus = OS.cpus();
+    for (let cpu of cpus) {
+      if (cpu.model.includes('Apple')) {
+        isAppleSilicon = true;
+        break;
+      }
+    }
+    const core = isAppleSilicon? "apple" : "intel";
+    os = "macos" + delimiter + core;
+  } else if (isLinux()) {
+    os = "linux";
+  }
+
+  return os;
+}
+
 module.exports = {
   loadConfig,
   checkConfig,
@@ -167,6 +214,12 @@ module.exports = {
   getElectronProgram,
   compareVersion,
   isWindows,
+  isOSX,
+  isMacOS,
+  isLinux,
+  isx86,
+  isx64,
+  getPlatform,
   rm,
   getPackage,
   readJsonSync,
