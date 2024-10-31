@@ -3,6 +3,13 @@
   "version": "0.1.0-beta.1",
   "description": "ee bin for typescript",
   "main": "index.js",
+  "module": "./esm/index.js",
+  "exports": {
+    ".": {
+      "require": "./index.cjs",
+      "import": "./esm/index.js"
+    }
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
