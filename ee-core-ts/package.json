@@ -5,14 +5,10 @@
   "description": "ee-core for typescript",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
-  "exports": {
-    ".": {
-      "require": "./dist/**/*",
-      "import": "./dist/**/*"
-    }
-  },
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
+    "types",
     "LICENSE",
     "README.md"
   ],
