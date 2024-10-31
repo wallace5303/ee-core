@@ -1,24 +1,40 @@
 {
   "name": "ee-bin-ts",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.2",
   "description": "ee bin for typescript",
   "main": "index.js",
-  "module": "./esm/index.js",
+  "type": "commonjs",
   "exports": {
     ".": {
-      "require": "./index.cjs",
-      "import": "./esm/index.js"
+      "require": {
+        "types": "./typings/index.d.ts",
+        "default": "./index.js"
+      },
+      "import": {
+        "types": "./typings/esm.d.mts",
+        "default": "./index.mjs"
+      },
+      "default": "./index.js"
+    },
+    "./index.mjs": {
+      "types": "./typings/esm.d.mts",
+      "import": "./index.mjs"
     }
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "check": "npm run check:type",
+    "check:type": "npm run check:type:js && npm run check:type:ts",
+    "check:type:ts": "tsd && tsc -p tsconfig.ts.json",
+    "check:type:js": "tsc -p tsconfig.js.json"
   },
   "author": "",
   "license": "ISC",
   "bin": {
-    "ee-bin": "index.js"
+    "ee-bin-esm": "./index.mjs",
+    "ee-bin-cjs": "index.js"
   },
   "dependencies": {
+    "@types/node": "^20.9.0",
     "adm-zip": "^0.4.11",
     "bytenode": "^1.3.6",
     "chalk": "^4.1.2",
@@ -33,6 +49,7 @@
     "mkdirp": "^2.1.3"
   },
   "devDependencies": {
-    "cjstoesm": "^3.0.0"
+    "tsd": "^0.31.2",
+    "typescript": "^5.4.2"
   }
 }
