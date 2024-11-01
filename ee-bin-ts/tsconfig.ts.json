@@ -8,7 +8,7 @@
   },
   "include": [
     /* All TypeScript targets from tsconfig.json include. */
-    "**/*.ts",
-    "**/*.mts",
+    "src/**/*.ts",
+    "src/**/*.mts",
   ],
 }
