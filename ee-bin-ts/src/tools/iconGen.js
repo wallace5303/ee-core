@@ -2,7 +2,6 @@
 
 const fs = require("fs");
 const path = require("path");
-const icongen = require("icon-gen");
 
 class IconGen {
   constructor() {
@@ -96,6 +95,7 @@ class IconGen {
     if (!fs.existsSync(this.imagesDir)) {
       fs.mkdirSync(this.imagesDir, { recursive: true });
     }
+    const icongen = require("icon-gen");
     icongen(this.input, this.output, this.iconOptions)
       .then((results) => {
         console.log("[ee-bin] [icon-gen] iconGen 已生成下方图片资源");

@@ -4,8 +4,8 @@
     "module": "node16",
     "target": "es2021",
 
-    // "allowJs": true,
-    // "checkJs": true,
+    "allowJs": true,
+    "checkJs": true,
 
     /* Strict by default, but dial it down to reduce churn in our JavaScript code. */
     "strict": true,
@@ -24,10 +24,18 @@
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true /* common TypeScript config */,
     "resolveJsonModule": true /* needed for globals in node_modules?! */,
+
+    "outDir": "./dist"
   },
   "include": [
-    "src/**/*.js",
-    "src/**/*.mjs"
+    "src/**/*"
   ],
+  // "include": [
+  //   "src/**/*.js",
+  //   "src/**/*.mjs",
+
+  //   "src/**/*.ts",
+  //   "src/**/*.mts"
+  // ],
   "exclude": ["node_modules"]
 }
