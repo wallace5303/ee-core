@@ -1,21 +1,18 @@
 {
   "name": "ee-bin-ts",
-  "version": "0.1.0-beta.3",
+  "version": "0.1.0-beta.4",
   "description": "ee bin for ts",
-  "main": "./src/index.js",
+  "main": "./dist/index.js",
   "type": "commonjs",
   "exports": {
     ".": {
       "require": {
-        "default": "./src/index.js"
+        "default": "./dist/index.js"
       },
       "import": {
-        "default": "./src/index.mjs"
+        "default": "./ems/index.mjs"
       },
-      "default": "./src/index.js"
-    },
-    "./index.mjs": {
-      "import": "./src/index.mjs"
+      "default": "./dist/index.js"
     }
   },
   "scripts": {
@@ -27,8 +24,8 @@
   "author": "",
   "license": "ISC",
   "bin": {
-    "ee-bin-m": "./src/index.mjs",
-    "ee-bin-c": "./src/index.js"
+    "ee-bin-m": "./ems/index.mjs",
+    "ee-bin-c": "./dist/index.js"
   },
   "dependencies": {
     "@types/node": "^20.9.0",

@@ -1,11 +1,10 @@
 #!/usr/bin/env node
-
-const { program } = require('commander');
-const moveScript = require('./tools/move');
-const encrypt = require('./tools/encrypt');
-const serve = require('./tools/serve');
-const updater = require('./tools/incrUpdater');
-const iconGen = require('./tools/iconGen');
+import { program } from 'commander';
+import moveScript from './tools/move';
+import encrypt from './tools/encrypt';
+import serve from './tools/serve';
+import updater from './tools/incrUpdater';
+import iconGen from './tools/iconGen';
 
 /**
  * move - Moves resources
@@ -15,7 +14,7 @@ program
   .description('Move multip resources')
   .option('--config <folder>', 'config file', './electron/config/bin.js')
   .option('--flag <flag>', 'Custom flag')
-  .action(function() {
+  .action(function () {
     moveScript.run(this.opts());
   });
 
@@ -27,7 +26,7 @@ program
   .description('Code encryption')
   .option('--config <folder>', 'config file')
   .option('--out <folder>', 'output directory', './public')
-  .action(function() {
+  .action(function () {
     encrypt.run(this.opts());
   });
 
@@ -38,7 +37,7 @@ program
   .command('clean')
   .description('Clear the encrypted code')
   .option('-d, --dir <folder>', 'clean directory')
-  .action(function() {
+  .action(function () {
     encrypt.clean(this.opts());
   });
 
@@ -50,8 +49,8 @@ program
   .description('Generate logo')
   .option('-i, --input <file>', 'image file default /public/images/logo.png')
   .option('-o, --output <folder>', 'output directory default /build/icons/')
-  .action(function() {
-    iconGen.run();
+  .action(function () {
+    iconGen.run(this.opts());
   });
 
 /**
@@ -62,7 +61,7 @@ program
   .description('create frontend-serve and electron-serve')
   .option('--config <folder>', 'config file', './electron/config/bin.js')
   .option('--serve <mode>', 'serve mode')
-  .action(function() {
+  .action(function () {
     serve.dev(this.opts());
   });
 
@@ -74,7 +73,7 @@ program
   .description('building multiple resources')
   .option('--config <folder>', 'config file', './electron/config/bin.js')
   .option('--cmds <flag>', 'custom commands')
-  .action(function() {
+  .action(function () {
     serve.build(this.opts());
   });
 
@@ -85,7 +84,7 @@ program
   .command('start')
   .description('preview effect')
   .option('--config <folder>', 'config file', './electron/config/bin.js')
-  .action(function() {
+  .action(function () {
     serve.start(this.opts());
   });
 
@@ -98,7 +97,7 @@ program
   .option('--config <folder>', 'config file', './electron/config/bin.js')
   .option('--command <command>', 'Custom command')
   .option('--cmds <flag>', 'custom commands')
-  .action(function() {
+  .action(function () {
     // command 选项是关键字，不再使用，改为 cmds
     serve.exec(this.opts());
   });
@@ -112,9 +111,8 @@ program
   .option('--config <folder>', 'config file', './electron/config/bin.js')
   .option('--asar-file <file>', 'asar file path')
   .option('--platform <flag>', 'platform')
-  .action(function() {
+  .action(function () {
     updater.run(this.opts());
   });
 
 program.parse();
-

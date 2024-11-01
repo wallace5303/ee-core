@@ -1,27 +1,32 @@
-'use strict';
+import path from 'path';
+import fs from 'fs';
+import fsPro from 'fs-extra';
+import chalk from 'chalk';
+import * as Utils from '../lib/utils';
 
-const path = require('path');
-const fs = require('fs');
-const fsPro = require('fs-extra');
-const chalk = require('chalk');
-const Utils = require('../lib/utils');
+interface MoveConfig {
+  dist: string;
+  target: string;
+}
+
+interface BinConfig {
+  move: Record<string, MoveConfig>;
+}
 
 /**
  * 移动资源
  */
-
-module.exports = {
-  
+const moveResources = {
   /**
    * 执行
-   */  
-  run(options = {}) {
+   */
+  run(options: { config: string; flag: string } = {}) {
     console.log('[ee-bin] [move] Start moving resources');
     const homeDir = process.cwd();
     const { config, flag } = options;
-    const binCfg = Utils.loadConfig(config);
-    
-    let flags;
+    const binCfg: BinConfig = Utils.loadConfig(config);
+
+    let flags: string[];
     const flagString = flag.trim();
     if (flagString.indexOf(',') !== -1) {
       flags = flagString.split(',');
@@ -31,13 +36,13 @@ module.exports = {
 
     for (let i = 0; i < flags.length; i++) {
       let f = flags[i];
-      let cfg = binCfg.move[f];
+      let cfg: MoveConfig | undefined = binCfg.move[f];
 
       if (!cfg) {
-        console.log(chalk.blue('[ee-bin] [move] ') + chalk.red(`Error: ${f} config does not exist` ));
+        console.log(chalk.blue('[ee-bin] [move] ') + chalk.red(`Error: ${f} config does not exist`));
         return;
       }
-  
+
       console.log(chalk.blue('[ee-bin] [move] ') + chalk.green(`Move flag: ${f}`));
       console.log(chalk.blue('[ee-bin] [move] ') + chalk.green('config:'), cfg);
 
@@ -45,13 +50,13 @@ module.exports = {
       if (!fs.existsSync(distResource)) {
         const errorTips = chalk.bgRed('Error') + ` ${cfg.dist} resource does not exist !`;
         console.error(errorTips);
-        return
+        return;
       }
 
       // clear the historical resource and copy it to the ee resource directory
       const targetResource = path.join(homeDir, cfg.target);
       if (fs.statSync(distResource).isDirectory() && !fs.existsSync(targetResource)) {
-        fs.mkdirSync(targetResource, {recursive: true, mode: 0o777});
+        fs.mkdirSync(targetResource, { recursive: true, mode: 0o777 });
       } else {
         this._rm(targetResource);
         console.log('[ee-bin] [move] Clear history resources:', targetResource);
@@ -69,17 +74,19 @@ module.exports = {
   /**
    * Delete a file or folder
    */
-  _rm(name) {
+  _rm(name: string) {
     // check
     if (!fs.existsSync(name)) {
-      return
+      return;
     }
 
     const nodeVersion = (process.versions && process.versions.node) || null;
-    if (nodeVersion && Utils.compareVersion(nodeVersion, '14.14.0') == 1) {
-      fs.rmSync(name, {recursive: true});
+    if (nodeVersion && Utils.compareVersion(nodeVersion, '14.14.0') === 1) {
+      fs.rmSync(name, { recursive: true });
     } else {
-      fs.rmdirSync(name, {recursive: true});
+      fs.rmdirSync(name, { recursive: true });
     }
   },
-}
+};
+
+export = moveResources;
