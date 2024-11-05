@@ -2,10 +2,11 @@
 
 const path = require('path');
 const fs = require('fs');
-const crypto = require('crypto')
+const crypto = require('crypto');
 const chalk = require('chalk');
 const Utils = require('../lib/utils');
-const admZip = require('adm-zip')
+const admZip = require('adm-zip');
+const globby = require('globby');
 
 /**
  * 增量升级
@@ -86,11 +87,16 @@ module.exports = {
     zip.addLocalFile(asarFilePath); 
     // 添加 extraResources
     if (cfg.extraResources && cfg.extraResources.length > 0) {
-      for (const extraRes of cfg.extraResources) {
+      const files = globby.sync(cfg.extraResources, { cwd: homeDir });
+      for (const extraRes of files) {
         const extraResPath = path.normalize(path.join(homeDir, extraRes));
-        if (fs.existsSync(extraResPath)) {
-          zip.addLocalFile(extraResPath, "extraResources");
+        if (!fs.existsSync(extraResPath)) {
+          continue;
         }
+        const extraResDir = path.dirname(extraResPath);
+        const index = extraResDir.indexOf('extraResources');
+        const zipFileDir = extraResDir.substring(index);
+        zip.addLocalFile(extraResPath, zipFileDir);
       }
     }
 
