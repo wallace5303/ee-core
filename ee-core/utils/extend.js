@@ -1,9 +1,9 @@
 'use strict';
 
-var hasOwn = Object.prototype.hasOwnProperty;
-var toStr = Object.prototype.toString;
+const hasOwn = Object.prototype.hasOwnProperty;
+const toStr = Object.prototype.toString;
 
-var isPlainObject = function isPlainObject(obj) {
+function isPlainObject(obj) {
   if (!obj || toStr.call(obj) !== '[object Object]') {
     return false;
   }
@@ -23,8 +23,8 @@ var isPlainObject = function isPlainObject(obj) {
   return typeof key === 'undefined' || hasOwn.call(obj, key);
 };
 
-module.exports = function extend() {
-  var options, name, src, copy, copyIsArray, clone;
+function extend() {
+  var options, name, src, copy, clone;
   var target = arguments[0];
   var i = 1;
   var length = arguments.length;
@@ -70,4 +70,9 @@ module.exports = function extend() {
 
   // Return the modified object
   return target;
+};
+
+module.exports = {
+  extend,
+  isPlainObject,
 };

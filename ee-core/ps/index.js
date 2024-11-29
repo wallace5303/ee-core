@@ -310,7 +310,6 @@ module.exports = {
   getExtraResourcesDir,
   getAppUserDataDir,
   getExecDir,
-
   getUserHomeDir,
   getUserHomeConfigDir,
   getUserHomeAppFilePath,

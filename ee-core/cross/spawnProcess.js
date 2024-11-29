@@ -7,7 +7,7 @@ const Channel = require('../const/channel');
 const EE = require('../ee');
 const Helper = require('../utils/helper');
 const UtilsIs = require('../utils/is');
-const UtilsPargv = require('../utils/pargv');
+const { parseArgv } = require('../utils/pargv');
 
 class SpawnProcess {
   constructor(host, opt = {}) {
@@ -155,7 +155,7 @@ class SpawnProcess {
   }
 
   getArgsObj() {
-    const obj = UtilsPargv(this.config.args);
+    const obj = parseArgv(this.config.args);
     return obj;
   }
 

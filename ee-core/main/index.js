@@ -8,7 +8,7 @@ const Ps = require('../ps');
 const EE = require('../ee');
 const UtilsCore = require('../core/lib/utils');
 const Loader = require('../loader');
-const UtilsPargv = require('../utils/pargv');
+const { parseArgv } = require('../utils/pargv');
 
 class ElectronEgg {
 
@@ -27,7 +27,7 @@ class ElectronEgg {
     Ps.initMode(this.mode);
 
     // env 可能为空
-    const argsObj = UtilsPargv(process.argv);
+    const argsObj = parseArgv(process.argv);
     let isDev = false;
     if ( argsObj['env'] == 'development' || argsObj['env'] === 'dev' || argsObj['env'] === 'local' ) {
       isDev = true;

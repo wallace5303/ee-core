@@ -5,7 +5,7 @@ const is = require('is-type-of');
 const co = require('./co');
 const path = require('path');
 const chalk = require('chalk');
-const Pargv = require('./pargv');
+const { parseArgv } = require('./pargv');
 
 const _basePath = process.cwd();
 
@@ -17,7 +17,7 @@ const _basePath = process.cwd();
  * @param  {Boolean} isImediate - 是否需要立即调用
  * @param  {type} args - 回调函数传入参数
 */
-exports.fnDebounce = function() {
+function fnDebounce() {
   const fnObject = {};
   let timer;
 
@@ -43,25 +43,19 @@ exports.fnDebounce = function() {
   };
 }
 
-/**
- * 随机10位字符串
- */
-exports.getRandomString = function() {
+// 随机10位字符串
+function getRandomString() {
   return Math.random().toString(36).substring(2);
 };
 
-/**
- * 创建文件夹
- */
-exports.mkdir = function(filepath, opt = {}) {
+// 创建文件夹
+function mkdir(filepath, opt = {}) {
   mkdirp.sync(filepath, opt);
   return
 }
 
-/**
- * 修改文件权限
- */
-exports.chmodPath = function(path, mode) {
+// 修改文件权限
+function chmodPath(path, mode) {
   let files = [];
   if (fs.existsSync(path)) {
     files = fs.readdirSync(path);
@@ -77,10 +71,8 @@ exports.chmodPath = function(path, mode) {
   }
 };
 
-/**
- * 版本号比较
- */
-exports.compareVersion = function (v1, v2) {
+// 版本号比较
+function compareVersion(v1, v2) {
   v1 = v1.split('.')
   v2 = v2.split('.')
   const len = Math.max(v1.length, v2.length)
@@ -106,24 +98,20 @@ exports.compareVersion = function (v1, v2) {
   return 0
 }
 
-/**
- * 执行一个函数
- */
-exports.callFn = async function (fn, args, ctx) {
+// 执行一个函数
+async function callFn(fn, args, ctx) {
   args = args || [];
   if (!is.function(fn)) return;
   if (is.generatorFunction(fn)) fn = co.wrap(fn);
   return ctx ? fn.call(ctx, ...args) : fn(...args);
 }
 
-exports.middleware = function (fn) {
+function middleware(fn) {
   return is.generatorFunction(fn) ? convert(fn) : fn;
 }
 
-/**
- * 序列化对象
- */
-exports.stringify = function(obj, ignore = []) {
+// 序列化对象
+function stringify(obj, ignore = []) {
   const result = {};
   Object.keys(obj).forEach(key => {
       if (!ignore.includes(key)) {
@@ -136,7 +124,7 @@ exports.stringify = function(obj, ignore = []) {
 /**
  * 是否有效值
  */
-exports.validValue = function(value) {
+function validValue(value) {
   return (
     value !== undefined &&
     value !== null &&
@@ -144,7 +132,7 @@ exports.validValue = function(value) {
   );
 }
 
-exports.checkConfig = function(prop) {
+function checkConfig(prop) {
   const filepath = path.join(_basePath, prop);
   if (fs.existsSync(filepath)) {
     return true;
@@ -153,7 +141,7 @@ exports.checkConfig = function(prop) {
   return false;
 }
 
-exports.loadConfig = function(prop) {
+function loadConfig(prop) {
   const configFile = prop;
   const filepath = path.join(_basePath, configFile);
   if (!fs.existsSync(filepath)) {
@@ -171,11 +159,11 @@ exports.loadConfig = function(prop) {
   return ret || {};
 };
 
-exports.sleep = function(ms) {
+function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
 
-exports.replaceArgsValue = function(argv, key, value) {
+function replaceArgsValue(argv, key, value) {
   key = key + "=";
   for (let i = 0; i < argv.length; i++) {
     let item = argv[i];
@@ -191,8 +179,8 @@ exports.replaceArgsValue = function(argv, key, value) {
   return argv;
 };
 
-exports.getValueFromArgv = function(argv, key) {
-  const argvObj = Pargv(argv);
+function getValueFromArgv(argv, key) {
+  const argvObj = parseArgv(argv);
   if (argvObj.hasOwnProperty(key)) {
     return argvObj[key];
   }
@@ -213,9 +201,27 @@ exports.getValueFromArgv = function(argv, key) {
   return value;
 };
 
-exports.fileIsExist = function(filepath) {
+function fileIsExist(filepath) {
   if (fs.existsSync(filepath) && fs.statSync(filepath).isFile()) {
     return true;
   }
   return false;
+};
+
+module.exports = {
+  fnDebounce,
+  getRandomString,
+  mkdir,
+  chmodPath,
+  compareVersion,
+  callFn,
+  middleware,
+  stringify,
+  validValue,
+  checkConfig,
+  loadConfig,
+  sleep,
+  replaceArgsValue,
+  getValueFromArgv,
+  fileIsExist
 };

@@ -2,7 +2,7 @@
 
 const debug = require('debug')('ee-core:config');
 const path = require('path');
-const extend = require('../../../../utils/extend');
+const { extend } = require('../../../../utils/extend');
 const assert = require('assert');
 const { Console } = require('console');
 

@@ -5,7 +5,7 @@ const Helper = require('../utils/helper');
 const Ps = require('../ps');
 const SpawnProcess = require('./spawnProcess');
 const Channel = require('../const/channel');
-const extend = require('../utils/extend');
+const { extend } = require('../utils/extend');
 const GetPort = require('../utils/get-port');
 
 /**
