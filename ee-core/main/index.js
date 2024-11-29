@@ -1,3 +1,5 @@
+'use strict';
+
 const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -54,4 +56,6 @@ class ElectronEgg {
   }
 }
 
-module.exports = ElectronEgg;
+module.exports = {
+  ElectronEgg
+}
