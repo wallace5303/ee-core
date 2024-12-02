@@ -16,7 +16,7 @@ const win32RegBinPath = {
 };
 const MachineGuid = {
   darwin: 'ioreg -rd1 -c IOPlatformExpertDevice',
-  win32: `${win32RegBinPath[isWindowsProcessMixedOrNativeArchitecture()]}\\REG.exe ` +
+  win32: `${win32RegBinPath[_isWindowsProcessMixedOrNativeArchitecture()]}\\REG.exe ` +
       'QUERY HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Cryptography ' +
       '/v MachineGuid',
   linux: '( cat /var/lib/dbus/machine-id /etc/machine-id 2> /dev/null || hostname ) | head -n 1 || :',
@@ -26,7 +26,7 @@ const MachineGuid = {
 /**
  * 获取项目根目录package.json
  */
-exports.getPackage = function() {
+function getPackage() {
   const json = UtilsJson.readSync(path.join(Ps.getHomeDir(), 'package.json'));
   
   return json;
@@ -36,7 +36,7 @@ exports.getPackage = function() {
  * Get the first proper MAC address
  * @param iface If provided, restrict MAC address fetching to this interface
  */
-exports.getMAC = function(iface) {
+function getMAC(iface) {
   const zeroRegex = /(?:[0]{1,2}[:-]){5}[0]{1,2}/;
   const list = os.networkInterfaces();
   if (iface) {
@@ -70,7 +70,7 @@ exports.getMAC = function(iface) {
 /**
  * Check if the input is a valid MAC address
  */
-exports.isMAC = function(macAddress) {
+function isMAC(macAddress) {
   const macRegex = /(?:[a-z0-9]{1,2}[:-]){5}[a-z0-9]{1,2}/i;
   return macRegex.test(macAddress);
 }
@@ -78,7 +78,7 @@ exports.isMAC = function(macAddress) {
 /**
  * is encrypt
  */
-exports.isEncrypt = function(basePath) {
+function isEncrypt(basePath) {
   const encryptDir = Ps.getEncryptDir(basePath);
   if (fs.existsSync(encryptDir)) {
     return true;
@@ -89,16 +89,16 @@ exports.isEncrypt = function(basePath) {
 /**
  * get machine id
  */
-exports.machineIdSync = function(original) {
-  let id = expose(execSync(MachineGuid[platform]).toString());
-  return original ? id : hash(id);
+function machineIdSync(original) {
+  let id = _expose(execSync(MachineGuid[platform]).toString());
+  return original ? id : _hash(id);
 }
 
 /**
  * get machine id (promise)
  * original <Boolean>, If true return original value of machine id, otherwise return hashed value (sha-256), default: false
  */
-exports.machineId = function(original) {
+function machineId(original) {
   return new Promise((resolve, reject) => {
     return exec(MachineGuid[platform], {}, (err, stdout, stderr) => {
       if (err) {
@@ -106,13 +106,13 @@ exports.machineId = function(original) {
             new Error(`Error while obtaining machine id: ${err.stack}`)
         );
       }
-      let id = expose(stdout.toString());
-      return resolve(original ? id : hash(id));
+      let id = _expose(stdout.toString());
+      return resolve(original ? id : _hash(id));
     });
   });
 }
 
-function isWindowsProcessMixedOrNativeArchitecture() {
+function _isWindowsProcessMixedOrNativeArchitecture() {
   // detect if the node binary is the same arch as the Windows OS.
   // or if this is 32 bit node on 64 bit windows.
   if(process.platform !== 'win32') {
@@ -124,11 +124,11 @@ function isWindowsProcessMixedOrNativeArchitecture() {
   return 'native';
 }
 
-function hash(guid) {
+function _hash(guid) {
   return createHash('sha256').update(guid).digest('hex');
 }
 
-function expose(result) {
+function _expose(result) {
   switch (platform) {
     case 'darwin':
       return result
@@ -156,5 +156,12 @@ function expose(result) {
   }
 }
 
-
+module.exports = {
+  getPackage,
+  getMAC,
+  isMAC,
+  isEncrypt,
+  machineIdSync,
+  machineId
+}
 

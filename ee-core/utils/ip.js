@@ -178,9 +178,7 @@ const queryAll = (version, options) => {
 	return promise;
 };
 
-/**
- * 查询 public ipv4
- */  
+// 查询 public ipv4  
 function publicIpv4(options) {
   options = {
     ...defaults,
@@ -198,9 +196,7 @@ function publicIpv4(options) {
   return queryAll('v4', options);
 }
 
-/**
- * 查询public ipv6
- */  
+// 查询public ipv6 
 function publicIpv6(options) {
   options = {
     ...defaults,
@@ -218,44 +214,8 @@ function publicIpv6(options) {
   return queryAll('v6', options);
 }
 
-/**
- * todo 未来趋势是ipv6优先，以后再放开
- */  
-const publicIp = createPublicIp(publicIpv4, publicIpv6);
-function createPublicIp(publicIpv4, publicIpv6) {
-	return function publicIp(options) {
-		const ipv4Promise = publicIpv4(options);
-		const ipv6Promise = publicIpv6(options);
-
-		const promise = (async () => {
-			try {
-				const ipv6 = await ipv6Promise;
-				ipv4Promise.cancel();
-				return ipv6;
-			} catch (ipv6Error) {
-				//Log.coreLogger.error('[ee-core] [utils/ip] publicIp ipv6Error:', ipv6Error);
-				try {
-					return await ipv4Promise;
-				} catch (ipv4Error) {
-					//Log.coreLogger.error('[ee-core] [utils/ip] publicIp ipv4Error:', ipv4Error);
-				}
-			}
-		})();
-
-		promise.cancel = () => {
-			ipv4Promise.cancel();
-			ipv6Promise.cancel();
-		};
-
-		return promise;
-	};
-}
-
-const IP = {
-  //publicIp,
+module.exports = {
   publicIpv4,
   publicIpv6
-}
-
-module.exports = IP;
+};
 

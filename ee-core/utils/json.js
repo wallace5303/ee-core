@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const mkdirp = require('mkdirp');
 
-exports.strictParse = function (str) {
+function strictParse(str) {
   const obj = JSON.parse(str);
   if (!obj || typeof obj !== 'object') {
     throw new Error('JSON string is not object');
@@ -10,14 +10,14 @@ exports.strictParse = function (str) {
   return obj;
 };
 
-exports.readSync = function(filepath) {
+function readSync(filepath) {
   if (!fs.existsSync(filepath)) {
     throw new Error(filepath + ' is not found');
   }
   return JSON.parse(fs.readFileSync(filepath));
 };
 
-exports.writeSync = function(filepath, str, options) {
+function writeSync(filepath, str, options) {
   options = options || {};
   if (!('space' in options)) {
     options.space = 2;
@@ -31,7 +31,7 @@ exports.writeSync = function(filepath, str, options) {
   fs.writeFileSync(filepath, str);
 };
 
-exports.read = function(filepath) {
+function read(filepath) {
   return fs.stat(filepath)
     .then(function(stats) {
       if (!stats.isFile()) {
@@ -44,7 +44,7 @@ exports.read = function(filepath) {
     });
 };
 
-exports.write = function(filepath, str, options) {
+function write(filepath, str, options) {
   options = options || {};
   if (!('space' in options)) {
     options.space = 2;
@@ -54,13 +54,13 @@ exports.write = function(filepath, str, options) {
     str = JSON.stringify(str, options.replacer, options.space) + '\n';
   }
 
-  return mkdir(path.dirname(filepath))
+  return _mkdir(path.dirname(filepath))
     .then(function() {
       return fs.writeFile(filepath, str);
     });
 };
 
-function mkdir(dir) {
+function _mkdir(dir) {
   return new Promise(function(resolve, reject) {
     mkdirp(dir, function(err) {
       if (err) {
@@ -69,4 +69,12 @@ function mkdir(dir) {
       resolve();
     });
   });
+}
+
+module.exports = {
+  strictParse,
+  readSync,
+  writeSync,
+  read,
+  write
 }
