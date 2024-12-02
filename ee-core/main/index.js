@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const Utils = require('../utils');
 const Ps = require('../ps');
-const EE = require('../ee');
+// const EE = require('../ee');
 const UtilsCore = require('../core/lib/utils');
 const Loader = require('../loader');
 const { parseArgv } = require('../utils/pargv');
@@ -28,6 +28,8 @@ class ElectronEgg {
 
     // env 可能为空
     const argsObj = parseArgv(process.argv);
+    // console.log('argsObj', argsObj);
+    // return;
     let isDev = false;
     if ( argsObj['env'] == 'development' || argsObj['env'] === 'dev' || argsObj['env'] === 'local' ) {
       isDev = true;
@@ -35,9 +37,10 @@ class ElectronEgg {
 
     // module mode
     if (Ps.isModuleMode()) {
-      const { Application } = EE;
-      new Application();
-      return;
+      // todo
+      // const { Application } = EE;
+      // new Application();
+      // return;
     }
 
     let baseDir = path.join(app.getAppPath(), 'electron');
