@@ -1,3 +1,5 @@
+'use strict';
+
 const Log = require('../log');
 const Ps = require('../ps');
 const Conf = require('../config/cache');

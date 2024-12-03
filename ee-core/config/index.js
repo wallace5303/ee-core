@@ -1,87 +1,51 @@
-const Storage = require('../storage');
+'use strict';
+
 const ConfigCache = require('./cache');
-var SystemDb = undefined;
 
-const Cfg = {
+/**
+ * all
+ */
+function all(fromCache = true) {
+  if (fromCache === true) {
+    // 如果子进程
+    const cacheValue = ConfigCache.all();
+    return cacheValue;
+  }
+  const config = getAllFromFile('config');
 
-  /**
-   * 获取 coredb
-   */
-  _getCoreDB() {
-    // [todo] 要么每次new对象，要么所有地方都用同一个实例，否则会出现数据无法刷新的情况
-    SystemDb = Storage.connection('system');
-    return SystemDb;
-  },
+  return config;
+}
 
-  /**
-   * all
-   */
-  all(fromCache = true) {
-    if (fromCache === true) {
-      // 如果子进程
-      const cacheValue = ConfigCache.all();
-      return cacheValue;
-    }
-    const cdb = this._getCoreDB();
-    const config = cdb.getItem('config');
-  
-    return config;
-  },
+/**
+ * getValue
+ */
+function getValue(key, fromCache = true) {
+  if (fromCache === true) {
+    const cacheValue = ConfigCache.getValue(key);
+    return cacheValue;
+  }
+  const v = getValueFromFile(key);
 
-  /**
-   * setAll
-   */
-  setAll(value) {
-    const cdb = this._getCoreDB();
-    cdb.setItem('config', value);
-  
-    return;
-  },
+  return v;
+}  
 
-  /**
-   * setValue
-   */
-  setValue(key, value) {
-    const cdb = this._getCoreDB();
-    cdb.setConfigItem(key, value);
-  
-    return;
-  },
+/**
+ * getValueFromFile
+ */
+function getValueFromFile(key) {
+  return ''
+}
 
-  /**
-   * getValue
-   */
-  getValue(key, fromCache = true) {
-    if (fromCache === true) {
-      const cacheValue = ConfigCache.getValue(key);
-      return cacheValue;
-    }
+/**
+ * getValueFromFile
+ */
+function getAllFromFile(key) {
+  return ''
+}
 
-    const cdb = this._getCoreDB();
-    let v = cdb.getConfigItem(key);
-  
-    return v;
-  },  
-
-  /**
-   * isFileProtocol
-   */
-  isFileProtocol(config) {
-    if (config.protocol == 'file://') {
-      return true;
-    }
-    return false;
-  },
-
-  /**
-   * isWebProtocol
-   */
-  isWebProtocol(config) {
-    if (['http://', 'https://'].includes(config.protocol)) {
-      return true;
-    }
-    return false;
-  },   
+module.exports = {
+  all,
+  getValue,
+  getValueFromFile,
+  getAllFromFile,
 };
-
-module.exports = Cfg;

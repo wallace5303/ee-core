@@ -5,10 +5,10 @@ const path = require('path');
 const fs = require('fs');
 const Utils = require('../utils');
 const Ps = require('../ps');
-// const EE = require('../ee');
 const UtilsCore = require('../core/lib/utils');
 const Loader = require('../loader');
 const { parseArgv } = require('../utils/pargv');
+const { eeCore } = require('../app');
 
 class ElectronEgg {
 
@@ -26,6 +26,17 @@ class ElectronEgg {
     }
     Ps.initMode(this.mode);
 
+    // todo module mode
+    // if (Ps.isModuleMode()) {
+    //   const { Application } = EE;
+    //   new Application();
+    //   return;
+    // }
+
+    // init application
+    eeCore.init();
+    return;
+
     // env 可能为空
     const argsObj = parseArgv(process.argv);
     // console.log('argsObj', argsObj);
@@ -35,20 +46,14 @@ class ElectronEgg {
       isDev = true;
     }
 
-    // module mode
-    if (Ps.isModuleMode()) {
-      // todo
-      // const { Application } = EE;
-      // new Application();
-      // return;
-    }
 
-    let baseDir = path.join(app.getAppPath(), 'electron');
+
+    let electronDir = path.join(app.getAppPath(), 'electron');
     if (!isDev && Utils.isEncrypt(app.getAppPath())) {
-      baseDir = Ps.getEncryptDir(app.getAppPath());
+      electronDir = Ps.getEncryptDir(app.getAppPath());
     }
 
-    let indexFile = path.join(baseDir, 'index');
+    let indexFile = path.join(electronDir, 'index');
     indexFile = Loader.resolveModule(indexFile);
     if (!fs.existsSync(indexFile)) {
       throw new Error(`The ${indexFile} file does not exist`);

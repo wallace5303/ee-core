@@ -1,3 +1,5 @@
+'use strict';
+
 const Exception = require('../exception');
 const { app } = require('electron');
 const path = require('path');
@@ -97,4 +99,6 @@ class Appliaction extends EeApp {
   } 
 }
 
-module.exports = Appliaction;
+module.exports = {
+  Appliaction
+};

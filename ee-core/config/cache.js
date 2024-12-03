@@ -1,4 +1,4 @@
-const EE = require('../ee');
+'use strict';
 
 const conf = {
 

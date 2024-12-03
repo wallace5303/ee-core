@@ -94,6 +94,14 @@ function one() {
   return false
 }
 
+function isFileProtocol(protocol) {
+  return protocol == 'file://';
+}
+
+function isWebProtocol(protocol) {
+  return ['http://', 'https://'].includes(protocol);
+}
+
 module.exports = {
   renderer,
   main,
@@ -109,4 +117,6 @@ module.exports = {
   all,
   none,
   one,
+  isFileProtocol,
+  isWebProtocol,
 };
