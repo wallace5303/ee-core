@@ -3,35 +3,6 @@
 const path = require('path');
 const is = require('../utils/is');
 
-// 初始化模式
-function initMode(mode) {
-  if (process.env.EE_MODE !== undefined) return;
-  return process.env.EE_MODE = mode ? mode : 'framework';
-}
-
-// 当前模式 - framework | module
-function mode() {
-  return process.env.EE_MODE;
-}
-
-// 校验模式
-function verifyMode(mode) {
-  if (['framework', 'module'].includes(mode)) {
-    return true;
-  }
-  return false;
-}
-
-// 是否为框架模式
-function isFrameworkMode() {
-  return (process.env.EE_MODE === 'framework');
-}
-
-// 是否为模块模式
-function isModuleMode() {
-  return (process.env.EE_MODE === 'module');
-}
-
 // 当前进程的所有env
 function allEnv() {
   return process.env;
@@ -285,11 +256,6 @@ function isChildPoolJob() {
 }
 
 module.exports = {
-  initMode,
-  mode,
-  verifyMode,
-  isFrameworkMode,
-  isModuleMode,
   allEnv,
   env,
   isProd,

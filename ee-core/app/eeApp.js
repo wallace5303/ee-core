@@ -92,8 +92,6 @@ class EeApp extends BaseApp {
     this.mainWindow = CoreElectronWindow.getMainWindow();
 
     await this.windowReady();
-  
-    await this._loderAddons();
 
     await this._loderPreload();
 
@@ -345,21 +343,6 @@ class EeApp extends BaseApp {
   }
 
   /**
-   * 加载插件
-   */
-  async _loderAddons() {
-    this.loader.loadAddons();
-
-    // 注册主窗口Contents id
-    const addonsCfg = this.config.addons;
-    if (addonsCfg.window.enable && Ps.isFrameworkMode()) {
-      const win = this.mainWindow;
-      const addonWindow = this.addon.window;
-      addonWindow.registerWCid('main', win.webContents.id);
-    }
-  }
-
-  /**
    * 预加载模块
    */
   async _loderPreload() {
@@ -371,17 +354,6 @@ class EeApp extends BaseApp {
     } else if (is.asyncFunction(fileObj)) {
       await fileObj();
     }
-  }
-
-  /**
-   * module模式初始化
-   */
-  async InitModuleMode() {
-    if (!Ps.isModuleMode()) return;
-
-    await this._loderAddons();
-
-    await this._loderPreload();
   }
 
   /**

@@ -8,12 +8,11 @@ const Ps = require('../ps');
 const UtilsCore = require('../core/lib/utils');
 const Loader = require('../loader');
 const { parseArgv } = require('../utils/pargv');
-const { eeCore } = require('../app');
+const { Appliaction } = require('../app');
 
 class ElectronEgg {
 
-  constructor(mode) {
-    this.mode = mode || 'framework';
+  constructor() {
     this._create();
   }
 
@@ -21,20 +20,9 @@ class ElectronEgg {
    * create ElectronEgg app
    */  
   _create() {
-    if (!Ps.verifyMode(this.mode)) {
-      throw new Error(`The mode supports only (framework | module) !`);
-    }
-    Ps.initMode(this.mode);
-
-    // todo module mode
-    // if (Ps.isModuleMode()) {
-    //   const { Application } = EE;
-    //   new Application();
-    //   return;
-    // }
 
     // init application
-    eeCore.init();
+    new Appliaction();
     return;
 
     // env 可能为空
