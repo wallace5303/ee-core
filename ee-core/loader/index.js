@@ -24,7 +24,6 @@ module.exports = {
     filepath = filepath && this.resolveModule(filepath);
     if (!fs.existsSync(filepath)) {
       let errorMsg = `[ee-core] [loader/index] loadOneFile ${filepath} does not exist`;
-      Log.coreLogger.error(errorMsg);
       throw new Error(errorMsg);
     }
 
@@ -45,8 +44,7 @@ module.exports = {
   loadJsFile (filepath) {
     if (!fs.existsSync(filepath)) {
       let errMsg = `[ee-core] [loader] loadJobFile ${filepath} does not exist`;
-      Log.coreLogger.error(errMsg);
-      return;
+      throw new Error(errMsg);
     }
 
     const ret = UtilsCore.loadFile(filepath);
@@ -64,8 +62,7 @@ module.exports = {
   execJsFile (filepath, ...inject) {
     if (!fs.existsSync(filepath)) {
       let errMsg = `[ee-core] [loader] loadJobFile ${filepath} does not exist`;
-      Log.coreLogger.error(errMsg);
-      return;
+      throw new Error(errMsg);
     }
 
     let ret = UtilsCore.loadFile(filepath);
@@ -97,7 +94,7 @@ module.exports = {
 
       if (!fs.existsSync(filepath) && !fs.existsSync(fullpath)) {
         let files = { filepath, fullpath }
-        Log.coreLogger.warn(`[ee-core] [loader] resolveModule unknow filepath: ${files}`)
+        console.warn(`[ee-core] [loader] resolveModule unknow filepath: ${files}`)
         return undefined;
       }
     }
@@ -122,7 +119,7 @@ module.exports = {
     fullpath = this.resolveModule(filepath);
     if (!fs.existsSync(fullpath)) {
       let errorMsg = `[ee-core] [loader] requireModule filepath: ${filepath} does not exist`;
-      Log.coreLogger.error(errorMsg);
+      throw new Error(errorMsg);
     }
     const ret = UtilsCore.loadFile(fullpath);
 

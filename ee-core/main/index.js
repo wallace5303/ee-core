@@ -43,13 +43,13 @@ class ElectronEgg {
       baseDir = Ps.getEncryptDir(app.getAppPath());
     }
 
-    let indexFile = path.join(baseDir, 'index');
-    indexFile = Loader.resolveModule(indexFile);
-    if (!fs.existsSync(indexFile)) {
+    const indexFile = path.join(baseDir, 'index');
+    const indexModulePath = Loader.resolveModule(indexFile);
+    if (!fs.existsSync(indexModulePath)) {
       throw new Error(`The ${indexFile} file does not exist`);
     }
 
-    const EEApp = UtilsCore.loadFile(indexFile);
+    const EEApp = UtilsCore.loadFile(indexModulePath);
     EE.app = new EEApp();
   }
 }
