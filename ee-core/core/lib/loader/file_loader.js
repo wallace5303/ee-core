@@ -210,8 +210,11 @@ class FileLoader {
       for (const addonName of addonpaths) {
         if (filterAddons.includes(addonName)) continue;
 
-        let fullpath = path.join(directory, addonName, 'index');
-        fullpath = loader.resolveModule(fullpath);
+        const filepath = path.join(directory, addonName, 'index');
+        const fullpath = loader.resolveModule(filepath);
+        if (!fs.existsSync(fullpath)) {
+          throw new Error(`The ${filepath} file does not exist`);
+        }
         if (!fs.statSync(fullpath).isFile()) continue;
   
         let exports = getExports(fullpath, this.options, addonName);
