@@ -1,13 +1,12 @@
 'use strict';
 
-const { app } = require('electron');
-const path = require('path');
-const fs = require('fs');
-const Utils = require('../utils');
-const Ps = require('../ps');
-const UtilsCore = require('../core/lib/utils');
-const Loader = require('../loader');
-const { parseArgv } = require('../utils/pargv');
+// const { app } = require('electron');
+// const path = require('path');
+// const fs = require('fs');
+// const Utils = require('../utils');
+// const Ps = require('../ps');
+// const Loader = require('../loader');
+// const { parseArgv } = require('../utils/pargv');
 const { Appliaction } = require('../app');
 
 class ElectronEgg {

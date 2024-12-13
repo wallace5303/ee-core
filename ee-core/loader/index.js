@@ -1,7 +1,7 @@
 const is = require('is-type-of');
 const fs = require('fs');
 const path = require('path');
-const UtilsCore = require('../core/lib/utils');
+const CoreUtils = require('../core/utils');
 const Ps = require('../ps');
 
 /**
@@ -11,7 +11,7 @@ const Ps = require('../ps');
  * @param {Array} inject - pass rest arguments into the function when invoke
  * @return {Object} exports
  */
-function loadOneFile(filepath, ...inject) {
+function loadFile(filepath, ...inject) {
   const isAbsolute = path.isAbsolute(filepath);
   if (!isAbsolute) {
     filepath = path.join(Ps.getElectronDir(), filepath);
@@ -19,50 +19,33 @@ function loadOneFile(filepath, ...inject) {
 
   filepath = filepath && resolveModule(filepath);
   if (!fs.existsSync(filepath)) {
-    let errorMsg = `[ee-core] [loader/index] loadOneFile ${filepath} does not exist`;
+    let errorMsg = `[ee-core] [loader/index] loadFile ${filepath} does not exist`;
     throw new Error(errorMsg);
   }
 
-  const ret = UtilsCore.loadFile(filepath);
-  if (is.function(ret) && !is.class(ret) && !UtilsCore.isBytecodeClass(ret)) {
+  let ret = CoreUtils.loadFile(filepath);
+  if (is.function(ret) && !is.class(ret) && !CoreUtils.isBytecodeClass(ret)) {
     ret = ret(...inject);
   }
   return ret;
 }
 
-/**
- * 加载js文件
- *
- * @param {String} filepath - fullpath
- * @return {Any} exports
- * @since 1.0.0
- */
-function loadJsFile(filepath) {
-  if (!fs.existsSync(filepath)) {
-    let errMsg = `[ee-core] [loader] loadJobFile ${filepath} does not exist`;
-    throw new Error(errMsg);
-  }
-
-  const ret = UtilsCore.loadFile(filepath);
-  return ret;
-}  
+// requireFile
+function requireFile(filepath) {
+  return CoreUtils.loadFile(filepath);
+}
+ 
 
 /**
- * 加载并运行js文件
+ * 加载并运行文件
  *
  * @param {String} filepath - fullpath
  * @param {Array} inject - pass rest arguments into the function when invoke
  * @return {Any}
- * @since 1.0.0
  */
-function execJsFile(filepath, ...inject) {
-  if (!fs.existsSync(filepath)) {
-    let errMsg = `[ee-core] [loader] loadJobFile ${filepath} does not exist`;
-    throw new Error(errMsg);
-  }
-
-  let ret = UtilsCore.loadFile(filepath);
-  if (is.class(ret) || UtilsCore.isBytecodeClass(ret)) {
+function execFile(filepath, ...inject) {
+  let ret = CoreUtils.loadFile(filepath);
+  if (is.class(ret) || CoreUtils.isBytecodeClass(ret)) {
     ret = new ret(inject);
   } else if (is.function(ret)) {
     ret = ret(inject);
@@ -99,30 +82,6 @@ function resolveModule(filepath) {
 }
 
 /**
- * 加载模块(子进程中使用)
- *
- * @param {String} filepath - fullpath
- * @return {Object} exports
- * @since 1.0.0
- */
-function requireModule(filepath, type = '') {
-  let fullpath;
-  const isAbsolute = path.isAbsolute(filepath);
-  if (!isAbsolute) {
-    filepath = path.join(Ps.getElectronDir(), type, filepath);
-  }
-
-  fullpath = resolveModule(filepath);
-  if (!fs.existsSync(fullpath)) {
-    let errorMsg = `[ee-core] [loader] requireModule filepath: ${filepath} does not exist`;
-    throw new Error(errorMsg);
-  }
-  const ret = UtilsCore.loadFile(fullpath);
-
-  return ret;
-}
-
-/**
  * 获取electron目录下文件的绝对路径
  * @param {String} filepath - fullpath
  */
@@ -135,18 +94,17 @@ function getFullpath(filepath) {
 
   fullpath = resolveModule(filepath);
   if (!fs.existsSync(fullpath)) {
-    throw new Error(`[ee-core] [loader] getFullpath filepath ${fullpath} not exists`);
+    throw new Error(`[ee-core] [loader] getFullpath filepath ${filepath} not exists`);
   }
 
   return fullpath;
 }
 
 module.exports = {
-  loadOneFile,
-  loadJsFile,
-  execJsFile,
+  loadFile,
+  execFile,
+  requireFile,
   resolveModule,
-  requireModule,
   getFullpath,
 }
 

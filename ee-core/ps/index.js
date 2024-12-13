@@ -10,21 +10,21 @@ function allEnv() {
 
 // 当前环境 - local | prod
 function env() {
-  return process.env.EE_SERVER_ENV;
+  return process.env.EE_ENV;
 }
 
 // 是否生产环境
 function isProd() {
-  return (process.env.EE_SERVER_ENV === 'prod');
+  return (process.env.EE_ENV === 'prod');
 }
 
 /**
  * 是否为开发环境
  */
 function isDev() {
-  if ( process.env.EE_SERVER_ENV === 'development' ||
-    process.env.EE_SERVER_ENV === 'dev' ||
-    process.env.EE_SERVER_ENV === 'local'
+  if ( process.env.EE_ENV === 'development' ||
+    process.env.EE_ENV === 'dev' ||
+    process.env.EE_ENV === 'local'
   ) {
     return true;
   }
@@ -76,11 +76,6 @@ function appName() {
   return process.env.EE_APP_NAME;
 }
 
-// 获取home路径
-function getHomeDir() {
-  return process.env.EE_HOME;
-}
-
 // 获取数据存储路径
 function getStorageDir() {
   const storageDir = path.join(getRootDir(), 'data');
@@ -102,7 +97,7 @@ function getEncryptDir(basePath) {
 
 // 获取root目录  (dev-项目根目录，pro-app user data目录)
 function getRootDir() {
-  const appDir = isDev() ? process.env.EE_HOME : process.env.EE_APP_USER_DATA;
+  const appDir = isDev() ? process.env.EE_BASE_DIR : process.env.EE_APP_USER_DATA;
   return appDir;
 }
 
@@ -113,12 +108,12 @@ function getBaseDir() {
 
 // 获取electron目录
 function getElectronDir() {
-  return process.env.EE_BASE_DIR;
+  return process.env.EE_ELECTRON_DIR;
 }
 
 // 获取public目录
 function getPublicDir() {
-  const dir = path.join(process.env.EE_HOME, "public");
+  const dir = path.join(process.env.EE_BASE_DIR, "public");
   return dir;
 }
 
@@ -163,17 +158,6 @@ function getUserHomeConfigDir() {
   const appname = appName();
   const cfgDir = path.join(getUserHomeDir(), ".config", appname);
   return cfgDir;
-}
-
-// 获取基础数据路径
-function getUserHomeAppFilePath() {
-  const p = path.join(getUserHomeConfigDir(), "app.json");
-  return p;
-}
-
-// 获取主进程端口
-function getMainPort() {
-  return parseInt(process.env.EE_MAIN_PORT) || 0;
 }
 
 // 获取内置socket端口
@@ -265,7 +249,6 @@ module.exports = {
   isForkedChild,
   processType,
   appName,
-  getHomeDir,
   getStorageDir,
   getLogDir,
   getEncryptDir,
@@ -278,8 +261,6 @@ module.exports = {
   getExecDir,
   getUserHomeDir,
   getUserHomeConfigDir,
-  getUserHomeAppFilePath,
-  getMainPort,
   getSocketPort,
   getHttpPort,
   isPackaged,

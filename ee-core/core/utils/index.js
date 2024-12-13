@@ -4,7 +4,7 @@ require('bytenode');
 const is = require('is-type-of');
 const path = require('path');
 const fs = require('fs');
-const co = require('../../../utils/co');
+const co = require('../../utils/co');
 const BuiltinModule = require('module');
 
 // Guard against poorly mocked module constructors.

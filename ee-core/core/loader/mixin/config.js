@@ -1,20 +1,21 @@
 'use strict';
 
-const debug = require('debug')('ee-core:config');
+const debug = require('debug')('core:loader:mixin:config');
 const path = require('path');
 const { extend } = require('../../../../utils/extend');
 const assert = require('assert');
-const { Console } = require('console');
 
-module.exports = {
+class ConfigLoader {
+  constructor() {
+    this.timing = undefined;
+  }
 
   /**
    * Load config/config.js
    *
    * Will merge config.default.js 和 config.${env}.js
    *
-   * @function EggLoader#loadConfig
-   * @since 1.0.0
+   * @function loadConfig
    */
   loadConfig() {
     this.timing.start('Load Config');
@@ -50,7 +51,7 @@ module.exports = {
 
     this.config = target;
     this.timing.end('Load Config');
-  },
+  }
 
   _preloadAppConfig() {
     const names = [
@@ -65,7 +66,7 @@ module.exports = {
       extend(true, target, config);
     }
     return target;
-  },
+  }
 
   _loadConfig(dirpath, filename, extraInject, type) {
     const isPlugin = type === 'plugin';
@@ -92,7 +93,7 @@ module.exports = {
     this._setConfigMeta(config, filepath);
 
     return config;
-  },
+  }
 
   _loadConfigFromEnv() {
     const envConfigStr = process.env.EE_APP_CONFIG;
@@ -104,13 +105,18 @@ module.exports = {
     } catch (err) {
       this.options.logger.warn('[ee-core] [core/.../config] process.env.EE_APP_CONFIG is not invalid JSON: %s', envConfigStr);
     }
-  },
+  }
 
   _setConfigMeta(config, filepath) {
     config = extend(true, {}, config);
     setConfig(config, filepath);
     extend(true, this.configMeta, config);
-  },
+  }
+}
+
+module.exports = {
+
+
 };
 
 function setConfig(obj, filepath) {

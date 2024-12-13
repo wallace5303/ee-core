@@ -1,51 +1,25 @@
 'use strict';
 
-const ConfigCache = require('./cache');
+const { ConfigLoader } = require('./config_loader');
 
-/**
- * all
- */
-function all(fromCache = true) {
-  if (fromCache === true) {
-    // 如果子进程
-    const cacheValue = ConfigCache.all();
-    return cacheValue;
-  }
-  const config = getAllFromFile('config');
+const Cache = {
+  config: null,
+};
 
-  return config;
+function loadConfig() {
+  const configLoader = new ConfigLoader();
+  Cache["config"] = configLoader.load();
+  return Cache["config"];
 }
 
-/**
- * getValue
- */
-function getValue(key, fromCache = true) {
-  if (fromCache === true) {
-    const cacheValue = ConfigCache.getValue(key);
-    return cacheValue;
-  }
-  const v = getValueFromFile(key);
-
-  return v;
-}  
-
-/**
- * getValueFromFile
- */
-function getValueFromFile(key) {
-  return ''
-}
-
-/**
- * getValueFromFile
- */
-function getAllFromFile(key) {
-  return ''
+function getConfig() {
+  if (!Cache["config"]) {
+    Cache["config"] = loadConfig();
+  };
+  return Cache["config"];
 }
 
 module.exports = {
-  all,
-  getValue,
-  getValueFromFile,
-  getAllFromFile,
+  loadConfig,
+  getConfig,
 };
