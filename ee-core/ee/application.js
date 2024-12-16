@@ -58,6 +58,7 @@ class Appliaction extends EeApp {
 
     // normalize env
     env.EE_APP_NAME = options.appName;
+    env.EE_APP_VERSION = options.appVersion;
     env.EE_HOME = options.homeDir;
     env.EE_BASE_DIR = options.baseDir;
     env.EE_SERVER_ENV = options.env;

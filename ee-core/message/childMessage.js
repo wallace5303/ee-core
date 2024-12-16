@@ -40,7 +40,6 @@ class ChildMessage {
    */
   sendErrorToTerminal(err) {
     let errTips = (err && typeof err == 'object') ? err.toString() : '';
-    errTips += ' Error !!! Please See file ee-core.log or ee-error-xxx.log for details !'
     let message = {
       channel: Channel.process.showException,
       data: errTips

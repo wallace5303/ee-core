@@ -7,7 +7,6 @@ const HttpClient = require('../httpclient');
 const HTTPCLIENT = Symbol('EeApplication#httpclient');
 const LOGGERS = Symbol('EeApplication#loggers');
 const Log = require('../log');
-const Conf = require('../config');
 
 class BaseApp extends EeAppCore {
   constructor (options = {}) {
@@ -15,10 +14,6 @@ class BaseApp extends EeAppCore {
     super(options);
 
     this.loader.loadConfig();
-    
-    
-    // [todo] 缓存配置
-    Conf.setAll(this.config);
 
     this.loader.load();
 

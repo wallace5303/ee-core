@@ -7,6 +7,7 @@ const Ps = require('../../ps');
 const Channel = require('../../const/channel');
 const Helper = require('../../utils/helper');
 const Loader = require('../../loader');
+const extend = require('../../utils/extend');
 
 class ForkProcess {
   constructor(host, opt = {}) {
@@ -18,8 +19,7 @@ class ForkProcess {
       cwd = path.join(Ps.getHomeDir(), '..');
     }
 
-    // TODO Object.assign 只能单层对象结构，多层的对象会直接覆盖
-    let options = Object.assign({
+    let options = extend(true,{
       processArgs: {},
       processOptions: { 
         cwd: cwd,

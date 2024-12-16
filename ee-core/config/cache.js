@@ -1,27 +1,47 @@
 const EE = require('../ee');
+const { ConfigLoader } = require('./config_loader');
+
+const Instance = {
+  config: null,
+};
 
 const conf = {
+
+  loadConfig() {
+    const configLoader = new ConfigLoader();
+    Instance["config"] = configLoader.load();
+    return Instance["config"];
+  },
 
   /**
    * 获取 内存中的config
    */
-  _getConfig(withError = true) {
+  _getConfig() {
     const { CoreApp } = EE;
-    if (!CoreApp && withError) {
-      throw new Error(`[ee-core] [config] Frame initialization is not complete !`);
-    }
-    if (!CoreApp) {
-      return null;
+
+    if (CoreApp && CoreApp.config) {
+      return CoreApp.config;
     }
 
-    return CoreApp.config;
+    if (Instance["config"]) {
+      return Instance["config"];
+    }
+
+    // 重新加载 config
+    this.loadConfig();
+
+    if (!Instance["config"]) {
+      throw new Error('[ee-core] [config] config is not loaded!');
+    }
+
+    return Instance["config"];
   },
 
   /**
    * all
    */
-  all(withError = true) {
-    return this._getConfig(withError);
+  all() {
+    return this._getConfig();
   },
 
   /**

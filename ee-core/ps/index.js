@@ -135,6 +135,13 @@ exports.appName = function() {
 }
 
 /**
+ * app version
+ */
+exports.appVersion = function() {
+  return process.env.EE_APP_VERSION;
+}
+
+/**
  * 获取home路径
  */
 exports.getHomeDir = function () {
