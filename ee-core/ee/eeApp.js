@@ -49,9 +49,6 @@ class EeApp extends BaseApp {
       process.env.EE_HTTP_PORT = httpPort;
       this.config.httpServer.port = httpPort;
     }
-    
-    // [todo] 更新db配置 (system.json 不再主进程中使用了，后续可能在子进程中使用）
-    Conf.setAll(this.config);
   }
 
   /**

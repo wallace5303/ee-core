@@ -19,7 +19,7 @@ class FileSync extends Base {
       let canDeserialized = this._canDeserialized(data);
       if (!canDeserialized) {
         let errMessage = `[ee-core] [storage/jsondb] malformed json in file: ${this.source}\n${data}`;
-        Log.coreLogger.error(errMessage);
+        console.error(errMessage);
 
         // 是否文件结尾多一个括号，尝试处理
         data = data.trim().slice(0, -1);
@@ -34,7 +34,7 @@ class FileSync extends Base {
             this._fsWrite(this.defaultValue);
           }
           errMessage = '[ee-core] [storage/jsondb] malformed json that cannot be handled!';
-          Log.coreLogger.error(errMessage);
+          console.error(errMessage);
         }
       }
       const value = canDeserialized ? this.deserialize(data) : this.defaultValue;
@@ -53,7 +53,7 @@ class FileSync extends Base {
   _fsWrite(data) {
     const isObject = Object.prototype.toString.call(data) === '[object Object]';
     if (!isObject) {
-      Log.coreLogger.error('[ee-core] [storage/jsondb] Variable is not an object :', data);
+      console.error('[ee-core] [storage/jsondb] Variable is not an object :', data);
       return
     }
 

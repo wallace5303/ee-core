@@ -58,7 +58,7 @@ class ChildApp {
 
     } else if (is.function(mod)) {
       mod(jobParams);
-    }
+    } 
   }
 }
 

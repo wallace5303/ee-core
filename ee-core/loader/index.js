@@ -3,7 +3,6 @@ const fs = require('fs');
 const path = require('path');
 const UtilsCore = require('../core/lib/utils');
 const Ps = require('../ps');
-const Log = require('../log');
 
 module.exports = {
 
@@ -27,7 +26,7 @@ module.exports = {
       throw new Error(errorMsg);
     }
 
-    const ret = UtilsCore.loadFile(filepath);
+    let ret = UtilsCore.loadFile(filepath);
     if (is.function(ret) && !is.class(ret) && !UtilsCore.isBytecodeClass(ret)) {
       ret = ret(...inject);
     }

@@ -3,8 +3,9 @@ const assert = require('assert');
 const dayjs = require('dayjs');
 const path = require('path');
 const Ps = require('../ps');
-const Conf = require('../config');
 const ConfigCache = require('../config/cache');
+const extend = require('../utils/extend');
+
 let LogDate = 0;
 const TmpFileName = {
   appLogName: '',
@@ -39,17 +40,13 @@ module.exports = {
           coreLogger: {},
           allowDebugAtProd: false,
           enablePerformanceTimer: false,
-          rotator: 'none',
+          rotator: 'day',
         },
         customLogger: {}
       }
 
-      // 先从 cache 中读配置且不能抛出错误，如果没有从文件中读（子进程无法获取 cache）
-      let sysConfig = ConfigCache.all(false);
-      if (!sysConfig) {
-        sysConfig = Conf.all(false);
-      }
-      opt = Object.assign(defaultConfig, {
+      const sysConfig = ConfigCache.all();
+      opt = extend(true, defaultConfig, {
         logger: sysConfig.logger,
         customLogger: sysConfig.customLogger || {}
       });
