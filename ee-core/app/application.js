@@ -69,6 +69,8 @@ class Appliaction {
   async initialize () {
     loadConfig();
 
+
+
     // await this.createPorts();
 
     // await this.startSocket();

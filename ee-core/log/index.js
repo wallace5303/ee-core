@@ -2,19 +2,15 @@ const dayjs = require('dayjs');
 const Logger = require('./logger');
 const EELoggers = Symbol('ee-core#EELoggers');
 
+const Cache = {
+  log: null,
+};
+
 class EELog {
 
   constructor() {
     this.logDate = 0;
     this[EELoggers] = null;
-  }
-
-  // 初始化日志实例
-  init(config) {
-    this._delCache();
-    this[EELoggers] = Logger.create(config);
-
-    return this[EELoggers];
   }
 
   // 创建日志实例
@@ -47,11 +43,26 @@ class EELog {
 
 };
 
+function loadLogger() {
+  const eeLog = new EELog();
+  
+  Cache["config"] = eeLog.create();
+  return Cache["config"];
+}
+
+function getConfig() {
+  if (!Cache["config"]) {
+    Cache["config"] = loadConfig();
+  };
+  return Cache["config"];
+}
+
 const eelog = new EELog();
 const coreLogger = eelog.coreLogger;
 const logger = eelog.logger;
 
 module.exports = {
+  EELog,
   logger,
   coreLogger,
 };

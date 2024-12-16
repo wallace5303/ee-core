@@ -1,10 +1,11 @@
+
+
 const Loggers = require('egg-logger').EggLoggers;
 const assert = require('assert');
 const dayjs = require('dayjs');
 const path = require('path');
 const Ps = require('../ps');
-const Conf = require('../config');
-const ConfigCache = require('../config/cache');
+
 let LogDate = 0;
 const TmpFileName = {
   appLogName: '',

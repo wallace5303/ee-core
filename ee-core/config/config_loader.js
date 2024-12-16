@@ -26,6 +26,7 @@ class ConfigLoader {
     this.config = appConfig;
 
     this.timing.end('Load Config');
+    return this.config;
   }
 
   _AppConfig() {
