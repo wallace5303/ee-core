@@ -2,21 +2,21 @@
 
 const { ConfigLoader } = require('./config_loader');
 
-const Cache = {
+const Instance = {
   config: null,
 };
 
 function loadConfig() {
   const configLoader = new ConfigLoader();
-  Cache["config"] = configLoader.load();
-  return Cache["config"];
+  Instance["config"] = configLoader.load();
+  return Instance["config"];
 }
 
 function getConfig() {
-  if (!Cache["config"]) {
-    Cache["config"] = loadConfig();
+  if (!Instance["config"]) {
+    loadConfig();
   };
-  return Cache["config"];
+  return Instance["config"];
 }
 
 module.exports = {

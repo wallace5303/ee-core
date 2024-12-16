@@ -43,8 +43,15 @@ class ConfigLoader {
   }
 
   _loadConfig(dirpath, filename) {
+    const appInfo = {
+      name: Ps.appName(),
+      baseDir: Ps.getBaseDir(),
+      electronDir: Ps.getElectronDir(),
+      env: Ps.env(),
+      root: Ps.getRootDir(),
+    }
     const filepath = path.join(dirpath, 'config', filename);
-    const config = Loader.loadFile(filepath);
+    const config = Loader.loadFile(filepath, appInfo);
     debug("[_loadConfig] filepath: %s", filepath);
     if (!config) return null;
 

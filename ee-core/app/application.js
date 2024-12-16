@@ -7,6 +7,7 @@ const debug = require('debug')('ee-core:app:Appliaction');
 const Utils = require('../utils');
 const Ps = require('../ps');
 const { loadConfig } = require('../config');
+const { loadLog } = require('../log');
 
 class Appliaction {
   constructor() {
@@ -68,7 +69,7 @@ class Appliaction {
 
   async initialize () {
     loadConfig();
-
+    loadLog();
 
 
     // await this.createPorts();

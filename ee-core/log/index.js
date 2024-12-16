@@ -1,68 +1,56 @@
 const dayjs = require('dayjs');
 const Logger = require('./logger');
-const EELoggers = Symbol('ee-core#EELoggers');
 
-const Cache = {
-  log: null,
+const Instance = {
+  eelog: null,
 };
 
-class EELog {
+let logDate = 0;
 
-  constructor() {
-    this.logDate = 0;
-    this[EELoggers] = null;
-  }
+// 创建日志实例
+function createLog(config) {
+  _delCache();
+  const eeLog = Logger.create(config);
 
-  // 创建日志实例
-  create(config) {
-    this._delCache();
-    const eeLog = Logger.create(config);
-
-    return eeLog;
-  }
-
-  _delCache() {
-    const now = parseInt(dayjs().format('YYYYMMDD'));
-    if (this.logDate != now) {
-      this.logDate = now;
-      this[EELoggers] = null;
-    }
-  }
-
-  get logger() {
-    this._delCache();
-
-    return this[EELoggers]['logger'] || null;
-  }
-
-  get coreLogger () {
-    this._delCache();
-
-    return this[EELoggers]['coreLogger'] || null;
-  }
-
-};
-
-function loadLogger() {
-  const eeLog = new EELog();
-  
-  Cache["config"] = eeLog.create();
-  return Cache["config"];
+  return eeLog;
 }
 
-function getConfig() {
-  if (!Cache["config"]) {
-    Cache["config"] = loadConfig();
-  };
-  return Cache["config"];
+function loadLog() {
+  Instance["eelog"] = createLog();
+  return Instance["eelog"];
 }
 
-const eelog = new EELog();
-const coreLogger = eelog.coreLogger;
-const logger = eelog.logger;
+function getLogger() {
+  _delCache();
+  if (!Instance["eelog"]) {
+    loadLog();
+  }
+  return Instance["eelog"]["logger"];
+}
+
+function getCoreLogger() {
+  _delCache();
+  if (!Instance["eelog"]) {
+    loadLog();
+  }
+  return Instance["eelog"]["coreLogger"];
+}
+
+function _delCache() {
+  const now = parseInt(dayjs().format('YYYYMMDD'));
+  if (logDate != now) {
+    logDate = now;
+    Instance["eelog"] = null;
+  }
+}
 
 module.exports = {
-  EELog,
-  logger,
-  coreLogger,
+  createLog,
+  loadLog,
+  get logger() {
+    return getLogger();
+  },
+  get coreLogger() {
+    return getCoreLogger();
+  },
 };

@@ -1,9 +1,11 @@
-
+'use strict';
 
 const Loggers = require('egg-logger').EggLoggers;
 const assert = require('assert');
 const dayjs = require('dayjs');
 const path = require('path');
+const { extend } = require('../utils/extend');
+const Config = require('../config');
 const Ps = require('../ps');
 
 let LogDate = 0;
@@ -22,31 +24,18 @@ function create(config = {}) {
       logger: {
         type: 'application',
         dir: Ps.getLogDir(),
-        encoding: 'utf8',
         env: Ps.env(),
-        level: 'INFO',
         consoleLevel: 'INFO',
         disableConsoleAfterReady: !Ps.isDev(),
-        outputJSON: false,
-        buffer: true,
-        appLogName: `ee.log`,
-        coreLogName: 'ee-core.log',
-        agentLogName: 'ee-agent.log',
-        errorLogName: `ee-error.log`,
         coreLogger: {},
         allowDebugAtProd: false,
-        enablePerformanceTimer: false,
-        rotator: 'none',
+        agentLogName: 'ee-agent.log',
+        rotator: 'day',
       },
       customLogger: {}
-    }
-
-    // 先从 cache 中读配置且不能抛出错误，如果没有从文件中读（子进程无法获取 cache）
-    let sysConfig = ConfigCache.all(false);
-    if (!sysConfig) {
-      sysConfig = Conf.all(false);
-    }
-    opt = Object.assign(defaultConfig, {
+    };
+    const sysConfig = Config.getConfig();
+    opt = extend(true, defaultConfig, {
       logger: sysConfig.logger,
       customLogger: sysConfig.customLogger || {}
     });
@@ -54,7 +43,7 @@ function create(config = {}) {
     opt.logger = config.logger;
     opt.customLogger = config.customLogger;
   }
-  // console.log('log---------', opt);
+  //console.log('log---------', opt);
 
   assert(Object.keys(opt).length != 0, `logger config is null`);
 
@@ -62,7 +51,7 @@ function create(config = {}) {
   if (rotateType == 'day') {
     opt = _rotateByDay(opt);
   }
-
+  console.log('log2---------', opt);
   const loggers = new Loggers(opt);
 
   return loggers;
