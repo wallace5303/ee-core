@@ -1,7 +1,6 @@
 'use strict';
 
 const Loggers = require('egg-logger').EggLoggers;
-const assert = require('assert');
 const dayjs = require('dayjs');
 const path = require('path');
 const { extend } = require('../utils/extend');
@@ -43,9 +42,10 @@ function create(config = {}) {
     opt.logger = config.logger;
     opt.customLogger = config.customLogger;
   }
-  //console.log('log---------', opt);
 
-  assert(Object.keys(opt).length != 0, `logger config is null`);
+  if (Object.keys(opt).length == 0) {
+    throw new Error("logger config is null");
+  }
 
   let rotateType = opt.logger.rotator;
   if (rotateType == 'day') {

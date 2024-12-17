@@ -8,6 +8,7 @@ const Utils = require('../utils');
 const Ps = require('../ps');
 const { loadConfig } = require('../config');
 const { loadLog } = require('../log');
+const { loadController } = require('../controller');
 
 class Appliaction {
   constructor() {
@@ -52,6 +53,7 @@ class Appliaction {
     // normalize env
     env.EE_ENV = options.env;
     env.EE_APP_NAME = options.appName;
+    env.EE_APP_VERSION = options.appVersion;
     env.EE_BASE_DIR = options.baseDir;
     env.EE_ELECTRON_DIR = options.electronDir;
     env.EE_USER_HOME = options.userHome;
@@ -70,15 +72,7 @@ class Appliaction {
   async initialize () {
     loadConfig();
     loadLog();
-
-
-    // await this.createPorts();
-
-    // await this.startSocket();
-    
-    // await this.ready();
-
-    // await this.createElectronApp();
+    loadController();
 
   } 
 }

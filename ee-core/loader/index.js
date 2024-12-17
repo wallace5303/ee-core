@@ -34,7 +34,6 @@ function loadFile(filepath, ...inject) {
 function requireFile(filepath) {
   return CoreUtils.loadFile(filepath);
 }
- 
 
 /**
  * 加载并运行文件

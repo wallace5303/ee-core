@@ -1,25 +1,16 @@
-'use strict';
+'use strict'
 
-/**
- * BaseContextClass is a base class that can be extended,
- * it's instantiated in context level,
- */
-class BaseContextClass {
+const { ControllerLoader } = require('./controller_loader');
 
-  /**
-   * @class
-   * @param {Context} ctx - context instance
-   * @since 1.1.0
-   */
-  constructor(ctx) {
+const Instance = {
+  controller: null,
+};
 
-    // todo 兼容旧版本，后续废弃ctx
-    if (typeof ctx === 'object') {
-      this.app = ctx;
-      this.config = ctx.config;
-      this.service = ctx.service;
-    }
-  }
+function loadController() {
+  const controllerLoader = new ControllerLoader();
+  Instance["controller"] = controllerLoader.load();
 }
 
-module.exports = BaseContextClass;
+module.exports = {
+  loadController
+};

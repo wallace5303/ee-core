@@ -76,6 +76,11 @@ function appName() {
   return process.env.EE_APP_NAME;
 }
 
+// app version
+function appVersion() {
+  return process.env.EE_APP_VERSION;
+}
+
 // 获取数据存储路径
 function getStorageDir() {
   const storageDir = path.join(getRootDir(), 'data');
@@ -249,6 +254,7 @@ module.exports = {
   isForkedChild,
   processType,
   appName,
+  appVersion,
   getStorageDir,
   getLogDir,
   getEncryptDir,

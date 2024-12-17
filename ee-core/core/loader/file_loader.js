@@ -2,22 +2,19 @@
 
 const assert = require('assert');
 const fs = require('fs');
-const debug = require('debug')('ee-core:fileLoader');
+const debug = require('debug')('ee-core:core:loader:file_loader');
 const path = require('path');
 const globby = require('globby');
 const is = require('is-type-of');
-const deprecate = require('../../../utils/depd')('ee');
 const Utils = require('../utils');
 const FULLPATH = Symbol('EE_LOADER_ITEM_FULLPATH');
 const EXPORTS = Symbol('EE_LOADER_ITEM_EXPORTS');
-//const Addon = require('../../../addon');
 
 const defaults = {
   directory: null,
   target: null,
   match: undefined,
   ignore: undefined,
-  lowercaseFirst: false,
   caseStyle: 'camel',
   initializer: null,
   call: true,
@@ -29,7 +26,6 @@ const defaults = {
 
 /**
  * Load files from directory to target object.
- * @since 1.0.0
  */
 class FileLoader {
 
@@ -50,25 +46,17 @@ class FileLoader {
    */
   constructor(options) {
     assert(options.directory, 'options.directory is required');
-    assert(options.target, 'options.target is required');
     this.options = Object.assign({}, defaults, options);
-
-    // compatible old options _lowercaseFirst_
-    if (this.options.lowercaseFirst === true) {
-      deprecate('lowercaseFirst is deprecated, use caseStyle instead');
-      this.options.caseStyle = 'lower';
-    }
   }
 
   /**
    * attach items to target object. Mapping the directory to properties.
    * `app/controller/group/repository.js` => `target.group.repository`
    * @return {Object} target
-   * @since 1.0.0
    */
   load() {
     const items = this.parse();
-    const target = this.options.target;
+    const target = {};
     for (const item of items) {
       // item { properties: [ 'a', 'b', 'c'], exports }
       // => target.a.b.c = exports
@@ -121,7 +109,6 @@ class FileLoader {
    *
    * `Exports` depends on type, if exports is a function, it will be called. if initializer is specified, it will be called with exports for customizing.
    * @return {Array} items
-   * @since 1.0.0
    */
   parse() {
     let files = this.options.match;
@@ -177,74 +164,7 @@ class FileLoader {
 
     return items;
   }
-
-  /**
-   * attach items to target object for addons.
-   * `app/addon/group/index.js` => `target.group`
-   * @return {Object} target
-   * @since 1.0.0
-   */
-  loadAddons() {
-    const items = [];
-    const files = '*';
-    const app = this.options.inject;
-    const loader = this.options.loader;
-    const target = this.options.target;
-    let directories = this.options.directory;
-    
-    if (!Array.isArray(directories)) {
-      directories = [ directories ];
-    }
-
-    // check addon 
-    const config = app.config.addons;
-    let filterAddons = [];
-    for (let key of Object.keys(config)) {
-      if (!config[key].enable) {
-        filterAddons.push(key);
-      }
-    }
-
-    for (const directory of directories) {
-      const addonpaths = globby.sync(files, { cwd: directory, deep: 1, onlyDirectories: true});
-      for (const addonName of addonpaths) {
-        if (filterAddons.includes(addonName)) continue;
-
-        let fullpath = path.join(directory, addonName, 'index');
-        fullpath = loader.resolveModule(fullpath);
-        if (!fs.statSync(fullpath).isFile()) continue;
-  
-        let exports = getExports(fullpath, this.options, addonName);
-        if (exports == null) continue;
-  
-        const properties = [addonName];
-        if (is.class(exports) || Utils.isBytecodeClass(exports)) {
-          exports.prototype.pathName = addonName;
-          exports.prototype.fullPath = fullpath;
-        }
-  
-        items.push({ fullpath, properties, exports });
-      }
-  
-      for (const item of items) {
-        const property = item.properties[0];
-        let obj = item.exports;
-        if (obj && !is.primitive(obj)) {
-          obj[FULLPATH] = item.fullpath;
-          obj[EXPORTS] = true;
-        }
-        
-        target[property] = obj;
-      }
-    }
-
-    return target;
-  }
 }
-
-module.exports = FileLoader;
-module.exports.EXPORTS = EXPORTS;
-module.exports.FULLPATH = FULLPATH;
 
 // convert file path to an array of properties
 // a/b/c.js => ['a', 'b', 'c']
@@ -324,3 +244,9 @@ function defaultCamelize(filepath, caseStyle) {
     return first + property.substring(1);
   });
 }
+
+module.exports = {
+  FileLoader,
+  EXPORTS,
+  FULLPATH,
+};
