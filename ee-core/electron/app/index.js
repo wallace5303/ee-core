@@ -1,64 +1,51 @@
-const { app } = require('electron');
-const EE = require('../../ee');
+'use strict';
+
+const { app: electronApp } = require('electron');
 const Log = require('../../log');
-const Electron = require('../index');
 const UtilsIs = require('../../utils/is');
-const Cross = require('../../cross');
-const Window = require('../window');
+// const Cross = require('../../cross');
+const { createMainWindow, setCloseAndQuit } = require('../window');
+
 
 /**
- * CoreElectronApp (框架封装的electron app对象)
+ * 创建electron应用
  */
-const CoreElectronApp = {
-
-  /**
-   * 创建electron应用
-   */
-  async create() {
-    const { CoreApp } = EE;
-
-    const gotTheLock = app.requestSingleInstanceLock();
-    if (!gotTheLock) {
-      app.quit();
-    }
-
-    app.whenReady().then(() => {
-      CoreApp.createWindow();
-    })
-
-    // 显示首次打开的窗口
-    app.on('second-instance', () => {
-      Log.coreLogger.info('[ee-core] [lib/eeApp] second-instance');
-      Window.restoreMainWindow();
-    });
-
-    app.on('window-all-closed', () => {
-      if (!UtilsIs.macOS()) {
-        Log.coreLogger.info('[ee-core] [lib/eeApp] window-all-closed quit');
-        CoreApp.appQuit();
-      }
-    })
-
-    app.on('before-quit', () => {
-      Electron.extra.closeWindow = true;
-
-      // kill cross services
-      Cross.killAll();
-    })
-
-    if (CoreApp.config.hardGpu.enable == false) {
-      app.disableHardwareAcceleration();
-    }
-
-    return app;
-  },
-
-  /**
-   * 退出app
-   */
-  quit() {
-    app.quit();
+function createElectron() {
+  // [todo] 允许多个实例 
+  const gotTheLock = app.requestSingleInstanceLock();
+  if (!gotTheLock) {
+    electronApp.quit();
   }
+  // [todo] 显示首次打开的窗口
+  // electronApp.on('second-instance', () => {
+  //   Log.coreLogger.info('[ee-core] [lib/eeApp] second-instance');
+  //   Window.restoreMainWindow();
+  // });
+
+  electronApp.whenReady().then(() => {
+    createMainWindow();
+    // [todo] windowReady、_loderPreload 、 selectAppType
+  })
+
+  electronApp.on('window-all-closed', () => {
+    if (!UtilsIs.macOS()) {
+      Log.coreLogger.info('[ee-core] [lib/eeApp] window-all-closed quit');
+      // [todo] before quit app
+      electronApp.quit(); 
+    }
+  })
+
+  electronApp.on('before-quit', () => {
+    setCloseAndQuit(true);
+
+    // [todo] kill cross services
+    // Cross.killAll();
+  })
+
+  return app;
 }
 
-module.exports = CoreElectronApp;
+module.exports = {
+  electronApp,
+  createElectron,
+};

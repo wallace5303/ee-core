@@ -244,6 +244,17 @@ function isChildPoolJob() {
   }
 }
 
+// Get cmd parameter by name
+function getArgumentByName(name) {
+  for (let i = 0; i < process.argv.length; i++) {
+    const item = process.argv[i]
+    const prefixKey = `--${name}=`;
+    if (item.indexOf(prefixKey) !== -1) {
+      return item.substring(prefixKey.length);
+    }
+  }
+}
+
 module.exports = {
   allEnv,
   env,
@@ -277,4 +288,5 @@ module.exports = {
   exitChildJob,
   isChildJob,
   isChildPoolJob,
+  getArgumentByName
 }

@@ -4,7 +4,7 @@ const Loggers = require('egg-logger').EggLoggers;
 const dayjs = require('dayjs');
 const path = require('path');
 const { extend } = require('../utils/extend');
-const Config = require('../config');
+const { getConfig } = require('../config');
 const Ps = require('../ps');
 
 let LogDate = 0;
@@ -33,7 +33,7 @@ function create(config = {}) {
       },
       customLogger: {}
     };
-    const sysConfig = Config.getConfig();
+    const sysConfig = getConfig();
     opt = extend(true, defaultConfig, {
       logger: sysConfig.logger,
       customLogger: sysConfig.customLogger || {}

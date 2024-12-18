@@ -1,57 +1,50 @@
 'use strict';
 
-//const Exception = require('../exception');
-const { app } = require('electron');
-const path = require('path');
 const debug = require('debug')('ee-core:app:Appliaction');
+const path = require('path');
+//const Exception = require('../exception');
+const { electronApp } = require('../electron/app');
 const Utils = require('../utils');
 const Ps = require('../ps');
 const { loadConfig } = require('../config');
 const { loadLog } = require('../log');
-const { loadController } = require('../controller');
+// const { loadController } = require('../controller');
 
 class Appliaction {
   constructor() {
     //Exception.start();
-    const baseDir = app.getAppPath();
+    const baseDir = electronApp.getAppPath();
     const { env } = process;
+    const environmet = Ps.getArgumentByName('env') || 'prod';
 
     const options = {
-      env: 'prod',
+      env: environmet,
       baseDir,
       electronDir: path.join(baseDir, 'electron'),
-      appName: app.getName(),
-      userHome: app.getPath('home'),
-      appData: app.getPath('appData'),
-      appUserData: app.getPath('userData'),
-      appVersion: app.getVersion(),
-      isPackaged: app.isPackaged,
+      appName: electronApp.getName(),
+      userHome: electronApp.getPath('home'),
+      appData: electronApp.getPath('appData'),
+      appUserData: electronApp.getPath('userData'),
+      appVersion: electronApp.getVersion(),
+      isPackaged: electronApp.isPackaged,
       execDir: baseDir,
       isEncrypted: false
     }
 
-    // argv
-    for (let i = 0; i < process.argv.length; i++) {
-      const tmpArgv = process.argv[i]
-      if (tmpArgv.indexOf('--env=') !== -1) {
-        options.env = tmpArgv.substring(6);
-      }
-    }
-
     // exec directory (exe dmg dep) for prod
-    if (options.env == 'prod' && app.isPackaged) {
-      options.execDir = path.dirname(app.getPath('exe'));
+    if (environmet == 'prod' && options.isPackaged) {
+      options.execDir = path.dirname(electronApp.getPath('exe'));
     }
 
     // Todo app.getAppPath() ??? process.cwd()
     // Use encryption, base directory is public/electron
-    if (options.env == 'prod' && Utils.isEncrypt(baseDir)) {
+    if (environmet == 'prod' && Utils.isEncrypt(baseDir)) {
       options.electronDir = Ps.getEncryptDir(baseDir);
       options.isEncrypted = true;
     }
 
     // normalize env
-    env.EE_ENV = options.env;
+    env.EE_ENV = environmet;
     env.EE_APP_NAME = options.appName;
     env.EE_APP_VERSION = options.appVersion;
     env.EE_BASE_DIR = options.baseDir;
@@ -65,16 +58,14 @@ class Appliaction {
     env.EE_SOCKET_PORT = null;
     env.EE_HTTP_PORT = null;
     debug('[constructor] options:%j', options)
-
-    this.initialize();
   }
 
-  async initialize () {
+  run() {
     loadConfig();
     loadLog();
-    loadController();
+    //loadController();
 
-  } 
+  }
 }
 
 module.exports = {
