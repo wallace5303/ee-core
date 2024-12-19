@@ -1,8 +1,8 @@
 'use strict';
 
-const { Appliaction } = require('./application');
+const { ElectronEgg, app } = require('./application');
 
 module.exports = {
-  Appliaction,
-  ElectronEgg: Appliaction
+  ElectronEgg,
+  app
 };

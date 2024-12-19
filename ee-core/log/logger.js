@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug')('ee-core:log:logger');
 const Loggers = require('egg-logger').EggLoggers;
 const dayjs = require('dayjs');
 const path = require('path');
@@ -51,7 +52,8 @@ function create(config = {}) {
   if (rotateType == 'day') {
     opt = _rotateByDay(opt);
   }
-  console.log('log2---------', opt);
+
+  debug('[create] opt:%j', opt);
   const loggers = new Loggers(opt);
 
   return loggers;

@@ -1,6 +1,6 @@
 'use strict';
 
-const debug = require('debug')('ee-core:app:appliaction');
+const debug = require('debug')('ee-core:boot');
 const path = require('path');
 //const Exception = require('../exception');
 const { electronApp } = require('../electron/app');
@@ -8,11 +8,8 @@ const Utils = require('../utils');
 const Ps = require('../ps');
 const { loadConfig } = require('../config');
 const { loadLog } = require('../log');
-const { loadController } = require('../controller');
-
-const Instance = {
-  app: null,
-};
+const { loadApp } = require('../app');
+// const { loadController } = require('../controller');
 
 class ElectronEgg {
   constructor() {
@@ -41,6 +38,8 @@ class ElectronEgg {
       options.execDir = path.dirname(electronApp.getPath('exe'));
     }
 
+    // Todo app.getAppPath() ??? process.cwd()
+    // Use encryption, base directory is public/electron
     if (environmet == 'prod' && Utils.isEncrypt(baseDir)) {
       options.electronDir = Ps.getEncryptDir(baseDir);
       options.isEncrypted = true;
@@ -67,7 +66,9 @@ class ElectronEgg {
   init() {
     loadConfig();
     loadLog();
-    loadController();
+    loadApp();
+    //loadController();
+    
   }
 
   use() {
@@ -82,6 +83,5 @@ class ElectronEgg {
 }
 
 module.exports = {
-  ElectronEgg,
-  app: Instance.app
+  ElectronEgg
 };
