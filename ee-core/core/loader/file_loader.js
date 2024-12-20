@@ -1,8 +1,8 @@
 'use strict';
 
+const debug = require('debug')('ee-core:core:loader:file_loader');
 const assert = require('assert');
 const fs = require('fs');
-const debug = require('debug')('ee-core:core:loader:file_loader');
 const path = require('path');
 const globby = require('globby');
 const is = require('is-type-of');
@@ -14,13 +14,11 @@ const defaults = {
   directory: null,
   target: null,
   match: undefined,
-  ignore: undefined,
   caseStyle: 'camel',
   initializer: null,
   call: true,
   override: false,
   inject: undefined,
-  filter: null,
   loader: undefined,
 };
 
@@ -35,18 +33,17 @@ class FileLoader {
    * @param {String|Array} options.directory - directories to be loaded
    * @param {Object} options.target - attach the target object from loaded files
    * @param {String} options.match - match the files when load, support glob, default to all js files
-   * @param {String} options.ignore - ignore the files when load, support glob
    * @param {Function} options.initializer - custom file exports, receive two parameters, first is the inject object(if not js file, will be content buffer), second is an `options` object that contain `path`
    * @param {Boolean} options.call - determine whether invoke when exports is function
    * @param {Boolean} options.override - determine whether override the property when get the same name
    * @param {Object} options.inject - an object that be the argument when invoke the function
-   * @param {Function} options.filter - a function that filter the exports which can be loaded
    * @param {String|Function} options.caseStyle - set property's case when converting a filepath to property list.
    * @param {Object} options.loader - an object that be the argument when invoke the function
    */
   constructor(options) {
     assert(options.directory, 'options.directory is required');
     this.options = Object.assign({}, defaults, options);
+    debug("[constructor] options: %o", this.options);
   }
 
   /**
@@ -56,6 +53,7 @@ class FileLoader {
    */
   load() {
     const items = this.parse();
+    return
     const target = {};
     for (const item of items) {
       // item { properties: [ 'a', 'b', 'c'], exports }
@@ -113,18 +111,9 @@ class FileLoader {
   parse() {
     let files = this.options.match;
     if (!files) {
-      files = (process.env.EE_TYPESCRIPT === 'true' && Utils.extensions['.ts'])
-        ? [ '**/*.(js|ts)', '!**/*.d.ts' ]
-        : [ '**/*.js', '**/*.jsc'];
+      files = [ '**/*.js', '**/*.jsc'];
     } else {
       files = Array.isArray(files) ? files : [ files ];
-    }
-    
-    let ignore = this.options.ignore;
-    if (ignore) {
-      ignore = Array.isArray(ignore) ? ignore : [ ignore ];
-      ignore = ignore.filter(f => !!f).map(f => '!' + f);
-      files = files.concat(ignore);
     }
 
     let directories = this.options.directory;
@@ -132,24 +121,26 @@ class FileLoader {
       directories = [ directories ];
     }
 
-    const filter = is.function(this.options.filter) ? this.options.filter : null;
     const items = [];
-    debug('parsing %j', directories);
-
+    debug('[parse] directories %o', directories);
+    
     for (const directory of directories) {
       const filepaths = globby.sync(files, { cwd: directory });
+      debug('[parse] filepaths %o', filepaths);
       for (const filepath of filepaths) {
         const fullpath = path.join(directory, filepath);
         if (!fs.statSync(fullpath).isFile()) continue;
         // get properties
-        // app/service/foo/bar.js => [ 'foo', 'bar' ]
+        // service/foo/bar.js => [ 'foo', 'bar' ]
         const properties = getProperties(filepath, this.options);
-        // app/service/foo/bar.js => service.foo.bar
+        debug('[parse] properties %o', properties);
+        // service/foo/bar.js => service.foo.bar
         const pathName = directory.split(/[/\\]/).slice(-1) + '.' + properties.join('.');
+        debug('[parse] pathName %s', pathName);
         // get exports from the file
         let exports = getExports(fullpath, this.options, pathName);
         // ignore exports when it's null or false returned by filter function
-        if (exports == null || (filter && filter(exports) === false)) continue;
+        if (exports == null) continue;
 
         // set properties of class
         if (is.class(exports) || Utils.isBytecodeClass(exports)) {
@@ -158,7 +149,8 @@ class FileLoader {
         }
 
         items.push({ fullpath, properties, exports });
-        debug('parse %s, properties %j, export %O', fullpath, properties, exports);
+        debug('[parse] fullpath %s, properties %o, export %O', fullpath, properties, exports);
+        return
       }
     }
 
@@ -183,7 +175,7 @@ function getProperties(filepath, { caseStyle }) {
 // If exports is null/undefined, it will be ignored
 function getExports(fullpath, { initializer, call, inject }, pathName) {
   let exports = Utils.loadFile(fullpath);
-
+  debug('[getExports] exports %o', exports);
   // process exports as you like
   if (initializer) {
     exports = initializer(exports, { path: fullpath, pathName });

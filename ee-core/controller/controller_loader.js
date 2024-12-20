@@ -2,6 +2,7 @@
 
 const debug = require('debug')('ee-core:controller:controller_loader');
 const path = require('path');
+const is = require('is-type-of');
 const Ps = require('../ps');
 const Timing = require('../core/utils/timing');
 const { FileLoader, FULLPATH} = require('../core/loader/file_loader');
@@ -24,13 +25,11 @@ class ControllerLoader {
       directory: path.join(Ps.getElectronDir(), 'controller'),
       inject: {},
       initializer: (obj, opt) => {
-
         if (is.class(obj) || CoreUtils.isBytecodeClass(obj)) {
           obj.prototype.pathName = opt.pathName;
           obj.prototype.fullPath = opt.path;
           return wrapClass(obj);
         }
- 
         return obj;
       },
     };
@@ -48,6 +47,7 @@ function wrapClass(Controller) {
   // tracing the prototype chain
   while (proto !== Object.prototype) {
     const keys = Object.getOwnPropertyNames(proto);
+    debug("[wrapClass] keys:", keys);
     for (const key of keys) {
       // getOwnPropertyNames will return constructor
       // that should be ignored

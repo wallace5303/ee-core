@@ -8,10 +8,15 @@ const Instance = {
 };
 
 function loadController() {
-  // const controllerLoader = new ControllerLoader();
-  // Instance["controller"] = controllerLoader.load();
+  const controllerLoader = new ControllerLoader();
+  Instance.controller = controllerLoader.load();
+}
+
+function getController() {
+  return Instance.controller;
 }
 
 module.exports = {
-  loadController
+  loadController,
+  getController
 };

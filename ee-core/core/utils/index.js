@@ -4,7 +4,6 @@ require('bytenode');
 const is = require('is-type-of');
 const path = require('path');
 const fs = require('fs');
-const co = require('../../utils/co');
 const BuiltinModule = require('module');
 
 // Guard against poorly mocked module constructors.
@@ -44,7 +43,6 @@ function loadFile(filepath) {
 async function callFn(fn, args, ctx) {
   args = args || [];
   if (!is.function(fn)) return;
-  if (is.generatorFunction(fn)) fn = co.wrap(fn);
   return ctx ? fn.call(ctx, ...args) : fn(...args);
 }
 
