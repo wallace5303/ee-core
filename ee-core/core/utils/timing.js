@@ -4,7 +4,6 @@ const assert = require('assert');
 const MAP = Symbol('Timing#map');
 const LIST = Symbol('Timing#list');
 
-
 class Timing {
 
   constructor() {
@@ -74,4 +73,6 @@ class Timing {
   }
 }
 
-module.exports = Timing;
+module.exports = {
+  Timing
+};

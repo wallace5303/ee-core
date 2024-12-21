@@ -1,7 +1,6 @@
 'use strict'
 
 const { ControllerLoader } = require('./controller_loader');
-const { coreLogger } = require('../log');
 
 const Instance = {
   controller: null,

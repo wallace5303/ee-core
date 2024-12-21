@@ -6,9 +6,9 @@ const fs = require('fs');
 const path = require('path');
 const globby = require('globby');
 const is = require('is-type-of');
-const Utils = require('../utils');
-const FULLPATH = Symbol('EE_LOADER_ITEM_FULLPATH');
-const EXPORTS = Symbol('EE_LOADER_ITEM_EXPORTS');
+const { isBytecodeClass, loadFile } = require('../utils');
+const FULLPATH = Symbol('LOADER_ITEM_FULLPATH');
+const EXPORTS = Symbol('LOADER_ITEM_EXPORTS');
 
 const defaults = {
   directory: null,
@@ -17,9 +17,7 @@ const defaults = {
   caseStyle: 'camel',
   initializer: null,
   call: true,
-  override: false,
   inject: undefined,
-  loader: undefined,
 };
 
 /**
@@ -35,10 +33,8 @@ class FileLoader {
    * @param {String} options.match - match the files when load, support glob, default to all js files
    * @param {Function} options.initializer - custom file exports, receive two parameters, first is the inject object(if not js file, will be content buffer), second is an `options` object that contain `path`
    * @param {Boolean} options.call - determine whether invoke when exports is function
-   * @param {Boolean} options.override - determine whether override the property when get the same name
    * @param {Object} options.inject - an object that be the argument when invoke the function
    * @param {String|Function} options.caseStyle - set property's case when converting a filepath to property list.
-   * @param {Object} options.loader - an object that be the argument when invoke the function
    */
   constructor(options) {
     assert(options.directory, 'options.directory is required');
@@ -48,23 +44,18 @@ class FileLoader {
 
   /**
    * attach items to target object. Mapping the directory to properties.
-   * `app/controller/group/repository.js` => `target.group.repository`
+   * `xxx/group/repository.js` => `target.group.repository`
    * @return {Object} target
    */
   load() {
     const items = this.parse();
-    return
     const target = {};
     for (const item of items) {
-      // item { properties: [ 'a', 'b', 'c'], exports }
-      // => target.a.b.c = exports
+      // item { fullpath, properties: [ 'a', 'b', 'c'], exports }
       item.properties.reduce((target, property, index) => {
         let obj;
-        const properties = item.properties.slice(0, index + 1).join('.');
+        // properties is a path slice, only the last value is the file name
         if (index === item.properties.length - 1) {
-          if (property in target) {
-            if (!this.options.override) throw new Error(`can't overwrite property '${properties}' from ${target[property][FULLPATH]} by ${item.fullpath}`);
-          }
           obj = item.exports;
           if (obj && !is.primitive(obj)) {
             obj[FULLPATH] = item.fullpath;
@@ -75,36 +66,27 @@ class FileLoader {
         }
         
         target[property] = obj;
-        debug('loaded %s', properties);
+        // const properties = item.properties.slice(0, index + 1).join('.');
+        // debug('[load] properties: %s', properties);
         return obj;
       }, target);
     }
-
+    //debug('[load] target: %O', target);
     return target;
   }
 
   /**
    * Parse files from given directories, then return an items list, each item contains properties and exports.
-   *
-   * For example, parse `app/controller/group/repository.js`
-   *
-   * ```
-   * module.exports = app => {
-   *   return class RepositoryController extends app.Controller {};
-   * }
-   * ```
-   *
+   * For example, parse `controller/group/repository.js`
    * It returns a item
-   *
    * ```
    * {
+   *   fullpath: '',
    *   properties: [ 'group', 'repository' ],
-   *   exports: app => { ... },
+   *   exports: { ... },
    * }
    * ```
-   *
    * `Properties` is an array that contains the directory of a filepath.
-   *
    * `Exports` depends on type, if exports is a function, it will be called. if initializer is specified, it will be called with exports for customizing.
    * @return {Array} items
    */
@@ -131,29 +113,27 @@ class FileLoader {
         const fullpath = path.join(directory, filepath);
         if (!fs.statSync(fullpath).isFile()) continue;
         // get properties
-        // service/foo/bar.js => [ 'foo', 'bar' ]
+        // controller/foo/bar.js => [ 'foo', 'bar' ]
         const properties = getProperties(filepath, this.options);
-        debug('[parse] properties %o', properties);
-        // service/foo/bar.js => service.foo.bar
+        // debug('[parse] properties %o', properties);
+        // controller/foo/bar.js => controller.foo.bar
         const pathName = directory.split(/[/\\]/).slice(-1) + '.' + properties.join('.');
-        debug('[parse] pathName %s', pathName);
+        // debug('[parse] pathName %s', pathName);
         // get exports from the file
         let exports = getExports(fullpath, this.options, pathName);
         // ignore exports when it's null or false returned by filter function
         if (exports == null) continue;
 
         // set properties of class
-        if (is.class(exports) || Utils.isBytecodeClass(exports)) {
+        if (is.class(exports) || isBytecodeClass(exports)) {
           exports.prototype.pathName = pathName;
           exports.prototype.fullPath = fullpath;
         }
-
         items.push({ fullpath, properties, exports });
-        debug('[parse] fullpath %s, properties %o, export %O', fullpath, properties, exports);
-        return
+        //debug('[parse] fullpath %s, properties %o, export %o', fullpath, properties, exports);
       }
     }
-
+    //debug('[parse] items %O', items);
     return items;
   }
 }
@@ -174,29 +154,18 @@ function getProperties(filepath, { caseStyle }) {
 // Get exports from filepath
 // If exports is null/undefined, it will be ignored
 function getExports(fullpath, { initializer, call, inject }, pathName) {
-  let exports = Utils.loadFile(fullpath);
-  debug('[getExports] exports %o', exports);
-  // process exports as you like
+  let exports = loadFile(fullpath);
+  //debug('[getExports] exports %o', exports);
   if (initializer) {
+    // exports type is Class or Object
     exports = initializer(exports, { path: fullpath, pathName });
   }
 
-  // return exports when it's a class or generator
-  //
-  // module.exports = class Service {};
-  // or
-  // module.exports = function*() {}
-  //new exports;
-
-  if (is.class(exports) || is.generatorFunction(exports) || is.asyncFunction(exports) || Utils.isBytecodeClass(exports)) {
+  if (is.class(exports) || is.generatorFunction(exports) || is.asyncFunction(exports) || isBytecodeClass(exports)) {
     return exports;
   }
 
-  // return exports after call when it's a function
-  //
-  // module.exports = function(app) {
-  //   return {};
-  // }
+  // whether to execute the function
   if (call && is.function(exports)) {
     exports = exports(inject);
     if (exports != null) {
@@ -204,7 +173,6 @@ function getExports(fullpath, { initializer, call, inject }, pathName) {
     }
   }
 
-  // return exports what is
   return exports;
 }
 
@@ -220,7 +188,7 @@ function defaultCamelize(filepath, caseStyle) {
     // fooBar.js  > FooBar
     // FooBar.js  > FooBar
     // FooBar.js  > FooBar
-    // FooBar.js  > fooBar (if lowercaseFirst is true)
+    // FooBar.js  > fooBar
     property = property.replace(/[_-][a-z]/ig, s => s.substring(1).toUpperCase());
     let first = property[0];
     switch (caseStyle) {

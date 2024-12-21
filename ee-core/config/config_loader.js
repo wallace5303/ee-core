@@ -2,11 +2,10 @@
 
 const debug = require('debug')('ee-core:config:config_loader');
 const path = require('path');
-const Ps = require('../ps');
+const { appName, env, getElectronDir, getBaseDir, getRootDir } = require('../ps');
 const { extend } = require('../utils/extend');
-const Timing = require('../core/utils/timing');
-const Loader= require('../loader');
-
+const { loadFile }= require('../loader');
+const { Timing } = require('../core/utils/timing');
 
 class ConfigLoader {
   constructor() {
@@ -32,11 +31,11 @@ class ConfigLoader {
   _AppConfig() {
     const names = [
       'config.default',
-      `config.${Ps.env()}`,
+      `config.${env()}`,
     ];
     const target = {};
     for (const filename of names) {
-      const config = this._loadConfig(Ps.getElectronDir(), filename);
+      const config = this._loadConfig(getElectronDir(), filename);
       extend(true, target, config);
     }
     return target;
@@ -44,14 +43,14 @@ class ConfigLoader {
 
   _loadConfig(dirpath, filename) {
     const appInfo = {
-      name: Ps.appName(),
-      baseDir: Ps.getBaseDir(),
-      electronDir: Ps.getElectronDir(),
-      env: Ps.env(),
-      root: Ps.getRootDir(),
+      name: appName(),
+      baseDir: getBaseDir(),
+      electronDir: getElectronDir(),
+      env: env(),
+      root: getRootDir(),
     }
     const filepath = path.join(dirpath, 'config', filename);
-    const config = Loader.loadFile(filepath, appInfo);
+    const config = loadFile(filepath, appInfo);
     debug("[_loadConfig] filepath: %s", filepath);
     if (!config) return null;
 

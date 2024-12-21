@@ -1,7 +1,7 @@
 'use strict';
 
 const dayjs = require('dayjs');
-const Logger = require('./logger');
+const { create } = require('./logger');
 
 const Instance = {
   eelog: null,
@@ -18,7 +18,7 @@ defineCoreLoggerProperty();
 // Create a log instance
 function createLog(config) {
   _delCache();
-  const eeLog = Logger.create(config);
+  const eeLog = create(config);
 
   return eeLog;
 }

@@ -3,11 +3,10 @@
 const debug = require('debug')('ee-core:controller:controller_loader');
 const path = require('path');
 const is = require('is-type-of');
-const Ps = require('../ps');
-const Timing = require('../core/utils/timing');
-const { FileLoader, FULLPATH} = require('../core/loader/file_loader');
-const CoreUtils = require('../core/utils');
-
+const { getElectronDir } = require('../ps');
+const { Timing } = require('../core/utils/timing');
+const { FileLoader, FULLPATH } = require('../core/loader/file_loader');
+const { isBytecodeClass, callFn } = require('../core/utils');
 
 class ControllerLoader {
   constructor() {
@@ -22,10 +21,9 @@ class ControllerLoader {
 
     const opt = {
       caseStyle: 'lower',
-      directory: path.join(Ps.getElectronDir(), 'controller'),
-      inject: {},
+      directory: path.join(getElectronDir(), 'controller'),
       initializer: (obj, opt) => {
-        if (is.class(obj) || CoreUtils.isBytecodeClass(obj)) {
+        if (is.class(obj) || isBytecodeClass(obj)) {
           obj.prototype.pathName = opt.pathName;
           obj.prototype.fullPath = opt.path;
           return wrapClass(obj);
@@ -34,7 +32,7 @@ class ControllerLoader {
       },
     };
     const target = new FileLoader(opt).load();
-    
+    debug("[load] controllers: %o", target);
     this.timing.end('Load Controller');
     return target;
   }
@@ -47,7 +45,7 @@ function wrapClass(Controller) {
   // tracing the prototype chain
   while (proto !== Object.prototype) {
     const keys = Object.getOwnPropertyNames(proto);
-    debug("[wrapClass] keys:", keys);
+    // debug("[wrapClass] keys:", keys);
     for (const key of keys) {
       // getOwnPropertyNames will return constructor
       // that should be ignored
@@ -66,13 +64,13 @@ function wrapClass(Controller) {
   }
 
   return ret;
+}
 
-  function methodToMiddleware(Controller, key) {
-    return function classControllerMiddleware(...args) {
-      const controller = new Controller();
-      return CoreUtils.callFn(controller[key], args, controller);
-    };
-  }
+function methodToMiddleware(Controller, key) {
+  return function classControllerMiddleware(...args) {
+    const controller = new Controller();
+    return callFn(controller[key], args, controller);
+  };
 }
 
 module.exports = {
