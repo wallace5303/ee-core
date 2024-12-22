@@ -4,13 +4,13 @@ const debug = require('debug')('ee-core:config:config_loader');
 const path = require('path');
 const { appName, env, getElectronDir, getBaseDir, getRootDir } = require('../ps');
 const { extend } = require('../utils/extend');
-const { loadFile }= require('../loader');
+const { loadFile } = require('../loader');
 const { Timing } = require('../core/utils/timing');
+const defaultConfig = require('./default_config');
 
 class ConfigLoader {
   constructor() {
     this.timing = new Timing();
-    this.config = {};
   }
 
   /**
@@ -21,11 +21,14 @@ class ConfigLoader {
 
     // Load Application config
     const appConfig = this._AppConfig();
-    debug("[load] appConfig: %o", appConfig);
-    this.config = appConfig;
+    // debug("[load] appConfig: %O", appConfig);
+
+    const defaultConf = defaultConfig();
+    const config = extend(true, defaultConf, appConfig);
+    debug("[load] config: %o", config);
 
     this.timing.end('Load Config');
-    return this.config;
+    return config;
   }
 
   _AppConfig() {

@@ -28,38 +28,7 @@ class EeApp extends BaseApp {
     this.mainWindow;
   }
 
-  /**
-   * 生成端口
-   */
-  async createPorts() {
-    if (Ps.isFrameworkMode() && Conf.isWebProtocol(this.config.mainServer)) {
-      const mainPort = await GetPort({port: parseInt(this.config.mainServer.port)});
-      process.env.EE_MAIN_PORT = mainPort;
-      this.config.mainServer.port = mainPort;
-    }
 
-    if (this.config.socketServer.enable) {
-      const socketPort = await GetPort({port: parseInt(this.config.socketServer.port)});
-      process.env.EE_SOCKET_PORT = socketPort;
-      this.config.socketServer.port = socketPort;
-    }
-    
-    if (this.config.httpServer.enable) {
-      const httpPort = await GetPort({port: parseInt(this.config.httpServer.port)});
-      process.env.EE_HTTP_PORT = httpPort;
-      this.config.httpServer.port = httpPort;
-    }
-    
-    // [todo] 更新db配置 (system.json 不再主进程中使用了，后续可能在子进程中使用）
-    Conf.setAll(this.config);
-  }
-
-  /**
-   * 启动通信模块
-   */
-  async startSocket() {
-    Socket.startAll(this);
-  }
   
   /**
    * 启动跨语言服务

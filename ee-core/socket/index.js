@@ -3,80 +3,61 @@
 const IoServer = require('socket.io');
 const IoClient = require('socket.io-client');
 const Koa = require('koa');
-const EESocketServer = Symbol('Ee#SocketServer');
-const EEIpcServer = Symbol('Ee#IpcServer');
-const EEHttpServer = Symbol('Ee#HttpServer');
+const { SocketServer } = require('./socketServer');
+const { HttpServer } = require('./httpServer');
+const { IpcServer } = require('./ipcServer');
 
-const EeSocket = {
+const Instance = {
+  socketServer: null,
+  httpServer: null,
+  coreLogger: null,
+};
 
-  /**
-   * 提供基础库 - 避免用户重复安装
-   */
+function startAll() {
+  createSocketServer();
+  createHttpServer();
+  createIpcServer();
+}
+
+// create SocketServer
+function createSocketServer() {
+  Instance.socketServer = new SocketServer();
+  return Instance.socketServer;
+}
+
+// socketServer
+function getSocketServer() {
+  return Instance.socketServer;
+}
+
+// create Http Server
+function createHttpServer() {
+  Instance.httpServer = new HttpServer();
+  return Instance.httpServer;
+}
+
+// httpServer
+function getHttpServer() {
+  return Instance.httpServer;
+} 
+
+// create IPC Server
+function createIpcServer() {
+  Instance.ipcServer = new IpcServer();
+  return Instance.ipcServer;
+}
+
+// ipcServer
+function getIpcServer() {
+  return Instance.ipcServer;
+}
+
+module.exports = {
   Koa,
   IoServer,
   IoClient,
-
-  /**
-   * 启动所有服务
-   */ 
-  startAll(app) {
-    this._createSocketServer(app);
-    this._createHttpServer(app);
-    this._createIpcServer(app);
-  },
-
-  /**
-   * 创建SocketServer
-   */ 
-  _createSocketServer(app) {
-    const SocketServer = require('./socketServer');
-    this[EESocketServer] = new SocketServer(app);
-
-    return this[EESocketServer];
-  },
-
-  /**
-   * 获取 Socket Server
-   */
-  getSocketServer() {
-    return this[EESocketServer] || null;
-  },  
-
-  /**
-   * 创建 Http Server
-   */ 
-  _createHttpServer(app) {
-    const HttpServer = require('./httpServer');
-    this[EEHttpServer] = new HttpServer(app);
-
-    return this[EEHttpServer];
-  },
-
-  /**
-   * 获取 Http Server
-   */
-  getHttpServer() {
-    return this[EEHttpServer] || null;
-  }, 
-
-  /**
-   * 创建 IPC Server
-   */ 
-  _createIpcServer(app) {
-    const IpcServer = require('./ipcServer');
-    this[EEIpcServer] = new IpcServer(app);
-
-    return this[EEIpcServer];
-  },
-
-  /**
-   * 获取 IPC Server
-   */
-  getIpcServer() {
-    return this[EEIpcServer] || null;
-  },   
-
-}
-
-
-module.exports = EeSocket;
+  startAll,
+  getSocketServer,
+  getHttpServer,
+  getIpcServer
+};

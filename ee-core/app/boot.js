@@ -1,15 +1,15 @@
 'use strict';
 
-const debug = require('debug')('ee-core:boot');
+const debug = require('debug')('ee-core:app:boot');
 const path = require('path');
 //const Exception = require('../exception');
 const { electronApp } = require('../electron/app');
-const Utils = require('../utils');
-const Ps = require('../ps');
+const { isEncrypt } = require('../utils');
+const { getArgumentByName, getEncryptDir } = require('../ps');
 const { loadConfig } = require('../config');
 const { loadLog } = require('../log');
-const { loadApp } = require('../app');
-// const { loadController } = require('../controller');
+const { loadController } = require('../controller');
+const { loadApp } = require('./application');
 
 class ElectronEgg {
   constructor() {
@@ -17,7 +17,7 @@ class ElectronEgg {
     //Exception.start();
     const baseDir = electronApp.getAppPath();
     const { env } = process;
-    const environmet = Ps.getArgumentByName('env') || 'prod';
+    const environmet = getArgumentByName('env') || 'prod';
 
     const options = {
       env: environmet,
@@ -38,10 +38,8 @@ class ElectronEgg {
       options.execDir = path.dirname(electronApp.getPath('exe'));
     }
 
-    // Todo app.getAppPath() ??? process.cwd()
-    // Use encryption, base directory is public/electron
-    if (environmet == 'prod' && Utils.isEncrypt(baseDir)) {
-      options.electronDir = Ps.getEncryptDir(baseDir);
+    if (environmet == 'prod' && isEncrypt(baseDir)) {
+      options.electronDir = getEncryptDir(baseDir);
       options.isEncrypted = true;
     }
 
@@ -66,9 +64,8 @@ class ElectronEgg {
   init() {
     loadConfig();
     loadLog();
+    loadController();
     loadApp();
-    //loadController();
-    
   }
 
   use() {
@@ -83,5 +80,6 @@ class ElectronEgg {
 }
 
 module.exports = {
-  ElectronEgg
+  ElectronEgg,
+
 };

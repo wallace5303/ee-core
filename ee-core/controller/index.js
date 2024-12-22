@@ -12,6 +12,9 @@ function loadController() {
 }
 
 function getController() {
+  if (!Instance.controller) {
+    loadController();
+  }
   return Instance.controller;
 }
 

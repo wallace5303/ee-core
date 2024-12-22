@@ -9,22 +9,22 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
-const Log = require('../log');
-const Ps = require('../ps');
+const { coreLogger } = require('../log');
+const { getHttpPort, getBaseDir } = require('../ps');
+const { getController } = require('../controller');
+const { getConfig } = require('../config');
 
 /**
  * http server
  */
 class HttpServer {
-  constructor (app) {
-    this.app = app;
-    this.options = this.app.config.httpServer;
-
+  constructor () {
+    this.options = getConfig().httpServer;
     if (this.options.enable == false) {
       return;
     }
 
-    let port = Ps.getHttpPort();
+    const port = getHttpPort();
     if (!port) {
       throw new Error('[ee-core] [socket/HttpServer] http port required, and must be a number !');
     }
@@ -36,15 +36,14 @@ class HttpServer {
    * 创建服务
    */
   _create () {
-    const app = this.app;
     const httpServer = this.options;
     const isHttps = httpServer?.https?.enable ?? false;
-    let sslOptions = {};
+    const sslOptions = {};
 
     if (isHttps === true) {
       httpServer.protocol = 'https://';
-      const keyFile = path.join(app.config.homeDir, httpServer.https.key);
-      const certFile = path.join(app.config.homeDir, httpServer.https.cert);
+      const keyFile = path.join(getBaseDir(), httpServer.https.key);
+      const certFile = path.join(getBaseDir(), httpServer.https.cert);
       assert(fs.existsSync(keyFile), 'ssl key file is required');
       assert(fs.existsSync(certFile), 'ssl cert file is required');
 
@@ -58,14 +57,9 @@ class HttpServer {
     koaApp
       .use(cors(corsOptions))
       .use(koaBody(httpServer.body))
-      .use(async (ctx, next) => {
-        ctx.eeApp = app;
-        await next();
-      })
       .use(this._dispatch);
 
     let msg = '[ee-core] [socket/http] server is: ' + url;
-
     const listenOpt = {
       host: httpServer.host,
       port: httpServer.port
@@ -73,12 +67,12 @@ class HttpServer {
     if (isHttps) {
       https.createServer(sslOptions, koaApp.callback()).listen(listenOpt, (err) => {
         msg = err ? err : msg;
-        Log.coreLogger.info(msg);
+        coreLogger.info(msg);
       });
     } else {
       koaApp.listen(listenOpt, (e) => {
         msg = e ? e : msg;
-        Log.coreLogger.info(msg);
+        coreLogger.info(msg);
       });
     }  
   }
@@ -87,7 +81,8 @@ class HttpServer {
    * 路由分发
    */
   async _dispatch (ctx, next) {
-    const config = ctx.eeApp.config.httpServer;
+    const controller = getController();
+    const config = getConfig().httpServer;
     let uriPath = ctx.request.path;
     const method = ctx.request.method;
     let params = ctx.request.query;
@@ -98,9 +93,9 @@ class HttpServer {
     // 默认
     ctx.response.status = 200;
 
-    // 添加到全局属性
-    ctx.eeApp.request = ctx.request;
-    ctx.eeApp.response = ctx.response;
+    // [todo] 添加到全局属性
+    // ctx.eeApp.request = ctx.request;
+    // ctx.eeApp.response = ctx.response;
 
     try {
       // 找函数
@@ -125,7 +120,7 @@ class HttpServer {
       let fn = null;
       if (is.string(cmd)) {
         const actions = cmd.split('.');
-        let obj = ctx.eeApp;
+        let obj = { controller };
         actions.forEach(key => {
           obj = obj[key];
           if (!obj) throw new Error(`class or function '${key}' not exists`);
@@ -134,14 +129,16 @@ class HttpServer {
       }
       if (!fn) throw new Error('function not exists');
 
-      const result = await fn.call(ctx.eeApp, args);
+      const result = await fn.call(controller, args);
       ctx.response.body = result;
     } catch (err) {
-      Log.coreLogger.error('[ee-core/httpServer] throw error:', err);
+      coreLogger.error('[ee-core/httpServer] throw error:', err);
     }
 
     await next();
   }
 }
 
-module.exports = HttpServer;
+module.exports = {
+  HttpServer
+};

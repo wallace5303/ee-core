@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const globby = require('globby');
 const is = require('is-type-of');
-const { isBytecodeClass, loadFile } = require('../utils');
+const { isBytecodeClass, loadFile, filePatterns } = require('../utils');
 const FULLPATH = Symbol('LOADER_ITEM_FULLPATH');
 const EXPORTS = Symbol('LOADER_ITEM_EXPORTS');
 
@@ -93,7 +93,7 @@ class FileLoader {
   parse() {
     let files = this.options.match;
     if (!files) {
-      files = [ '**/*.js', '**/*.jsc'];
+      files = filePatterns();
     } else {
       files = Array.isArray(files) ? files : [ files ];
     }

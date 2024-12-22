@@ -70,10 +70,7 @@ function isBytecodeClass(exports) {
  * 文件类型
  */
 function filePatterns() {
-  const files = (process.env.EE_TYPESCRIPT === 'true' && Module._extensions['.ts'])
-  ? [ '**/*.(js|ts)', '!**/*.d.ts' ]
-  : [ '**/*.js','**/*.jsc' ];
-
+  const files = [ '**/*.js','**/*.jsc' ];
   return files;
 }
 
