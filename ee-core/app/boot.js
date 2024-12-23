@@ -9,7 +9,7 @@ const { getArgumentByName, getEncryptDir } = require('../ps');
 const { loadConfig } = require('../config');
 const { loadLog } = require('../log');
 const { loadController } = require('../controller');
-const { loadApp } = require('./application');
+const { loadApp, getApp } = require('./application');
 
 class ElectronEgg {
   constructor() {
@@ -58,6 +58,7 @@ class ElectronEgg {
     env.EE_SOCKET_PORT = null;
     env.EE_HTTP_PORT = null;
     debug('[constructor] options:%j', options)
+
     this.init();
   }
 
@@ -69,8 +70,12 @@ class ElectronEgg {
   }
 
   use() {
-
-
+    const app = getApp();
+    app.use();
+  }
+  register(eventName, handler) {
+    const app = getApp();
+    app.register(eventName, handler);
   }
 
   run() {

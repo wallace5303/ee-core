@@ -10,8 +10,37 @@ const Instance = {
   app: null,
 };
 
+const Events = [
+  "ready",
+  "electronAppReady",
+  "quit",
+  "windowReady",
+  "beforeClose"
+];
+
+const Staff = {
+  name: '',
+  handler: null,
+  args: []
+}
+
 class Appliaction {
   constructor() {
+    this.eventMap = {};
+  }
+
+  register(eventName, handler) {
+    if (!this.eventMap[eventName]) {
+      this.eventMap[eventName] = handler;
+    }
+
+  }
+
+  callEvent(eventName, ...args) {
+    const eventFn = this.eventMap[eventName];
+    if (eventFn) {
+      eventFn(...args);
+    }
   }
 
   /**
@@ -51,7 +80,12 @@ async function loadApp() {
   return app;
 }
 
+function getApp() {
+  return Instance.app;
+}
+
 module.exports = {
   Appliaction,
   loadApp,
+  getApp,
 };
