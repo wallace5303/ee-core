@@ -4,7 +4,6 @@ const is = require('is-type-of');
 const { Server } = require('socket.io');
 const { coreLogger } = require('../log');
 const { getConfig } = require('../config');
-const { getSocketPort } = require('../ps');
 const { socketIo } = require('../const/channel');
 const { getController } = require('../controller');
 
@@ -14,25 +13,32 @@ const { getController } = require('../controller');
 class SocketServer {
   constructor () {
     this.socket = undefined;
-    const options = getConfig().socketServer;
-    if (options.enable == false) {
+    this.io = undefined;
+    this.config = getConfig().socketServer;
+    this.init();
+  }
+
+  async init() {
+    if (this.config.enable == false) {
       return;
     }
 
-    const port = getSocketPort();
+    const port = await getPort({port: parseInt(this.config.port)});
     if (!port) {
       throw new Error('[ee-core] [socket/socketServer] socekt port required, and must be a number !');
     }
     coreLogger.info('[ee-core] [socket/socketServer] port is:', port);
 
-    this.io = new Server(port, options);
-    this.connec(options);
+    process.env.EE_SOCKET_PORT = port;
+    this.config.port = port;
+    this.io = new Server(port, this.config);
+    this.connec();
   }
 
-  connec (opt = {}) {
+  connec () {
     const controller = getController();
     this.io.on('connection', (socket) => {
-      const channel = opt.channel || socketIo.partySoftware;
+      const channel = this.config.channel || socketIo.partySoftware;
       this.socket = socket;
       socket.on(channel, async (message, callback) => {
         coreLogger.info('[ee-core] [socket/socketServer] socket id:' + socket.id + ' message cmd: ' + message.cmd);

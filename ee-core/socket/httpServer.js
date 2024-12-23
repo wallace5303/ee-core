@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 const { coreLogger } = require('../log');
-const { getHttpPort, getBaseDir } = require('../ps');
+const { getBaseDir } = require('../ps');
 const { getController } = require('../controller');
 const { getConfig } = require('../config');
 
@@ -19,15 +19,21 @@ const { getConfig } = require('../config');
  */
 class HttpServer {
   constructor () {
-    this.options = getConfig().httpServer;
-    if (this.options.enable == false) {
+    this.config = getConfig().httpServer;
+    this.init();
+  }
+
+  async init() {
+    if (this.config.enable == false) {
       return;
     }
 
-    const port = getHttpPort();
+    const port = await getPort({port: parseInt(this.config.port)});
     if (!port) {
       throw new Error('[ee-core] [socket/HttpServer] http port required, and must be a number !');
     }
+    process.env.EE_HTTP_PORT = port;
+    this.config.port = httpPort;
 
     this._create();
   }
@@ -36,33 +42,33 @@ class HttpServer {
    * 创建服务
    */
   _create () {
-    const httpServer = this.options;
-    const isHttps = httpServer?.https?.enable ?? false;
+    const config = this.config;
+    const isHttps = config?.https?.enable ?? false;
     const sslOptions = {};
 
     if (isHttps === true) {
-      httpServer.protocol = 'https://';
-      const keyFile = path.join(getBaseDir(), httpServer.https.key);
-      const certFile = path.join(getBaseDir(), httpServer.https.cert);
+      config.protocol = 'https://';
+      const keyFile = path.join(getBaseDir(), config.https.key);
+      const certFile = path.join(getBaseDir(), config.https.cert);
       assert(fs.existsSync(keyFile), 'ssl key file is required');
       assert(fs.existsSync(certFile), 'ssl cert file is required');
 
       sslOptions.key = fs.readFileSync(keyFile);
       sslOptions.cert = fs.readFileSync(certFile);
     }
-    const url = httpServer.protocol + httpServer.host + ':' + httpServer.port;
-    const corsOptions = httpServer.cors;
+    const url = config.protocol + config.host + ':' + config.port;
+    const corsOptions = config.cors;
 
     const koaApp = new Koa();
     koaApp
       .use(cors(corsOptions))
-      .use(koaBody(httpServer.body))
+      .use(koaBody(config.body))
       .use(this._dispatch);
 
     let msg = '[ee-core] [socket/http] server is: ' + url;
     const listenOpt = {
-      host: httpServer.host,
-      port: httpServer.port
+      host: config.host,
+      port: config.port
     }
     if (isHttps) {
       https.createServer(sslOptions, koaApp.callback()).listen(listenOpt, (err) => {
