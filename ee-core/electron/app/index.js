@@ -1,21 +1,26 @@
 'use strict';
 
+const debug = require('debug')('ee-core:electron:app');
 const { app: electronApp } = require('electron');
-const Log = require('../../log');
+const { coreLogger } = require('../../log');
 const UtilsIs = require('../../utils/is');
 // const Cross = require('../../cross');
-const { createMainWindow, setCloseAndQuit } = require('../window');
-
+const { createMainWindow, setCloseAndQuit, loadServer } = require('../window');
+const { getApp, ElectronAppReady, BeforeClose } = require('../../app/application');
+const { getConfig } = require('../../config');
 
 /**
  * 创建electron应用
  */
 function createElectron() {
+  const app = getApp();
+  const { singleLock } = getConfig();
   // [todo] 允许多个实例 
-  const gotTheLock = app.requestSingleInstanceLock();
-  if (!gotTheLock) {
+  const gotTheLock = electronApp.requestSingleInstanceLock();
+  if (singleLock && !gotTheLock) {
     electronApp.quit();
   }
+  
   // [todo] 显示首次打开的窗口
   // electronApp.on('second-instance', () => {
   //   Log.coreLogger.info('[ee-core] [lib/eeApp] second-instance');
@@ -24,25 +29,27 @@ function createElectron() {
 
   electronApp.whenReady().then(() => {
     createMainWindow();
-    // [todo] windowReady、_loderPreload 、 selectAppType
+    // [todo] _loderPreload 、 selectAppType
+    loadServer();
   })
 
   electronApp.on('window-all-closed', () => {
     if (!UtilsIs.macOS()) {
-      Log.coreLogger.info('[ee-core] [lib/eeApp] window-all-closed quit');
-      // [todo] before quit app
+      coreLogger.info('[ee-core] [lib/eeApp] window-all-closed quit');
       electronApp.quit(); 
     }
   })
 
   electronApp.on('before-quit', () => {
     setCloseAndQuit(true);
-
+    // [todo] before quit app
     // [todo] kill cross services
     // Cross.killAll();
+    app.callEvent(BeforeClose);
   })
 
-  return app;
+  
+  app.callEvent(ElectronAppReady);
 }
 
 module.exports = {

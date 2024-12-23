@@ -10,6 +10,7 @@ const { socketIo } = require('../const/channel');
 module.exports = () => {
   return {
     openDevTools: false,
+    singleLock: true,
     windowsOption: {
       title: 'electron-egg',
       width: 980,
@@ -84,6 +85,10 @@ module.exports = () => {
         ],
         returnData: ''
       }
+    },
+    remote: {
+      enable: false,
+      url: ''
     },
     mainServer: {
       protocol: 'file://', // file://

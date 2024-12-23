@@ -2,7 +2,6 @@ const fs = require('fs');
 const mkdirp = require('mkdirp');
 const convert = require('koa-convert');
 const is = require('is-type-of');
-const co = require('./co');
 const path = require('path');
 const chalk = require('chalk');
 const { parseArgv } = require('./pargv');
@@ -96,14 +95,6 @@ function compareVersion(v1, v2) {
   }
 
   return 0
-}
-
-// 执行一个函数
-async function callFn(fn, args, ctx) {
-  args = args || [];
-  if (!is.function(fn)) return;
-  if (is.generatorFunction(fn)) fn = co.wrap(fn);
-  return ctx ? fn.call(ctx, ...args) : fn(...args);
 }
 
 function middleware(fn) {
@@ -214,7 +205,6 @@ module.exports = {
   mkdir,
   chmodPath,
   compareVersion,
-  callFn,
   middleware,
   stringify,
   validValue,

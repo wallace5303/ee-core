@@ -9,7 +9,9 @@ const { getArgumentByName, getEncryptDir } = require('../ps');
 const { loadConfig } = require('../config');
 const { loadLog } = require('../log');
 const { loadController } = require('../controller');
-const { loadApp, getApp } = require('./application');
+const { loadApp, getApp, Ready } = require('./application');
+const { loadSocket } = require('../socket');
+const { loadElectron } = require('../electron');
 
 class ElectronEgg {
   constructor() {
@@ -63,28 +65,32 @@ class ElectronEgg {
   }
 
   init() {
+    // basis functions
     loadConfig();
     loadLog();
-    loadController();
     loadApp();
   }
 
   use() {
     const app = getApp();
-    app.use();
+    return app.use();
   }
   register(eventName, handler) {
     const app = getApp();
-    app.register(eventName, handler);
+    return app.register(eventName, handler);
   }
 
   run() {
-    
+    // extended functions
+    const app = getApp();
+    loadController();
+    loadSocket();
+    app.callEvent(Ready);
+    loadElectron();
   }
 
 }
 
 module.exports = {
   ElectronEgg,
-
 };

@@ -1,14 +1,11 @@
 const path = require('path');
 
-/**
- * Html
- */
-const Html = {
-  getFilepath(name){
-    const pagePath = path.join(__dirname, name);
-    return pagePath;
-  },
-
+// Html
+function getHtmlFilepath(name){
+  const pagePath = path.join(__dirname, name);
+  return pagePath;
 }
 
-module.exports = Html;
+module.exports = {
+  getHtmlFilepath
+};

@@ -1,61 +1,63 @@
 'use strict';
 
 const debug = require('debug')('ee-core:app:appliaction');
-const path = require('path');
-const { getPort } = require('../utils/port');
-const { getConfig } = require('../config');
-const { startAll } = require("../socket");
 
 const Instance = {
   app: null,
 };
 
-const Events = [
-  "ready",
-  "electronAppReady",
-  "quit",
-  "windowReady",
-  "beforeClose"
-];
 
-const Staff = {
-  name: '',
-  handler: null,
-  args: []
-}
+const Ready = "ready";
+const ElectronAppReady = "electron-app-ready";
+const WindowReady = "window-ready";
+const BeforeClose = "before-close";
+
+// const Staff = {
+//   name: '',
+//   handler: null,
+//   args: []
+// }
 
 class Appliaction {
   constructor() {
-    this.eventMap = {};
+    this.lifecycleEvents = {};
+    this.eventsMap = {};
   }
 
+  // add lifecycle event
   register(eventName, handler) {
-    if (!this.eventMap[eventName]) {
-      this.eventMap[eventName] = handler;
+    if (!this.lifecycleEvents[eventName]) {
+      this.lifecycleEvents[eventName] = handler;
     }
-
   }
 
+  // call lifecycle event
   callEvent(eventName, ...args) {
-    const eventFn = this.eventMap[eventName];
+    const eventFn = this.lifecycleEvents[eventName];
+    if (eventFn) {
+      eventFn(...args);
+    }
+  } 
+
+  // add listener
+  on(eventName, handler) {
+    if (!this.eventsMap[eventName]) {
+      this.eventsMap[eventName] = handler;
+    }
+  }
+
+  // emit listener
+  emit(eventName, ...args) {
+    const eventFn = this.eventsMap[eventName];
     if (eventFn) {
       eventFn(...args);
     }
   }
 
-  /**
-   * load socket server
-   */
-  loadSocket() {
-    startAll();
-  }  
-
 }
 
-async function loadApp() {
+function loadApp() {
   const app = new Appliaction();
-  app.loadSocket();
-
   Instance.app = app;
   return app;
 }
@@ -68,4 +70,8 @@ module.exports = {
   Appliaction,
   loadApp,
   getApp,
+  Ready,
+  ElectronAppReady,
+  WindowReady,
+  BeforeClose
 };

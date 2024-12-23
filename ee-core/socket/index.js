@@ -13,12 +13,6 @@ const Instance = {
   coreLogger: null,
 };
 
-function startAll() {
-  createSocketServer();
-  createHttpServer();
-  createIpcServer();
-}
-
 // create SocketServer
 function createSocketServer() {
   Instance.socketServer = new SocketServer();
@@ -52,11 +46,19 @@ function getIpcServer() {
   return Instance.ipcServer;
 }
 
+
+// load socket server
+function loadSocket() {
+  createSocketServer();
+  createHttpServer();
+  createIpcServer();
+} 
+
 module.exports = {
   Koa,
   IoServer,
   IoClient,
-  startAll,
+  loadSocket,
   getSocketServer,
   getHttpServer,
   getIpcServer
