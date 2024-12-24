@@ -1,18 +1,20 @@
+'use strict';
+
 const fs = require('fs');
 const EventEmitter = require('events');
-const Conf = require('../config/cache');
-const Helper = require('../utils/helper');
-const Ps = require('../ps');
-const SpawnProcess = require('./spawnProcess');
+const { getConfig } = require('../config');
+const { sleep, getValueFromArgv, replaceArgsValue, mkdir } = require('../utils/helper');
+const { getUserHomeConfigDir } = require('../ps');
+const { SpawnProcess } = require('./spawnProcess');
 const { Events } = require('../const/channel');
 const { extend } = require('../utils/extend');
-const GetPort = require('../utils/get-port');
+const { getPort } = require('../utils/port');
 
 /**
- * Cross-language service
- * 跨语言服务
+ * Cross-language
+ * 跨语言
  */
-const CrossLanguageService = {
+const CrossLanguage = {
 
   emitter: undefined,
 
@@ -34,12 +36,12 @@ const CrossLanguageService = {
   async create() {
 
     // boot services
-    const servicesCfg = Conf.getValue('cross');
-    //await Helper.sleep(5 * 1000);
+    const crossCfg = getConfig().cross;
+    //await sleep(5 * 1000);
 
-    for (let key of Object.keys(servicesCfg)) {
-      let cfg = servicesCfg[key];
-      if (cfg.enable == true) {
+    for (let key of Object.keys(crossCfg)) {
+      let val = crossCfg[key];
+      if (val.enable == true) {
         this.run(key)
       }
     }
@@ -73,7 +75,8 @@ const CrossLanguageService = {
     this._initPath();
 
     const allConfig = Conf.all();
-    const defaultOpt = allConfig.cross[service] || {};
+    const crossConf = getConfig().cross;
+    const defaultOpt = crossConf[service] || {};
     const targetConf = extend(true, {}, defaultOpt, opt);
     if (Object.keys(targetConf).length == 0) {
       throw new Error(`[ee-core] [cross] The service [${service}] config does not exit`);
@@ -84,16 +87,16 @@ const CrossLanguageService = {
     
     // format params
     let tmpArgs = targetConf.args;
-    let confPort = parseInt(Helper.getValueFromArgv(tmpArgs, 'port'));
+    let confPort = parseInt(getValueFromArgv(tmpArgs, 'port'));
     // 某些程序给它传入不存在的参数时会报错
     if (isNaN(confPort) && targetConf.port > 0) {
       confPort = targetConf.port;
     }
     if (confPort > 0) {
       // 动态生成port，传入的端口必须为int
-      confPort = await GetPort({ port: confPort });
+      confPort = await getPort({ port: confPort });
       // 替换port
-      targetConf.args = Helper.replaceArgsValue(tmpArgs, "port", String(confPort));
+      targetConf.args = replaceArgsValue(tmpArgs, "port", String(confPort));
     }
 
     // 创建进程
@@ -172,12 +175,14 @@ const CrossLanguageService = {
    * init path
    */  
   _initPath() {
-    const pathname = Ps.getUserHomeConfigDir();
+    const pathname = getUserHomeConfigDir();
     if (!fs.existsSync(pathname)) {
-      Helper.mkdir(pathname, {mode: 0o755});
+      mkdir(pathname, {mode: 0o755});
     }
   },
 
 }
 
-module.exports = CrossLanguageService;
+module.exports = {
+  CrossLanguage
+};

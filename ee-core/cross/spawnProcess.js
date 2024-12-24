@@ -1,11 +1,12 @@
+'use strict';
+
 const EventEmitter = require('events');
 const path = require('path');
 const crossSpawn = require('cross-spawn');
-const Log = require('../log');
-const Ps = require('../ps');
+const { coreLogger } = require('../log');
+const { getExtraResourcesDir, isPackaged, isDev, getBaseDir } = require('../ps');
 const { Events } = require('../const/channel');
-const EE = require('../ee');
-const Helper = require('../utils/helper');
+const { getRandomString } = require('../utils/helper');
 const UtilsIs = require('../utils/is');
 const { parseArgv } = require('../utils/pargv');
 
@@ -35,9 +36,9 @@ class SpawnProcess {
     // Launch executable program
     let cmdPath = '';
     let cmdArgs = targetConf.args;
-    let execDir = Ps.getExtraResourcesDir();
+    let execDir = getExtraResourcesDir();
     let standardOutput = ['inherit', 'inherit', 'inherit', 'ipc'];
-    if (Ps.isPackaged()) {
+    if (isPackaged()) {
       standardOutput = ['ignore', 'ignore', 'ignore', 'ipc'];
     }
     if (targetConf.stdio) {
@@ -51,18 +52,18 @@ class SpawnProcess {
         throw new Error(`[ee-core] [cross] The config [directory] attribute does not exist`);
       }
       cmdPath = cmd;
-      if (!path.isAbsolute(cmd) && !Ps.isDev()) {
-        cmdPath = path.join(Ps.getExtraResourcesDir(), cmd);
+      if (!path.isAbsolute(cmd) && !isDev()) {
+        cmdPath = path.join(getExtraResourcesDir(), cmd);
       }
     } else {
-      cmdPath = path.join(Ps.getExtraResourcesDir(), targetConf.name);
+      cmdPath = path.join(getExtraResourcesDir(), targetConf.name);
     }
 
     // windows
     if (UtilsIs.windows() && path.extname(cmdPath) != '.exe') {
       // Complete the executable program extension
       // notice: python.exe may bring up the App Store
-      if (targetConf.windowsExtname === true || !Ps.isDev()) {
+      if (targetConf.windowsExtname === true || !isDev()) {
         cmdPath += ".exe";
       }
     }
@@ -71,16 +72,16 @@ class SpawnProcess {
     if (directory && path.isAbsolute(directory)) {
       execDir = directory;
     } else if (directory && !path.isAbsolute(directory)) {
-      if (Ps.isDev()) {
-        execDir = path.join(Ps.getHomeDir(), directory);
+      if (isDev()) {
+        execDir = path.join(getBaseDir(), directory);
       } else {
-        execDir = path.join(Ps.getExtraResourcesDir(), directory);
+        execDir = path.join(getExtraResourcesDir(), directory);
       }
     } else {
-      execDir = Ps.getExtraResourcesDir();
+      execDir = getExtraResourcesDir();
     }
 
-    Log.coreLogger.info(`[ee-core] [cross/run] cmd: ${cmdPath}, args: ${cmdArgs}`);
+    coreLogger.info(`[ee-core] [cross/run] cmd: ${cmdPath}, args: ${cmdArgs}`);
     const coreProcess = crossSpawn(cmdPath, cmdArgs, { 
       stdio: standardOutput, 
       detached: false,
@@ -96,7 +97,7 @@ class SpawnProcess {
       }
       this.host.emitter.emit(Events.childProcessExit, data);
       // Child process closed: The child process was killed externally or an internal error caused the application to stop, resulting in the application exiting
-      Log.coreLogger.info(`[ee-core] [corss/process] received a exit from child-process, code:${code}, signal:${signal}, pid:${this.pid}, cmd:${cmdPath}, args: ${cmdArgs}`);
+      coreLogger.info(`[ee-core] [corss/process] received a exit from child-process, code:${code}, signal:${signal}, pid:${this.pid}, cmd:${cmdPath}, args: ${cmdArgs}`);
       this._exitElectron();
     });
 
@@ -105,7 +106,7 @@ class SpawnProcess {
         pid: this.pid
       }
       this.host.emitter.emit(Events.childProcessError, data);
-      Log.coreLogger.error(`[ee-core] [corss/process] received a error from child-process, error: ${err}, pid:${this.pid}`);
+      coreLogger.error(`[ee-core] [corss/process] received a error from child-process, error: ${err}, pid:${this.pid}`);
       this._exitElectron();
     });
   }
@@ -120,26 +121,6 @@ class SpawnProcess {
       this.child.kill('SIGKILL');
     }, timeout)
   }
-
-  // send(message) {
-  //   return this.sendByType(message, 'message');
-  // }
-
-  // close() {
-  //   return this.sendByType('close', 'close');
-  // }
-
-  // async sendByType(message, type) {
-  //   const msg = typeof message === 'string' ? message : JSON.stringify(message);
-  //   const id = this._generateId();
-
-  //   this.child.send({
-  //       id,
-  //       type,
-  //       data: msg,
-  //   });
-  //   return;
-  // }
 
   getUrl() {
     const ssl = Helper.getValueFromArgv(this.config.args, 'ssl');
@@ -164,7 +145,7 @@ class SpawnProcess {
   }
 
   _generateId() {
-    const rid = Helper.getRandomString();
+    const rid = getRandomString();
     return `node:${this.pid}:${rid}`;
   }
 
@@ -172,14 +153,15 @@ class SpawnProcess {
    * exit electron
    */
   _exitElectron(timeout = 1000) {
-    const { CoreApp } = EE;
     if (this.config.appExit) {
       setTimeout(() => {
-        // 进程退出前的一些清理工作
-        CoreApp.appQuit();
+        // [todo] 进程退出前的一些清理工作
+        // CoreApp.appQuit();
       }, timeout)
     }
   }
 }
 
-module.exports = SpawnProcess;
+module.exports = {
+  SpawnProcess
+};
