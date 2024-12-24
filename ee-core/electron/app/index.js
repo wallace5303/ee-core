@@ -6,7 +6,7 @@ const { coreLogger } = require('../../log');
 const UtilsIs = require('../../utils/is');
 // const Cross = require('../../cross');
 const { createMainWindow, setCloseAndQuit, loadServer } = require('../window');
-const { getApp, ElectronAppReady, BeforeClose } = require('../../app/application');
+const { getApp, ElectronAppReady, BeforeClose, Preload } = require('../../app/application');
 const { getConfig } = require('../../config');
 
 /**
@@ -30,6 +30,7 @@ function createElectron() {
   electronApp.whenReady().then(() => {
     createMainWindow();
     // [todo] _loderPreload 、 selectAppType
+    app.callEvent(Preload);
     loadServer();
   })
 

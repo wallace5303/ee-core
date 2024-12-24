@@ -11,6 +11,7 @@ const Ready = "ready";
 const ElectronAppReady = "electron-app-ready";
 const WindowReady = "window-ready";
 const BeforeClose = "before-close";
+const Preload = "preload";
 
 // const Staff = {
 //   name: '',
@@ -73,5 +74,6 @@ module.exports = {
   Ready,
   ElectronAppReady,
   WindowReady,
+  Preload,
   BeforeClose
 };
