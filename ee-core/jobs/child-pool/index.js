@@ -210,4 +210,6 @@ class ChildPoolJob extends EventEmitter {
   }
 }
 
-module.exports = ChildPoolJob;
+module.exports = {
+  ChildPoolJob
+};

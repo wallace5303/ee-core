@@ -2,7 +2,7 @@
 
 const path = require('path');
 const { env, getBaseDir, getLogDir } = require('../ps');
-const { SocketIo } = require('../const/channel');
+const { SocketIO } = require('../const/channel');
 
 /**
  * default
@@ -58,7 +58,7 @@ module.exports = () => {
       cors: {
         origin: true, // http协议时，要设置跨域 类型 Boolean String RegExp Array Function
       },
-      channel: SocketIo.partySoftware
+      channel: SocketIO.partySoftware
     },
     httpServer: {
       enable: false, // Is it enabled
