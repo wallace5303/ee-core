@@ -4,7 +4,7 @@ const Conf = require('../config/cache');
 const Helper = require('../utils/helper');
 const Ps = require('../ps');
 const SpawnProcess = require('./spawnProcess');
-const Channel = require('../const/channel');
+const { Events } = require('../const/channel');
 const { extend } = require('../utils/extend');
 const GetPort = require('../utils/get-port');
 
@@ -53,12 +53,12 @@ const CrossLanguageService = {
       return
     }
     this.emitter = new EventEmitter();  
-    this.emitter.on(Channel.events.childProcessExit, (data) => {
+    this.emitter.on(Events.childProcessExit, (data) => {
       const child = this.children[data.pid];
       delete this.childrenMap[child.name];
       delete this.children[data.pid];
     });
-    this.emitter.on(Channel.events.childProcessError, (data) => {
+    this.emitter.on(Events.childProcessError, (data) => {
       const child = this.children[data.pid];
       delete this.childrenMap[child.name];
       delete this.children[data.pid];

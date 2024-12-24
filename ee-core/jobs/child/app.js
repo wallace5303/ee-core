@@ -1,9 +1,9 @@
 
 const is = require('is-type-of');
 const Exception = require('ee-core/exception');
-const Loader = require('ee-core/loader');
-const Log = require('ee-core/log');
-const UtilsCore = require('ee-core/core/lib/utils');
+const { loadJsFile } = require('ee-core/loader');
+const { coreLogger } = require('ee-core/log');
+const UtilsCore = require('ee-core/core/utils');
 
 Exception.start();
 const commands = ['run'];
@@ -20,7 +20,7 @@ class ChildApp {
   _initEvents() {
     process.on('message', this._handleMessage.bind(this));
     process.once('exit', (code) => {
-      Log.coreLogger.info(`[ee-core] [jobs/child] received a exit from main-process, code:${code}, pid:${process.pid}`);
+      coreLogger.info(`[ee-core] [jobs/child] received a exit from main-process, code:${code}, pid:${process.pid}`);
     });
   }
 
@@ -37,7 +37,7 @@ class ChildApp {
         break;
       default:
     }
-    Log.coreLogger.info(`[ee-core] [jobs/child] received a message from main-process, message: ${JSON.stringify(m)}`);
+    coreLogger.info(`[ee-core] [jobs/child] received a message from main-process, message: ${JSON.stringify(m)}`);
   }
 
   /**
@@ -45,7 +45,7 @@ class ChildApp {
    */  
   run(msg = {}) {
     const {jobPath, jobParams, jobFunc, jobFuncParams} = msg;
-    let mod = Loader.loadJsFile(jobPath);
+    let mod = loadJsFile(jobPath);
     if (is.class(mod) || UtilsCore.isBytecodeClass(mod)) {
       if (!this.jobMap.has(jobPath)) {
         const instance = new mod(...jobParams);

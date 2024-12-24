@@ -1,10 +1,10 @@
 const EventEmitter = require('events');
 const LoadBalancer = require('../load-balancer');
-const Loader = require('../../loader');
-const ForkProcess = require('../child/forkProcess');
-const Channel = require('../../const/channel');
-const Helper = require('../../utils/helper');
-const Conf = require('../../config/cache');
+const { getFullpath } = require('../../loader');
+const { ForkProcess } = require('../child/forkProcess');
+const { Events } = require('../../const/channel');
+const { validValue } = require('../../utils/helper');
+const { getConfig } = require('../../config');
 
 class ChildPoolJob extends EventEmitter {
 
@@ -21,7 +21,7 @@ class ChildPoolJob extends EventEmitter {
     this.max = 6;
     this.strategy = 'polling';
     this.weights = new Array(this.max).fill().map((v, i) => {
-      let w = Helper.validValue(options.weights[i]) ? options.weights[i] : 1
+      let w = validValue(options.weights[i]) ? options.weights[i] : 1
       return w;
     });
 
@@ -31,7 +31,7 @@ class ChildPoolJob extends EventEmitter {
     }
     this.LB = new LoadBalancer(lbOpt);
 
-    const cfg = Conf.getValue('jobs');
+    const cfg = getConfig().jobs;
     if (cfg) {
       this.config = cfg;
     }
@@ -43,10 +43,10 @@ class ChildPoolJob extends EventEmitter {
    * 初始化监听
    */  
   _initEvents() {
-    this.on(Channel.events.childProcessExit, (data) => {
+    this.on(Events.childProcessExit, (data) => {
       this._removeChild(data.pid);
     });
-    this.on(Channel.events.childProcessError, (data) => {
+    this.on(Events.childProcessError, (data) => {
       this._removeChild(data.pid);
     });
   }
@@ -115,7 +115,7 @@ class ChildPoolJob extends EventEmitter {
    * 执行一个job文件
    */  
   run(filepath, params = {}) {
-    const jobPath = Loader.getFullpath(filepath);
+    const jobPath = getFullpath(filepath);
     const childProcess = this.getChild();
     childProcess.dispatch('run', jobPath, params);
 

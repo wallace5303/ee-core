@@ -1,15 +1,14 @@
-const Channel = require('../const/channel');
+'use strict';
+
+const { Receiver, Processes } = require('../const/channel');
 
 class ChildMessage {
-  constructor() {
-    // ...
-  }
 
   /**
    * 向主进程发消息 for ChildJob 实例
    */
   sendToMain(eventName, params = {}) {
-    let receiver = Channel.receiver.childJob;
+    let receiver = Receiver.childJob;
     return this.send(eventName, params, receiver);
   }
 
@@ -17,9 +16,9 @@ class ChildMessage {
    * 向主进程发消息 for task 实例
    */
   send(eventName, params = {}, receiver) {
-    let eventReceiver = receiver || Channel.receiver.forkProcess;
+    let eventReceiver = receiver || Receiver.forkProcess;
     let message = {
-      channel: Channel.process.sendToMain,
+      channel: Processes.sendToMain,
       eventReceiver,
       event: eventName,
       data: params,
@@ -42,7 +41,7 @@ class ChildMessage {
     let errTips = (err && typeof err == 'object') ? err.toString() : '';
     errTips += ' Error !!! Please See file ee-core.log or ee-error-xxx.log for details !'
     let message = {
-      channel: Channel.process.showException,
+      channel: Processes.showException,
       data: errTips
     }
     process.send(message);
@@ -51,4 +50,6 @@ class ChildMessage {
 
 
 
-module.exports = ChildMessage;
+module.exports = { 
+  ChildMessage
+};

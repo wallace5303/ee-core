@@ -1,8 +1,8 @@
 const EventEmitter = require('events');
-const ForkProcess = require('./forkProcess');
-const Loader = require('../../loader');
-const Channel = require('../../const/channel');
-const Conf = require('../../config/cache');
+const { ForkProcess } = require('./forkProcess');
+const { getFullpath } = require('../../loader');
+const { Events } = require('../../const/channel');
+const { getConfig } = require('../../config');
 
 class ChildJob extends EventEmitter {
 
@@ -11,7 +11,7 @@ class ChildJob extends EventEmitter {
     this.jobs = {};
     this.config = {};
 
-    const cfg = Conf.getValue('jobs');
+    const cfg = getConfig().jobs;
     if (cfg) {
       this.config = cfg;
     }
@@ -23,10 +23,10 @@ class ChildJob extends EventEmitter {
    * 初始化监听
    */  
   _initEvents() {
-    this.on(Channel.events.childProcessExit, (data) => {
+    this.on(Events.childProcessExit, (data) => {
       delete this.jobs[data.pid];
     });
-    this.on(Channel.events.childProcessError, (data) => {
+    this.on(Events.childProcessError, (data) => {
       delete this.jobs[data.pid];
     });
   }
@@ -35,7 +35,7 @@ class ChildJob extends EventEmitter {
    * 执行一个job文件
    */  
   exec(filepath, params = {}, opt = {}) {
-    const jobPath = Loader.getFullpath(filepath);
+    const jobPath = getFullpath(filepath);
     const proc = this.createProcess(opt);
     const cmd = 'run';
     proc.dispatch(cmd, jobPath, params);
@@ -79,4 +79,6 @@ class ChildJob extends EventEmitter {
 
 }
 
-module.exports = ChildJob;
+module.exports = {
+  ChildJob
+};

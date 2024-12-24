@@ -3,7 +3,7 @@ const path = require('path');
 const crossSpawn = require('cross-spawn');
 const Log = require('../log');
 const Ps = require('../ps');
-const Channel = require('../const/channel');
+const { Events } = require('../const/channel');
 const EE = require('../ee');
 const Helper = require('../utils/helper');
 const UtilsIs = require('../utils/is');
@@ -94,7 +94,7 @@ class SpawnProcess {
       let data = {
         pid: this.pid
       }
-      this.host.emitter.emit(Channel.events.childProcessExit, data);
+      this.host.emitter.emit(Events.childProcessExit, data);
       // Child process closed: The child process was killed externally or an internal error caused the application to stop, resulting in the application exiting
       Log.coreLogger.info(`[ee-core] [corss/process] received a exit from child-process, code:${code}, signal:${signal}, pid:${this.pid}, cmd:${cmdPath}, args: ${cmdArgs}`);
       this._exitElectron();
@@ -104,7 +104,7 @@ class SpawnProcess {
       let data = {
         pid: this.pid
       }
-      this.host.emitter.emit(Channel.events.childProcessError, data);
+      this.host.emitter.emit(Events.childProcessError, data);
       Log.coreLogger.error(`[ee-core] [corss/process] received a error from child-process, error: ${err}, pid:${this.pid}`);
       this._exitElectron();
     });

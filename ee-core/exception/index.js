@@ -1,22 +1,22 @@
 'use strict';
 
-const Log = require('../log');
-const Ps = require('../ps');
-const Conf = require('../config/cache');
-const Message = require('../message');
+const { coreLogger } = require('../log');
+const { isForkedChild, isDev } = require('../ps');
+const { getConfig } = require('../config');
+const { childMessage } = require('../message');
 
 /**
  * 捕获异常
  */
-exports.start = function() {
-  this.uncaughtExceptionHandler();
-  this.unhandledRejectionHandler();
+function loadException() {
+  uncaughtExceptionHandler();
+  unhandledRejectionHandler();
 }
 
 /**
  * 当进程上抛出异常而没有被捕获时触发该事件，并且使异常静默。
  */
-exports.uncaughtExceptionHandler = function() {
+function uncaughtExceptionHandler() {
   process.on('uncaughtException', function(err) {
     if (!(err instanceof Error)) {
       err = new Error(String(err));
@@ -26,7 +26,7 @@ exports.uncaughtExceptionHandler = function() {
       err.name = 'unhandledExceptionError';
     }
 
-    Log.coreLogger.error(err);
+    coreLogger.error(err);
 
     _devError(err);
 
@@ -37,21 +37,20 @@ exports.uncaughtExceptionHandler = function() {
 /**
  * 当进程上抛出异常而没有被捕获时触发该事件。
  */
-exports.uncaughtExceptionMonitorHandler = function() {
-  // process.on('uncaughtExceptionMonitor', function(err, origin) {
-  //   if (!(err instanceof Error)) {
-  //     err = new Error(String(err));
-  //   }
-   
-  //   Log.coreLogger.error('uncaughtExceptionMonitor:',err);
-  // });
+function uncaughtExceptionMonitorHandler() {
+  process.on('uncaughtExceptionMonitor', function(err, origin) {
+    if (!(err instanceof Error)) {
+      err = new Error(String(err));
+    }
+    coreLogger.error('uncaughtExceptionMonitor:',err);
+  });
 }
 
 /**
  * 当promise中reject的异常在同步任务中没有使用catch捕获就会触发该事件，
  * 即便是在异步情况下使用了catch也会触发该事件
  */
-exports.unhandledRejectionHandler = function() {
+function unhandledRejectionHandler() {
   process.on('unhandledRejection', function(err) {
     if (!(err instanceof Error)) {
       const newError = new Error(String(err));
@@ -66,11 +65,8 @@ exports.unhandledRejectionHandler = function() {
     if (err.name === 'Error') {
       err.name = 'unhandledRejectionError';
     }
-
-    Log.coreLogger.error(err);
-
+    coreLogger.error(err);
     _devError(err);
-
     _exit();
   });
 }
@@ -79,8 +75,8 @@ exports.unhandledRejectionHandler = function() {
  * 如果是子进程，发送错误到主进程控制台
  */
 function _devError (err) {
-  if (Ps.isForkedChild() && Ps.isDev()) {
-    Message.childMessage.sendErrorToTerminal(err);
+  if (isForkedChild() && isDev()) {
+    childMessage.sendErrorToTerminal(err);
   }
 }
 
@@ -88,7 +84,7 @@ function _devError (err) {
  * 捕获异常后是否退出
  */
 function _exit () {
-  let cfg = Conf.getValue('exception');
+  const cfg = getConfig().exception;
   if (!cfg) {
     return;
   }
@@ -113,3 +109,10 @@ function _delayExit() {
     process.exit();
   }, 1500)
 }
+
+module.exports = {
+  loadException,
+  uncaughtExceptionHandler,
+  unhandledRejectionHandler,
+  uncaughtExceptionMonitorHandler
+};

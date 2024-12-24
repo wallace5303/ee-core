@@ -1,29 +1,29 @@
 const path = require('path');
 const EventEmitter = require('events');
-const { fork } = require('child_process');
 const serialize = require('serialize-javascript');
-const Log = require('../../log');
-const Ps = require('../../ps');
-const Channel = require('../../const/channel');
-const Helper = require('../../utils/helper');
-const Loader = require('../../loader');
+const { fork } = require('child_process');
+const { coreLogger } = require('../../log');
+const { getBaseDir, isPackaged, allEnv } = require('../../ps');
+const { Processes, Events, Receiver } = require('../../const/channel');
+const { getRandomString } = require('../../utils/helper');
+const { getFullpath } = require('../../loader');
+const { extend } = require('../../utils/extend');
 
 class ForkProcess {
   constructor(host, opt = {}) {
     
-    let cwd = Ps.getHomeDir();
-    let appPath = path.join(__dirname, 'app.js');
-    if (Ps.isPackaged()) {
+    const cwd = getBaseDir();
+    const appPath = path.join(__dirname, 'app.js');
+    if (isPackaged()) {
       // todo fork的cwd目录为什么要在app.asar外 ？
-      cwd = path.join(Ps.getHomeDir(), '..');
+      cwd = path.join(getBaseDir(), '..');
     }
 
-    // TODO Object.assign 只能单层对象结构，多层的对象会直接覆盖
-    let options = Object.assign({
+    const options = extend(true, {
       processArgs: {},
       processOptions: { 
         cwd: cwd,
-        env: Ps.allEnv(), 
+        env: allEnv(), 
         stdio: 'ignore' // pipe
       }
     }, opt);
@@ -48,15 +48,15 @@ class ForkProcess {
     const { messageLog } = this.host.config;
     this.child.on('message', (m) => {
       if (messageLog == true) {
-        Log.coreLogger.info(`[ee-core] [jobs/child] received a message from child-process, message: ${serialize(m)}`);
+        coreLogger.info(`[ee-core] [jobs/child] received a message from child-process, message: ${serialize(m)}`);
       }
       
-      if (m.channel == Channel.process.showException) {
-        Log.coreLogger.error(`${m.data}`);
+      if (m.channel == Processes.showException) {
+        coreLogger.error(`${m.data}`);
       }
 
       // 收到子进程消息，转发到 event 
-      if (m.channel == Channel.process.sendToMain) {
+      if (m.channel == Processes.sendToMain) {
         this._eventEmit(m);
       }
     });
@@ -65,16 +65,16 @@ class ForkProcess {
       let data = {
         pid: this.pid
       }
-      this.host.emit(Channel.events.childProcessExit, data);
-      Log.coreLogger.info(`[ee-core] [jobs/child] received a exit from child-process, code:${code}, signal:${signal}, pid:${this.pid}`);
+      this.host.emit(Events.childProcessExit, data);
+      coreLogger.info(`[ee-core] [jobs/child] received a exit from child-process, code:${code}, signal:${signal}, pid:${this.pid}`);
     });
 
     this.child.on('error', (err) => {
       let data = {
         pid: this.pid
       }
-      this.host.emit(Channel.events.childProcessError, data);
-      Log.coreLogger.error(`[ee-core] [jobs/child] received a error from child-process, error: ${err}, pid:${this.pid}`);
+      this.host.emit(Events.childProcessError, data);
+      coreLogger.error(`[ee-core] [jobs/child] received a error from child-process, error: ${err}, pid:${this.pid}`);
     });
   }
 
@@ -83,10 +83,10 @@ class ForkProcess {
    */
   _eventEmit(m) {
     switch (m.eventReceiver) {
-      case Channel.receiver.forkProcess:
+      case Receiver.forkProcess:
         this.emitter.emit(m.event, m.data);
         break;
-      case Channel.receiver.childJob:
+      case Receiver.childJob:
         this.host.emit(m.event, m.data);
         break;    
       default:
@@ -101,7 +101,7 @@ class ForkProcess {
    */
   dispatch(cmd, jobPath = '', ...params) {
     // 消息对象
-    const mid = Helper.getRandomString();
+    const mid = getRandomString();
     let msg = {
       mid,
       cmd,
@@ -118,10 +118,10 @@ class ForkProcess {
    * 调用job的方法
    */
   callFunc(jobPath = '', funcName = '', ...params) {
-    jobPath = Loader.getFullpath(jobPath);
+    jobPath = getFullpath(jobPath);
 
     // 消息对象
-    const mid = Helper.getRandomString();
+    const mid = getRandomString();
     let msg = {
       mid,
       cmd:'run',
@@ -142,24 +142,8 @@ class ForkProcess {
       this.child.kill('SIGKILL');
     }, timeout)
   }
-
-  /**
-   * sleep (仅Unix平台)
-   */
-  sleep() {
-    if (this.sleeping) return;
-    process.kill(this.pid, 'SIGSTOP');
-    this.sleeping = true;
-  }
-  
-  /**
-   * wakeup (仅Unix平台)
-   */
-  wakeup() {
-    if (!this.sleeping) return;
-    process.kill(this.pid, 'SIGCONT');
-    this.sleeping = false;
-  }
 }
 
-module.exports = ForkProcess;
+module.exports = {
+  ForkProcess
+};

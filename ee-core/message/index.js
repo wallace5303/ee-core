@@ -1,19 +1,9 @@
-const ChildMessage = require('./childMessage');
-const EEChildMessage = Symbol('EeCore#Module#ChildMessage');
+'use strict';
 
-const message = {
+const { ChildMessage } = require('./childMessage');
 
-  /**
-   * childMessage
-   */
-  get childMessage() {
-    if (!this[EEChildMessage]) {
-      this[EEChildMessage] = new ChildMessage();
-    }
+const childMessage = new ChildMessage();
 
-    return this[EEChildMessage] || null;
-  },
-
+module.exports = {
+  childMessage
 };
-
-module.exports = message;
