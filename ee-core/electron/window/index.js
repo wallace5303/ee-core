@@ -122,15 +122,14 @@ async function loadServer() {
             timeout: 1000,
             proxy: false,
             headers: { 
-              'Accept': 'text/html',
-              'content-type': 'application/x-www-form-urlencoded' 
+              'Accept': 'text/html, application/json, text/plain, */*',
             },
             responseType: 'text',
           });
           frontendReady = true;
         } catch(err) {
           // console.log('The frontend service is starting');
-          console.warn(err.stack)
+          // console.warn(err.stack)
         }
         count++;
       }
