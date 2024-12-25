@@ -5,8 +5,9 @@ const path = require('path');
 const fs = require('fs');
 const { exec, execSync } = require('child_process');
 const { createHash } = require('crypto');
-const Ps = require('../ps');
-const UtilsJson = require('./json');
+const { getEncryptDir, getBaseDir } = require('../ps');
+const { readSync } = require('./json');
+const is = require('./is');
 
 // machine id
 const { platform } = process;
@@ -27,7 +28,7 @@ const MachineGuid = {
  * 获取项目根目录package.json
  */
 function getPackage() {
-  const json = UtilsJson.readSync(path.join(Ps.getHomeDir(), 'package.json'));
+  const json = readSync(path.join(getBaseDir(), 'package.json'));
   
   return json;
 };
@@ -79,11 +80,19 @@ function isMAC(macAddress) {
  * is encrypt
  */
 function isEncrypt(basePath) {
-  const encryptDir = Ps.getEncryptDir(basePath);
+  const encryptDir = getEncryptDir(basePath);
   if (fs.existsSync(encryptDir)) {
     return true;
   }
   return false;
+}
+
+function isFileProtocol(protocol) {
+  return protocol == 'file://';
+}
+
+function isWebProtocol(protocol) {
+  return ['http://', 'https://'].includes(protocol);
 }
 
 /**
@@ -161,7 +170,10 @@ module.exports = {
   getMAC,
   isMAC,
   isEncrypt,
+  isFileProtocol,
+  isWebProtocol,
   machineIdSync,
-  machineId
+  machineId,
+  is
 }
 
