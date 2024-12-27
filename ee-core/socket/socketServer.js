@@ -33,10 +33,10 @@ class SocketServer {
     process.env.EE_SOCKET_PORT = port;
     this.config.port = port;
     this.io = new Server(port, this.config);
-    this.connec();
+    this.connect();
   }
 
-  connec () {
+  connect () {
     const controller = getController();
     this.io.on('connection', (socket) => {
       const channel = this.config.channel || SocketIO.partySoftware;
