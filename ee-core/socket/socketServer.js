@@ -4,8 +4,9 @@ const is = require('is-type-of');
 const { Server } = require('socket.io');
 const { coreLogger } = require('../log');
 const { getConfig } = require('../config');
-const { socketIo } = require('../const/channel');
+const { SocketIO } = require('../const/channel');
 const { getController } = require('../controller');
+const { getPort } = require('../utils/port');
 
 /**
  * socket server
@@ -38,7 +39,7 @@ class SocketServer {
   connec () {
     const controller = getController();
     this.io.on('connection', (socket) => {
-      const channel = this.config.channel || socketIo.partySoftware;
+      const channel = this.config.channel || SocketIO.partySoftware;
       this.socket = socket;
       socket.on(channel, async (message, callback) => {
         coreLogger.info('[ee-core] [socket/socketServer] socket id:' + socket.id + ' message cmd: ' + message.cmd);

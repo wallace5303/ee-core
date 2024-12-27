@@ -21,9 +21,6 @@ const Instance = {
 
 // getMainWindow
 function getMainWindow() {
-  // if (!Instance.mainWindow) {
-  //   Instance.mainWindow = createMainWindow();
-  // }
   return Instance.mainWindow;
 }
 

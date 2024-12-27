@@ -13,6 +13,7 @@ const { coreLogger } = require('../log');
 const { getBaseDir } = require('../ps');
 const { getController } = require('../controller');
 const { getConfig } = require('../config');
+const { getPort } = require('../utils/port');
 
 /**
  * http server
@@ -20,6 +21,7 @@ const { getConfig } = require('../config');
 class HttpServer {
   constructor () {
     this.config = getConfig().httpServer;
+    this.httpApp = undefined;
     this.init();
   }
 
@@ -33,7 +35,7 @@ class HttpServer {
       throw new Error('[ee-core] [socket/HttpServer] http port required, and must be a number !');
     }
     process.env.EE_HTTP_PORT = port;
-    this.config.port = httpPort;
+    this.config.port = port;
 
     this._create();
   }
@@ -80,7 +82,9 @@ class HttpServer {
         msg = e ? e : msg;
         coreLogger.info(msg);
       });
-    }  
+    }
+    
+    this.httpApp = koaApp;
   }
 
   /**
@@ -88,20 +92,15 @@ class HttpServer {
    */
   async _dispatch (ctx, next) {
     const controller = getController();
-    const config = getConfig().httpServer;
+    const { filterRequest } = getConfig().httpServer;
     let uriPath = ctx.request.path;
     const method = ctx.request.method;
     let params = ctx.request.query;
     params = is.object(params) ? JSON.parse(JSON.stringify(params)) : {};
     const body = ctx.request.body;
-    const files = ctx.request.files;
 
     // 默认
     ctx.response.status = 200;
-
-    // [todo] 添加到全局属性
-    // ctx.eeApp.request = ctx.request;
-    // ctx.eeApp.response = ctx.response;
 
     try {
       // 找函数
@@ -110,8 +109,8 @@ class HttpServer {
         uriPath = uriPath.substring(1);
       }
       // 过滤
-      if (_.includes(config.filterRequest.uris, uriPath)) {
-        ctx.response.body = config.filterRequest.returnData;
+      if (_.includes(filterRequest.uris, uriPath)) {
+        ctx.response.body = filterRequest.returnData;
         await next();
         return
       }
@@ -119,10 +118,7 @@ class HttpServer {
         uriPath = 'controller/' + uriPath;
       }
       const cmd = uriPath.split('/').join('.');
-      const args = (method == 'POST') ? (ctx.request.header['content-type'] && ctx.request.header['content-type'].startsWith('multipart/form-data;') ? files : body) : params;
-      args.files = ctx.request.files;
-      args.body = ctx.request.body;
-      args.query = ctx.request.query;
+      const args = (method == 'POST') ? body: params;
       let fn = null;
       if (is.string(cmd)) {
         const actions = cmd.split('.');
@@ -135,13 +131,17 @@ class HttpServer {
       }
       if (!fn) throw new Error('function not exists');
 
-      const result = await fn.call(controller, args);
+      const result = await fn.call(controller, args, ctx);
       ctx.response.body = result;
     } catch (err) {
       coreLogger.error('[ee-core/httpServer] throw error:', err);
     }
 
     await next();
+  }
+
+  getHttpApp() {
+    return this.httpApp;
   }
 }
 
