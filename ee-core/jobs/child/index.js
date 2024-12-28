@@ -3,6 +3,7 @@ const { ForkProcess } = require('./forkProcess');
 const { getFullpath } = require('../../loader');
 const { Events } = require('../../const/channel');
 const { getConfig } = require('../../config');
+const { extend } = require('../../utils/extend');
 
 class ChildJob extends EventEmitter {
 
@@ -47,7 +48,7 @@ class ChildJob extends EventEmitter {
    * 创建子进程
    */  
   createProcess(opt = {}) {
-    let options = Object.assign({
+    const options = extend(true, {
       processArgs: {
         type: 'childJob'
       }

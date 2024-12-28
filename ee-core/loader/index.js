@@ -2,7 +2,7 @@ const is = require('is-type-of');
 const fs = require('fs');
 const path = require('path');
 const CoreUtils = require('../core/utils');
-const Ps = require('../ps');
+const { getElectronDir } = require('../ps');
 
 /**
  * 加载单个文件(如果是函数，将被执行)
@@ -14,7 +14,7 @@ const Ps = require('../ps');
 function loadFile(filepath, ...inject) {
   const isAbsolute = path.isAbsolute(filepath);
   if (!isAbsolute) {
-    filepath = path.join(Ps.getElectronDir(), filepath);
+    filepath = path.join(getElectronDir(), filepath);
   }
 
   filepath = filepath && resolveModule(filepath);
@@ -88,7 +88,7 @@ function getFullpath(filepath) {
   let fullpath;
   const isAbsolute = path.isAbsolute(filepath);
   if (!isAbsolute) {
-    filepath = path.join(Ps.getElectronDir(), filepath);
+    filepath = path.join(getElectronDir(), filepath);
   }
 
   fullpath = resolveModule(filepath);

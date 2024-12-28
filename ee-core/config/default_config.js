@@ -101,7 +101,7 @@ module.exports = () => {
       rendererExit: true,
     },
     jobs: {
-      messageLog: true
+      messageLog: false
     },
     cross: {}
   }

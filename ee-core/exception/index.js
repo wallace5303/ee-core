@@ -1,7 +1,7 @@
 'use strict';
 
 const { coreLogger } = require('../log');
-const { isForkedChild, isDev } = require('../ps');
+const { isForkedChild, isRenderer, isDev, isMain } = require('../ps');
 const { getConfig } = require('../config');
 const { childMessage } = require('../message');
 
@@ -84,16 +84,13 @@ function _devError (err) {
  * 捕获异常后是否退出
  */
 function _exit () {
-  const cfg = getConfig().exception;
-  if (!cfg) {
-    return;
-  }
+  const { mainExit, childExit, rendererExit  } = getConfig().exception;
 
-  if (Ps.isMain() && cfg.mainExit == true) {
+  if (isMain() && mainExit == true) {
     _delayExit();
-  } else if (Ps.isForkedChild() && cfg.childExit == true) {
+  } else if (isForkedChild() && childExit == true) {
     _delayExit();
-  } else if (Ps.isRenderer() && cfg.rendererExit == true) {
+  } else if (isRenderer() && rendererExit == true) {
     _delayExit();
   } else {
     // other

@@ -8,7 +8,7 @@ class ChildMessage {
    * 向主进程发消息 for ChildJob 实例
    */
   sendToMain(eventName, params = {}) {
-    let receiver = Receiver.childJob;
+    const receiver = Receiver.childJob;
     return this.send(eventName, params, receiver);
   }
 
@@ -16,8 +16,8 @@ class ChildMessage {
    * 向主进程发消息 for task 实例
    */
   send(eventName, params = {}, receiver) {
-    let eventReceiver = receiver || Receiver.forkProcess;
-    let message = {
+    const eventReceiver = receiver || Receiver.forkProcess;
+    const message = {
       channel: Processes.sendToMain,
       eventReceiver,
       event: eventName,
@@ -40,15 +40,13 @@ class ChildMessage {
   sendErrorToTerminal(err) {
     let errTips = (err && typeof err == 'object') ? err.toString() : '';
     errTips += ' Error !!! Please See file ee-core.log or ee-error-xxx.log for details !'
-    let message = {
+    const message = {
       channel: Processes.showException,
       data: errTips
     }
     process.send(message);
   }
 }
-
-
 
 module.exports = { 
   ChildMessage

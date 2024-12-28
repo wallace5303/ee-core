@@ -2,7 +2,7 @@
 
 const debug = require('debug')('ee-core:app:boot');
 const path = require('path');
-//const Exception = require('../exception');
+const { loadException } = require('../exception');
 const { electronApp } = require('../electron/app');
 const { isEncrypt } = require('../utils');
 const { getArgumentByName, getEncryptDir } = require('../ps');
@@ -15,8 +15,6 @@ const { loadElectron } = require('../electron');
 
 class ElectronEgg {
   constructor() {
-
-    //Exception.start();
     const baseDir = electronApp.getAppPath();
     const { env } = process;
     const environmet = getArgumentByName('env') || 'prod';
@@ -66,6 +64,7 @@ class ElectronEgg {
 
   init() {
     // basis functions
+    loadException();
     loadConfig();
     loadLog();
     loadApp();

@@ -1,11 +1,11 @@
 
 const is = require('is-type-of');
-const Exception = require('ee-core/exception');
-const { loadJsFile } = require('ee-core/loader');
+const { loadException } = require('ee-core/exception');
+const { requireFile } = require('ee-core/loader');
 const { coreLogger } = require('ee-core/log');
-const UtilsCore = require('ee-core/core/utils');
+const { isBytecodeClass } = require('ee-core/core/utils');
 
-Exception.start();
+loadException();
 const commands = ['run'];
 
 class ChildApp {
@@ -45,8 +45,8 @@ class ChildApp {
    */  
   run(msg = {}) {
     const {jobPath, jobParams, jobFunc, jobFuncParams} = msg;
-    let mod = loadJsFile(jobPath);
-    if (is.class(mod) || UtilsCore.isBytecodeClass(mod)) {
+    let mod = requireFile(jobPath);
+    if (is.class(mod) || isBytecodeClass(mod)) {
       if (!this.jobMap.has(jobPath)) {
         const instance = new mod(...jobParams);
         instance.handle(...jobParams);
