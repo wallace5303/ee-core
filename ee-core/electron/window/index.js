@@ -35,7 +35,7 @@ function createMainWindow() {
     win.webContents.openDevTools(openDevTools);
   } else if (openDevTools === true) {
     win.webContents.openDevTools({
-      mode: 'undocked'
+      mode: 'bottom'
     });
   }
   

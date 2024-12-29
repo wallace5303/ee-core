@@ -6,7 +6,7 @@ const crossSpawn = require('cross-spawn');
 const { coreLogger } = require('../log');
 const { getExtraResourcesDir, isPackaged, isDev, getBaseDir } = require('../ps');
 const { Events } = require('../const/channel');
-const { getRandomString } = require('../utils/helper');
+const { getRandomString, getValueFromArgv } = require('../utils/helper');
 const { is } = require('../utils');
 const { parseArgv } = require('../utils/pargv');
 
@@ -123,8 +123,8 @@ class SpawnProcess {
   }
 
   getUrl() {
-    const ssl = Helper.getValueFromArgv(this.config.args, 'ssl');
-    let hostname = Helper.getValueFromArgv(this.config.args, 'hostname')
+    const ssl = getValueFromArgv(this.config.args, 'ssl');
+    let hostname = getValueFromArgv(this.config.args, 'hostname')
     let protocol = 'http://';
     if (ssl && (ssl == 'true' || ssl == '1')) {
       protocol = 'https://';
