@@ -4,8 +4,8 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const Database = require('better-sqlite3');
-const { mkdir, chmodPath } = require('../utils/helper');
-const { getStorageDir } = require('../ps');
+const { mkdir } = require('../utils/helper');
+const { getDataDir } = require('../ps');
 
 class SqliteStorage {
   constructor (name, opt = {}) {
@@ -13,7 +13,7 @@ class SqliteStorage {
 
     this.name = name;
     this.mode = this.getMode(name);
-    this.storageDir = this._createStorageDir();
+    this.dbDir = this._createDatabaseDir();
     this.fileName = this._formatFileName(name);
     this.db = this._initDB(opt);
   }
@@ -36,7 +36,7 @@ class SqliteStorage {
 
     // 如果是文件类型，判断文件是否创建成功
     if (this.mode != 'memory') {
-      assert(fs.existsSync(dbPath), `error: storage ${dbPath} not exists`);
+      assert(fs.existsSync(dbPath), `error: db ${dbPath} not exists`);
     }
 
     return db;
@@ -57,19 +57,17 @@ class SqliteStorage {
   /**
    * 创建storage目录
    */
-  _createStorageDir () {
-    let storageDir = getStorageDir();
-
+  _createDatabaseDir () {
+    let dbDir = path.join(getDataDir(), 'db');
     if (this.mode == 'absolute') {
-      storageDir = path.dirname(this.name); 
+      dbDir = path.dirname(this.name); 
     }
 
-    if (!fs.existsSync(storageDir)) {
-      mkdir(storageDir);
-      chmodPath(storageDir, '777');
+    if (!fs.existsSync(dbDir)) {
+      mkdir(dbDir, { mode: 0o755 });
     }
 
-    return storageDir;
+    return dbDir;
   }
 
   /**
@@ -84,7 +82,7 @@ class SqliteStorage {
       return mode;
     }
 
-    assert(path.extname(name) == '.db', `error: storage ${name} file ext name must be .db`);
+    assert(path.extname(name) == '.db', `error: db ${name} file ext name must be .db`);
 
     // 路径模式
     name = name.replace(/[/\\]/g, '/');
@@ -105,17 +103,17 @@ class SqliteStorage {
   }
 
   /**
-   * 获取storage目录
+   * 获取 db 文件目录
    */
-  getStorageDir () {
-    return this.storageDir;
+  getDbDir () {
+    return this.dbDir;
   }
 
   /**
    * 获取文件绝对路径
    */
   getFilePath () {
-    const dbFile = path.join(this.storageDir, this.fileName);
+    const dbFile = path.join(this.dbDir, this.fileName);
 
     return dbFile;
   }

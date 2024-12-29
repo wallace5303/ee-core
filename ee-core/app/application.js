@@ -13,12 +13,6 @@ const WindowReady = "window-ready";
 const BeforeClose = "before-close";
 const Preload = "preload";
 
-// const Staff = {
-//   name: '',
-//   handler: null,
-//   args: []
-// }
-
 class Appliaction {
   constructor() {
     this.lifecycleEvents = {};

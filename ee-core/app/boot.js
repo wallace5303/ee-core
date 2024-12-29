@@ -10,6 +10,7 @@ const { loadConfig } = require('../config');
 const { loadLog } = require('../log');
 const { loadController } = require('../controller');
 const { loadApp, getApp, Ready } = require('./application');
+const { loadDir } = require('./dir');
 const { loadSocket } = require('../socket');
 const { loadElectron } = require('../electron');
 
@@ -63,9 +64,10 @@ class ElectronEgg {
   }
 
   init() {
-    // basis functions
+    // basic functions
     loadException();
     loadConfig();
+    loadDir();
     loadLog();
     loadApp();
   }

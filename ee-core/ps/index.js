@@ -82,14 +82,16 @@ function appVersion() {
 }
 
 // 获取数据存储路径
-function getStorageDir() {
-  const storageDir = path.join(getRootDir(), 'data');
-  return storageDir;
+function getDataDir() {
+  const base = isDev() ? getBaseDir() : getUserHomeHiddenAppDir();
+  const dataDir = path.join(base, 'data');
+  return dataDir;
 }
 
 // 获取日志存储路径 
 function getLogDir() {
-  const dir = path.join(getRootDir(), 'logs');
+  const base = isDev() ? getBaseDir() : getUserHomeHiddenAppDir();
+  const dir = path.join(base, 'logs');
   return dir;
 }
 
@@ -102,7 +104,7 @@ function getEncryptDir(basePath) {
 
 // 获取root目录  (dev-项目根目录，pro-app user data目录)
 function getRootDir() {
-  const appDir = isDev() ? process.env.EE_BASE_DIR : process.env.EE_APP_USER_DATA;
+  const appDir = isDev() ? getBaseDir() : getAppUserDataDir();
   return appDir;
 }
 
@@ -118,7 +120,7 @@ function getElectronDir() {
 
 // 获取public目录
 function getPublicDir() {
-  const dir = path.join(process.env.EE_BASE_DIR, "public");
+  const dir = path.join(getBaseDir(), "public");
   return dir;
 }
 
@@ -158,11 +160,18 @@ function getUserHomeDir() {
   return process.env.EE_USER_HOME;
 }
 
-// 获取用户配置数据目录
-function getUserHomeConfigDir() {
-  const appname = appName();
-  const cfgDir = path.join(getUserHomeDir(), ".config", appname);
-  return cfgDir;
+// 获取用户家目录中的隐藏的app目录
+function getUserHomeHiddenAppDir() {
+  const appnameDir = "." + appName();
+  const dir = path.join(getUserHomeDir(), appnameDir);
+  return dir;
+}
+
+// 获取用户家目录中的app目录
+function getUserHomeAppDir() {
+  const appnameDir = appName();
+  const dir = path.join(getUserHomeDir(), appnameDir);
+  return dir;
 }
 
 // 获取内置socket端口
@@ -266,7 +275,7 @@ module.exports = {
   processType,
   appName,
   appVersion,
-  getStorageDir,
+  getDataDir,
   getLogDir,
   getEncryptDir,
   getRootDir,
@@ -277,7 +286,8 @@ module.exports = {
   getAppUserDataDir,
   getExecDir,
   getUserHomeDir,
-  getUserHomeConfigDir,
+  getUserHomeAppDir,
+  getUserHomeHiddenAppDir,
   getSocketPort,
   getHttpPort,
   isPackaged,

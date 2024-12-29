@@ -7,7 +7,7 @@ const { coreLogger } = require('../log');
 const { getExtraResourcesDir, isPackaged, isDev, getBaseDir } = require('../ps');
 const { Events } = require('../const/channel');
 const { getRandomString } = require('../utils/helper');
-const UtilsIs = require('../utils/is');
+const { is } = require('../utils');
 const { parseArgv } = require('../utils/pargv');
 
 class SpawnProcess {
@@ -60,7 +60,7 @@ class SpawnProcess {
     }
 
     // windows
-    if (UtilsIs.windows() && path.extname(cmdPath) != '.exe') {
+    if (is.windows() && path.extname(cmdPath) != '.exe') {
       // Complete the executable program extension
       // notice: python.exe may bring up the App Store
       if (targetConf.windowsExtname === true || !isDev()) {

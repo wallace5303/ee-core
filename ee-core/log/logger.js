@@ -6,7 +6,7 @@ const dayjs = require('dayjs');
 const path = require('path');
 const { extend } = require('../utils/extend');
 const { getConfig } = require('../config');
-const Ps = require('../ps');
+const { getLogDir, env, isDev } = require('../ps');
 
 let LogDate = 0;
 const TmpFileName = {
@@ -23,10 +23,10 @@ function create(config = {}) {
     const defaultConfig = {
       logger: {
         type: 'application',
-        dir: Ps.getLogDir(),
-        env: Ps.env(),
+        dir: getLogDir(),
+        env: env(),
         consoleLevel: 'INFO',
-        disableConsoleAfterReady: !Ps.isDev(),
+        disableConsoleAfterReady: !isDev(),
         coreLogger: {},
         allowDebugAtProd: false,
         agentLogName: 'ee-agent.log',
