@@ -1,10 +1,57 @@
 #!/usr/bin/env node
 
 const { program } = require('commander');
-const moveScript = require('./tools/move');
-const encrypt = require('./tools/encrypt');
-const serve = require('./tools/serve');
-const updater = require('./tools/incrUpdater');
+const { move } = require('./tools/move');
+const { encrypt, cleanEncrypt } = require('./tools/encrypt');
+const { serveProcess } = require('./tools/serve');
+const { incrUpdater } = require('./tools/incrUpdater');
+
+/**
+ * dev
+ */
+program
+  .command('dev')
+  .description('create frontend-serve and electron-serve')
+  .option('--config <folder>', 'config file')
+  .option('--serve <mode>', 'serve mode')
+  .action(function() {
+    serveProcess.dev(this.opts());
+  });
+
+/**
+ * build
+ */
+program
+  .command('build')
+  .description('building multiple resources')
+  .option('--config <folder>', 'config file')
+  .option('--cmds <flag>', 'custom commands')
+  .action(function() {
+    serveProcess.build(this.opts());
+  });
+
+/**
+ * start
+ */
+program
+  .command('start')
+  .description('preview effect')
+  .option('--config <folder>', 'config file')
+  .action(function() {
+    serveProcess.start(this.opts());
+  });
+
+/**
+ * exec
+ */
+program
+  .command('exec')
+  .description('create frontend-serve and electron-serve')
+  .option('--config <folder>', 'config file')
+  .option('--cmds <flag>', 'custom commands')
+  .action(function() {
+    serveProcess.exec(this.opts());
+  });
 
 /**
  * move - Moves resources
@@ -12,10 +59,10 @@ const updater = require('./tools/incrUpdater');
 program
   .command('move')
   .description('Move multip resources')
-  .option('--config <folder>', 'config file', './electron/config/bin.js')
+  .option('--config <folder>', 'config file')
   .option('--flag <flag>', 'Custom flag')
   .action(function() {
-    moveScript.run(this.opts());
+    move(this.opts());
   });
 
 /**
@@ -25,9 +72,9 @@ program
   .command('encrypt')
   .description('Code encryption')
   .option('--config <folder>', 'config file')
-  .option('--out <folder>', 'output directory', './public')
+  .option('--out <folder>', 'output directory')
   .action(function() {
-    encrypt.run(this.opts());
+    encrypt(this.opts());
   });
 
 /**
@@ -38,7 +85,7 @@ program
   .description('Clear the encrypted code')
   .option('-d, --dir <folder>', 'clean directory')
   .action(function() {
-    encrypt.clean(this.opts());
+    cleanEncrypt(this.opts());
   });
 
 /**
@@ -55,66 +102,16 @@ program
   });
 
 /**
- * dev
- */
-program
-  .command('dev')
-  .description('create frontend-serve and electron-serve')
-  .option('--config <folder>', 'config file', './electron/config/bin.js')
-  .option('--serve <mode>', 'serve mode')
-  .action(function() {
-    serve.dev(this.opts());
-  });
-
-/**
- * build
- */
-program
-  .command('build')
-  .description('building multiple resources')
-  .option('--config <folder>', 'config file', './electron/config/bin.js')
-  .option('--cmds <flag>', 'custom commands')
-  .action(function() {
-    serve.build(this.opts());
-  });
-
-/**
- * start
- */
-program
-  .command('start')
-  .description('preview effect')
-  .option('--config <folder>', 'config file', './electron/config/bin.js')
-  .action(function() {
-    const serve = require('./tools/serve');
-    serve.start(this.opts());
-  });
-
-/**
- * exec
- */
-program
-  .command('exec')
-  .description('create frontend-serve and electron-serve')
-  .option('--config <folder>', 'config file', './electron/config/bin.js')
-  .option('--command <command>', 'Custom command')
-  .option('--cmds <flag>', 'custom commands')
-  .action(function() {
-    // command 选项是关键字，不再使用，改为 cmds
-    serve.exec(this.opts());
-  });
-
-/**
  * updater
  */
 program
   .command('updater')
   .description('updater commands')
-  .option('--config <folder>', 'config file', './electron/config/bin.js')
+  .option('--config <folder>', 'config file')
   .option('--asar-file <file>', 'asar file path')
   .option('--platform <flag>', 'platform')
   .action(function() {
-    updater.run(this.opts());
+    incrUpdater.run(this.opts());
   });
 
 program.parse();

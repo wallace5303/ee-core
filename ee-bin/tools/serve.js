@@ -1,22 +1,24 @@
 'use strict';
 
 const path = require('path');
-const Utils = require('../lib/utils');
+const { loadConfig } = require('../lib/utils');
 const is = require('is-type-of');
 const chalk = require('chalk');
 const crossSpawn = require('cross-spawn');
 
-module.exports = {
+class ServeProcess {
 
-  execProcess: {},
+  constructor() {
+    this.execProcess = {};
+  }
 
   /**
    * 启动前端、主进程服务
    */
   dev(options = {}) {
     const { config, serve } = options;
+    const binCfg = loadConfig(config);
     const binCmd = 'dev';
-    const binCfg = Utils.loadConfig(config);
     const binCmdConfig = binCfg[binCmd];
 
     let command = serve;
@@ -30,15 +32,15 @@ module.exports = {
       command,
     }
     this.multiExec(opt);
-  },
+  }
 
   /**
    * 启动主进程服务
    */
   start(options = {}) {
     const { config } = options;
+    const binCfg = loadConfig(config);
     const binCmd = 'start';
-    const binCfg = Utils.loadConfig(config);
     const binCmdConfig = {
       start: binCfg[binCmd]
     };
@@ -49,25 +51,23 @@ module.exports = {
       command: binCmd,
     }
     this.multiExec(opt);
-  },
+  }
 
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  },
+  }
 
   /**
    * 构建
    */
   build(options = {}) {
     const { config, cmds } = options;
+    const binCfg = loadConfig(config);
     const binCmd = 'build';
-    const binCfg = Utils.loadConfig(config);
     const binCmdConfig = binCfg[binCmd];
 
     if (!cmds || cmds == "") {
-      // [todo]
-      let tip = chalk.bgYellow('Warning') + ' Please modify the ' + chalk.blue('build') + ' config, See: ';
-      tip += chalk.underline('https://www.kaka996.com/pages/c492f8/');
+      const tip = chalk.bgYellow('Warning') + ' Please modify the ' + chalk.blue('build') + ' property in the bin file';
       console.log(tip);
       return
     }
@@ -78,26 +78,16 @@ module.exports = {
       command: cmds,
     }
     this.multiExec(opt);
-  },
+  }
 
   /**
    * 执行自定义命令
    */
   exec(options = {}) {
-    let { config, command, cmds } = options;
+    const { config, cmds } = options;
+    const binCfg = loadConfig(config);
     const binCmd = 'exec';
-    const binCfg = Utils.loadConfig(config);
     const binCmdConfig = binCfg[binCmd];
-
-    // if (typeof command !== "string" || !cmds) {
-    //   console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.red(`Error: Please specify parameters for --cmds` ));
-    //   return
-    // }
-
-    // 兼容
-    if (typeof command === "string") {
-      cmds = command;
-    }
 
     const opt = {
       binCmd,
@@ -105,7 +95,7 @@ module.exports = {
       command: cmds,
     }
     this.multiExec(opt);
-  },
+  }
 
   /**
    * 支持多个命令
@@ -124,7 +114,7 @@ module.exports = {
 
     for (let i = 0; i < cmds.length; i++) {
       let cmd = cmds[i];
-      let cfg = binCmdConfig[cmd];
+      const cfg = binCmdConfig[cmd];
 
       if (!cfg) {
         console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.red(`Error: [${binCmd} ${cmd}] config does not exist` ));
@@ -139,9 +129,9 @@ module.exports = {
       console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + "Run " + chalk.green(`[${binCmd} ${cmd}]` + " command"));
       console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.green('config:'), JSON.stringify(cfg));
 
-      let execDir = path.join(process.cwd(), cfg.directory);
-      let execArgs = is.string(cfg.args) ? [cfg.args] : cfg.args;
-      let stdio = cfg.stdio ? cfg.stdio: 'inherit';
+      const execDir = path.join(process.cwd(), cfg.directory);
+      const execArgs = is.string(cfg.args) ? [cfg.args] : cfg.args;
+      const stdio = cfg.stdio ? cfg.stdio: 'inherit';
 
       const handler = cfg.sync ? crossSpawn.sync : crossSpawn;
 
@@ -158,10 +148,14 @@ module.exports = {
             console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.green('Press "CTRL+C" to exit'));
             return
           }
-          console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`[${binCmd} ${cmd}]`) + ' command is executed and exits');
+          console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`[${binCmd} ${cmd}]`) + ' command has been executed and exited');
         });
       }
     }
-  },
+  }  
+}
 
+module.exports = {
+  ServeProcess,
+  serveProcess: new ServeProcess()
 }

@@ -10,18 +10,11 @@ const mkdirp = require('mkdirp');
 const OS = require('os');
 
 const _basePath = process.cwd();
+const defaultBin = './cmd/bin.js';
 
-function checkConfig(prop) {
-  const filepath = path.join(_basePath, prop);
-  if (fs.existsSync(filepath)) {
-    return true;
-  }
-
-  return false;
-}
-
-function loadConfig(prop) {
-  const configFile = path.join(_basePath, prop);
+function loadConfig(binFile) {
+  const binPath = binFile ? binFile : defaultBin;
+  const configFile = path.join(_basePath, binPath);
   if (!fs.existsSync(configFile)) {
     const errorTips = 'config file ' + chalk.blue(`${configFile}`) + ' does not exist !';
     throw new Error(errorTips)
@@ -44,24 +37,6 @@ function loadConfig(prop) {
     result = result();
   }
   return result || {}
-};
-
-function loadEncryptConfig() {
-  const configFile = './electron/config/encrypt.js';
-  const filepath = path.join(_basePath, configFile);
-  if (!fs.existsSync(filepath)) {
-    const errorTips = 'config file ' + chalk.blue(`${filepath}`) + ' does not exist !';
-    throw new Error(errorTips)
-  }
-  const obj = require(filepath);
-  if (!obj) return obj;
-
-  let ret = obj;
-  if (is.function(obj) && !is.class(obj)) {
-    ret = obj();
-  }
-
-  return ret || {};
 };
 
 /**
@@ -154,9 +129,7 @@ function rm(name) {
  * 获取项目根目录package.json
  */
 function getPackage () {
-  const homeDir = process.cwd();
-  const content = readJsonSync(path.join(homeDir, 'package.json'));
-  
+  const content = readJsonSync(path.join(_basePath, 'package.json'));
   return content;
 }
 
@@ -209,8 +182,6 @@ function getPlatform(delimiter = "_", isDiffArch = false) {
 
 module.exports = {
   loadConfig,
-  checkConfig,
-  loadEncryptConfig,
   getElectronProgram,
   compareVersion,
   isWindows,
