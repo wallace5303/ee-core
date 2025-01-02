@@ -46,11 +46,9 @@
     "plugin"
   ],
   "scripts": {
-    "format": "prettier --write .",
-    "lint": "eslint --ext .ts src/**",
     "typecheck": "tsc --noEmit",
-    "build": "npm run lint && rollup -c rollup.config.ts --configPlugin typescript",
-    "buildp": "pnpm run lint && rollup -c rollup.config.ts --configPlugin typescript"
+    "build": "rollup -c rollup.config.ts --configPlugin typescript",
+    "buildp": "rollup -c rollup.config.ts --configPlugin typescript"
   },
   "peerDependencies": {
     "@swc/core": "^1.0.0",
