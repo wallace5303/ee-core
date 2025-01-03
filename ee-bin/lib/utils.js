@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug')('ee-bin:lib:utils');
 const path = require('path');
 const fs = require('fs');
 const chalk = require('chalk');
@@ -8,15 +9,25 @@ const { loadTsConfig } = require('config-file-ts');
 const JsonLib = require('json5');
 const mkdirp = require('mkdirp');
 const OS = require('os');
+const defaultConfig = require('../config/bin_default');
+const { extend } = require('./extend');
 
 const _basePath = process.cwd();
-const defaultBin = './cmd/bin.js';
+const userBin = './cmd/bin.js';
 
 function loadConfig(binFile) {
-  const binPath = binFile ? binFile : defaultBin;
-  const configFile = path.join(_basePath, binPath);
+  const binPath = binFile ? binFile : userBin;
+  const userConfig = loadFile(binPath);
+  const result = extend(true, defaultConfig, userConfig);
+  debug('[loadConfig] bin:%j', result)
+
+  return result
+};
+
+function loadFile(filepath) {
+  const configFile = path.join(_basePath, filepath);
   if (!fs.existsSync(configFile)) {
-    const errorTips = 'config file ' + chalk.blue(`${configFile}`) + ' does not exist !';
+    const errorTips = 'file ' + chalk.blue(`${configFile}`) + ' does not exist !';
     throw new Error(errorTips)
   }
 

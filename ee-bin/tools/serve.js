@@ -1,10 +1,12 @@
 'use strict';
 
+const debug = require('debug')('ee-bin:serve');
 const path = require('path');
 const { loadConfig } = require('../lib/utils');
 const is = require('is-type-of');
 const chalk = require('chalk');
 const crossSpawn = require('cross-spawn');
+const { buildSync } = require('esbuild');
 
 class ServeProcess {
 
@@ -24,6 +26,15 @@ class ServeProcess {
     let command = serve;
     if (!command) {
       command = Object.keys(binCmdConfig).join();
+    }
+
+    // build electron code 
+    const cmds = this._formatCmds(command);
+    if (cmds.indexOf("electron") !== -1) {
+      const electronBuildConfig = binCfg.build.electron;
+      const esbuildOptions = electronBuildConfig[electronBuildConfig.language];
+      debug('esbuild options:%O', esbuildOptions);
+      buildSync(esbuildOptions);
     }
 
     const opt = {
@@ -103,14 +114,7 @@ class ServeProcess {
   multiExec(opt = {}) {
     //console.log('multiExec opt:', opt)
     const { binCmd, binCmdConfig, command } = opt;
-
-    let cmds;
-    const cmdString = command.trim();
-    if (cmdString.indexOf(',') !== -1) {
-      cmds = cmdString.split(',');
-    } else {
-      cmds = [cmdString];
-    }
+    const cmds = this._formatCmds(command);
 
     for (let i = 0; i < cmds.length; i++) {
       let cmd = cmds[i];
@@ -122,7 +126,7 @@ class ServeProcess {
       }
 
       // frontend 如果是 file:// 协议，则不启动
-      if (cmd == 'frontend' && cfg.protocol == 'file://') {
+      if (binCmd == 'dev' && cmd == 'frontend' && cfg.protocol == 'file://') {
         continue;
       }
 
@@ -152,6 +156,19 @@ class ServeProcess {
         });
       }
     }
+  } 
+  
+  // format commands
+  _formatCmds(command) {
+    let cmds;
+    const cmdString = command.trim();
+    if (cmdString.indexOf(',') !== -1) {
+      cmds = cmdString.split(',');
+    } else {
+      cmds = [cmdString];
+    }
+
+    return cmds;
   }  
 }
 
