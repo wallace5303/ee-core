@@ -14,6 +14,7 @@ const { getHtmlFilepath } = require('../../html');
 const { fileIsExist, sleep } = require('../../utils/helper');
 const { coreLogger } = require('../../log');
 const { extend } = require('../../utils/extend');
+const { cross } = require('../../cross');
 
 const Instance = {
   mainWindow: null,
@@ -134,11 +135,11 @@ async function loadServer() {
           });
           frontendReady = true;
         } catch(err) {
-          // console.log('The frontend service is starting');
           // console.warn(err.stack)
         }
         count++;
       }
+      debug('it takes %d seconds to start the frontend', count);
 
       if (frontendReady == false && frontendConf.force !== true) {
         const bootFailurePage = getHtmlFilepath('failure.html');
@@ -153,10 +154,9 @@ async function loadServer() {
   }
 
   // 生产环境
-  // cross service takeover web
-  if (mainServer.hasOwnProperty('takeover')) {
-    // [todo] 
-    //await this._crossTakeover(mainServer)
+  // cross takeover web
+  if (mainServer.takeover.length > 0) {
+    await crossTakeover()
     return
   }
 
@@ -197,6 +197,68 @@ function _loadingPage(name) {
   const win = getMainWindow();
   win.loadFile(name);
 }
+
+/**
+ * cross takeover web
+ */
+async function crossTakeover() {
+  const crossConf = getConfig().cross;
+  const mainConf = getConfig().mainServer;
+
+  // loading page
+  if (mainConf.loadingPage.length > 0) {
+    const lp = path.join(getBaseDir, mainConf.loadingPage);
+    _loadingPage(lp);
+  }
+
+  // cross service url
+  const service = mainConf.takeover;
+  if (!crossConf.hasOwnProperty(service)) {
+    throw new Error(`[ee-core] Please Check the value of mainServer.takeover in the config file !`);
+  }
+  // check service
+  if (crossConf[service].enable != true) {
+    throw new Error(`[ee-core] Please Check the value of cross.${service} enable is true !`);
+  }
+
+  const entityName = crossConf[service].name;
+  const url = cross.getUrl(entityName);
+
+  // 循环检查
+  let count = 0;
+  let serviceReady = false;
+  const times = isDev() ? 20 : 100;
+  const sleeptime = isDev() ? 1000 : 200;
+  while(!serviceReady && count < times){
+    await sleep(sleeptime);
+    try {
+      await axios({
+        method: 'get',
+        url,
+        timeout: 100,
+        proxy: false,
+        headers: { 
+          'Accept': 'text/html, application/json, text/plain, */*',
+        },
+      });
+      serviceReady = true;
+    } catch(err) {
+      // console.warn(err.stack)
+    }
+    count++;
+  }
+  debug('it takes %d seconds to start the cross serivce', count * sleeptime);
+
+  if (serviceReady == false) {
+    const bootFailurePage = getHtmlFilepath('cross-failure.html');
+    const mainWindow = getMainWindow();
+    mainWindow.loadFile(bootFailurePage);
+    throw new Error(`[ee-core] Please check cross service [${service}] ${url} !`)
+  }
+
+  coreLogger.info(`[ee-core] cross service [${service}] is started successfully`);
+  loadMainUrl('spa', url);
+} 
 
 module.exports = {
   getMainWindow,

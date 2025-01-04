@@ -94,6 +94,8 @@ module.exports = () => {
       protocol: 'file://', // file://
       indexPath: '/public/dist/index.html',
       options: {},
+      takeover: '',
+      loadingPage: '',
     },
     exception: {
       mainExit: false,
