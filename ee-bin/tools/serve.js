@@ -31,10 +31,7 @@ class ServeProcess {
     // build electron code 
     const cmds = this._formatCmds(command);
     if (cmds.indexOf("electron") !== -1) {
-      const electronBuildConfig = binCfg.build.electron;
-      const esbuildOptions = electronBuildConfig[electronBuildConfig.language];
-      debug('esbuild options:%O', esbuildOptions);
-      buildSync(esbuildOptions);
+      this.bundle(true, binCfg.build.electron);
     }
 
     const opt = {
@@ -81,6 +78,11 @@ class ServeProcess {
       const tip = chalk.bgYellow('Warning') + ' Please modify the ' + chalk.blue('build') + ' property in the bin file';
       console.log(tip);
       return
+    }
+
+    if (cmds.indexOf("electron") !== -1) {
+      this.bundle(false, binCfg.build.electron);
+      return;
     }
 
     const opt = {
@@ -158,6 +160,17 @@ class ServeProcess {
     }
   } 
   
+  // esbuild
+  bundle(isDev = false, bundleConfig) {
+    const esbuildOptions = bundleConfig[bundleConfig.language];
+    if (isDev) {
+      // [todo]
+      esbuildOptions.minify = false;
+    }
+    debug('esbuild options:%O', esbuildOptions);
+    buildSync(esbuildOptions);
+  }
+
   // format commands
   _formatCmds(command) {
     let cmds;

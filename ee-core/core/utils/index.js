@@ -61,7 +61,6 @@ function isBytecodeClass(exports) {
   if (exports.toString().indexOf('[class') != -1) {
     isClass = true;
   }
-  // TODO 更严谨的判断，应该加上文件名和路径
   
   return isClass;
 }

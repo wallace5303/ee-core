@@ -13,6 +13,7 @@ const { isFileProtocol } = require('../../utils');
 const { getHtmlFilepath } = require('../../html');
 const { fileIsExist, sleep } = require('../../utils/helper');
 const { coreLogger } = require('../../log');
+const { extend } = require('../../utils/extend');
 
 const Instance = {
   mainWindow: null,
@@ -88,8 +89,16 @@ async function loadServer() {
     const binFile = path.join(getBaseDir(), "./cmd/bin.js");
     const binConfig = loadFile(binFile);
     const { dev } = binConfig;
-    const frontendConf = dev.frontend;
-    const electronConf = dev.electron;
+    // tips: match with ee-bin
+    const frontendConf = extend(true, {
+      protocol: 'http://',
+      hostname: 'localhost',
+      port: 8080,
+      indexPath: 'index.html',
+    }, dev.frontend);
+    const electronConf = extend(true, {
+      loadingPage: '/public/html/loading.html',
+    }, dev.electron);
 
     url = frontendConf.protocol + frontendConf.hostname + ':' + frontendConf.port;
     if (isFileProtocol(frontendConf.protocol)) {
@@ -121,7 +130,7 @@ async function loadServer() {
             headers: { 
               'Accept': 'text/html, application/json, text/plain, */*',
             },
-            responseType: 'text',
+            //responseType: 'text',
           });
           frontendReady = true;
         } catch(err) {

@@ -43,7 +43,7 @@ module.exports = {
         platform: 'node',
         bundle: false,
         minify: true,
-        outdir: 'runtime',
+        outdir: 'public/electron',
         packages: 'external',
       },
       typescript: {
@@ -53,19 +53,9 @@ module.exports = {
         format: 'cjs',
         bundle: false,
         minify: true,
-        outdir: 'runtime',
+        outdir: 'public/electron',
         packages: 'external',
-      },
-      // javascript: {
-      //   directory: './',
-      //   cmd: 'esbuild',
-      //   args: ['./electron/**/*.js', '--platform=node', '--minify', '--outdir=runtime', '--watch', '--packages=external']
-      // },
-      // typescript: {
-      //   directory: './',
-      //   cmd: 'esbuild',
-      //   args: ['./electronts/**/*.ts', '--platform=node', '--minify', '--format=cjs', '--outdir=runtime', '--tsconfig=./electronts/tsconfig.json', '--packages=external'],
-      // }
+      }
     }
   },
 
@@ -96,11 +86,11 @@ module.exports = {
   encrypt: {
     type: 'none',
     files: [
-      'electron/**/*.(js|json)',
+      './public/electron/**/*.(js|json)',
     ],
     fileExt: ['.js'],
     cleanFiles: ['./public/electron'],
-    specificFiles: ['electron/preload/bridge.js'],
+    specificFiles: ['./public/electron/preload/bridge.js'],
     confusionOptions: {
       compact: true,      
       stringArray: true,

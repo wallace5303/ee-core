@@ -128,7 +128,7 @@ const queryHttps = (version, options) => {
 			try {
 				const gotPromise = hc.request(url, requestOptions);
 				gotPromise.cancel = () => {
-					// todo
+					// ..
 				}
 				cancel = gotPromise.cancel;
 

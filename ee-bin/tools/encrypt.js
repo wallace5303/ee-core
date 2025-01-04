@@ -10,6 +10,8 @@ const globby = require('globby');
 const chalk = require('chalk');
 const { loadConfig } = require('../lib/utils');
 
+const EncryptTypes = ['bytecode', 'confusion', 'strict'];
+
 class Encrypt {
   constructor(options = {}) {
     // cli args
@@ -21,13 +23,13 @@ class Encrypt {
     const cfg = loadConfig(config);
     this.config = cfg.encrypt;
     
-    this.filesExt = this.config.fileExt || ['.js'];
-    this.type = this.config.type || 'confusion';
-    this.bOpt = this.config.bytecodeOptions || {};
-    this.cOpt = this.config.confusionOptions || {};
-    this.cleanFiles = this.config.cleanFiles || ['./public/electron'];
+    this.filesExt = this.config.fileExt;
+    this.type = this.config.type;
+    this.bOpt = this.config.bytecodeOptions;
+    this.cOpt = this.config.confusionOptions;
+    this.cleanFiles = this.config.cleanFiles;
     this.patterns = this.config.files || null;
-    this.specFiles = this.config.specificFiles || [ 'electron/preload/bridge.js' ];
+    this.specFiles = this.config.specificFiles;
 
     this.codefiles = this._initCodeFiles();
     console.log(chalk.blue('[ee-bin] [encrypt] ') + 'cleanFiles:' + this.cleanFiles);
@@ -123,14 +125,15 @@ class Encrypt {
 
     let tips = chalk.blue('[ee-bin] [encrypt] ') + 'file: ' + chalk.green(`${curPath}`) + ' ' + chalk.cyan(`(${encryptType})`);
     console.log(tips);
-
-    if (encryptType == 'bytecode') {
+    if (encryptType == 'strict') {
+      this.generateJSConfuseFile(curPath);
+      this.generateBytecodeFile(curPath);
+    } else if (encryptType == 'bytecode') {
       this.generateBytecodeFile(curPath);
     } else if (encryptType == 'confusion') {
       this.generateJSConfuseFile(curPath);
     } else {
-      this.generateJSConfuseFile(curPath);
-      this.generateBytecodeFile(curPath);
+      // none
     }
   }
 
@@ -170,9 +173,10 @@ class Encrypt {
 }
 
 function encrypt(options = {}) {
-  const e = new Encrypt(options);
-  if (!e.backup()) return;
-  e.encrypt();
+  const enc = new Encrypt(options);
+  if (EncryptTypes.indexOf(enc.type) == -1) return;
+  //if (!enc.backup()) return;
+  enc.encrypt();
 }
 
 function cleanEncrypt(options = {}) {

@@ -9,6 +9,7 @@ const { Events } = require('../const/channel');
 const { getRandomString, getValueFromArgv } = require('../utils/helper');
 const { is } = require('../utils');
 const { parseArgv } = require('../utils/pargv');
+const { app: electronApp } = require('electron');
 
 class SpawnProcess {
   constructor(host, opt = {}) {
@@ -155,8 +156,8 @@ class SpawnProcess {
   _exitElectron(timeout = 1000) {
     if (this.config.appExit) {
       setTimeout(() => {
-        // [todo] 进程退出前的一些清理工作
-        // CoreApp.appQuit();
+        // 主进程退出
+        electronApp.quit();
       }, timeout)
     }
   }
