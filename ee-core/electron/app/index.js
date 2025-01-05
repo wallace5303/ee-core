@@ -6,14 +6,13 @@ const { coreLogger } = require('../../log');
 const { is } = require('../../utils');
 const { cross } = require('../../cross');
 const { createMainWindow, setCloseAndQuit, loadServer } = require('../window');
-const { getEventBus, ElectronAppReady, BeforeClose, Preload } = require('../../app/events');
+const { eventBus, ElectronAppReady, BeforeClose, Preload } = require('../../app/events');
 const { getConfig } = require('../../config');
 
 /**
  * 创建electron应用
  */
 function createElectron() {
-  const eventBus = getEventBus();
   const { singleLock } = getConfig();
   // 允许多个实例 
   const gotTheLock = electronApp.requestSingleInstanceLock();

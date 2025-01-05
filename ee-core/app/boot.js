@@ -7,19 +7,16 @@ const { electronApp } = require('../electron/app');
 const { getArgumentByName, getBundleDir } = require('../ps');
 const { loadConfig } = require('../config');
 const { loadLog } = require('../log');
-const { loadController } = require('../controller');
-const { loadEventBus, getEventBus, Ready } = require('./events');
-const { loadApp } = require('./application');
+const { app } = require('./application');
 const { loadDir } = require('./dir');
-const { loadSocket } = require('../socket');
-const { loadElectron } = require('../electron');
+const { isJsProject } = require('../utils');
 
 class ElectronEgg {
   constructor() {
     const baseDir = electronApp.getAppPath();
     const { env } = process;
-    const entryFile = process.argv[1];
     const environmet = getArgumentByName('env') || 'prod';
+    console.log('argv:', process.argv);
 
     const options = {
       env: environmet,
@@ -39,10 +36,10 @@ class ElectronEgg {
       options.execDir = path.dirname(electronApp.getPath('exe'));
     }
 
-    // 开发环境可以指定 electron 入口文件
-    if (environmet !== 'prod' && ['.', './'].entryFile.indexOf(entryFile) !== -1) {
-      options.electronDir = path.join(baseDir, entryFile);
-    }
+    // js开发环境使用源码目录
+    // if (isJsProject(baseDir) && environmet !== 'prod' ) {
+    //   options.electronDir = path.join(baseDir, 'electron');
+    // }
 
     // normalize env
     env.EE_ENV = environmet;
@@ -68,22 +65,14 @@ class ElectronEgg {
     loadConfig();
     loadDir();
     loadLog();
-    loadEventBus();
-    loadApp();
   }
 
   register(eventName, handler) {
-    const eventBus = getEventBus();
-    return eventBus.register(eventName, handler);
+    return app.register(eventName, handler);
   }
 
   run() {
-    // extended functions
-    const eventBus = getEventBus();
-    loadController();
-    loadSocket();
-    eventBus.emitLifecycle(Ready);
-    loadElectron();
+    app.run();
   }
 }
 

@@ -6,7 +6,7 @@ const path = require('path');
 const axios = require('axios');
 const { BrowserWindow } = require('electron');
 const { getConfig } = require('../../config');
-const { getEventBus, WindowReady } = require('../../app/events');
+const { eventBus, WindowReady } = require('../../app/events');
 const { env, isDev, getBaseDir } = require('../../ps');
 const { loadFile } = require('../../loader');
 const { isFileProtocol } = require('../../utils');
@@ -41,7 +41,6 @@ function createMainWindow() {
     });
   }
   
-  const eventBus = getEventBus();
   eventBus.emitLifecycle(WindowReady);
   return win;
 }

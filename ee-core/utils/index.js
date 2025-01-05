@@ -84,6 +84,15 @@ function isWebProtocol(protocol) {
   return ['http://', 'https://'].includes(protocol);
 }
 
+function isJsProject(baseDir) {
+  const entryFile1 = path.join(baseDir, 'electron/main.js');
+  const entryFile2 = path.join(baseDir, 'electron/index.js');
+  if (fs.existsSync(entryFile1) || fs.existsSync(entryFile2)) {
+    return true;
+  }
+  return false;
+}
+
 /**
  * get machine id
  */
@@ -160,6 +169,7 @@ module.exports = {
   isMAC,
   isFileProtocol,
   isWebProtocol,
+  isJsProject,
   machineIdSync,
   machineId,
   is

@@ -1,9 +1,5 @@
 'use strict';
 
-const Instance = {
-  eventBus: null,
-};
-
 const Ready = "ready";
 const ElectronAppReady = "electron-app-ready";
 const WindowReady = "window-ready";
@@ -47,20 +43,11 @@ class EventBus {
   }
 }
 
-function loadEventBus() {
-  const eb = new EventBus();
-  Instance.eventBus = eb;
-  return eb;
-}
-
-function getEventBus() {
-  return Instance.eventBus;
-}
+const eventBus = new EventBus();
 
 module.exports = {
   EventBus,
-  loadEventBus,
-  getEventBus,
+  eventBus,
   Ready,
   ElectronAppReady,
   WindowReady,
