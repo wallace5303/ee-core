@@ -12,7 +12,7 @@ const { extend } = require('../../utils/extend');
 class ForkProcess {
   constructor(host, opt = {}) {
     
-    const cwd = getBaseDir();
+    let cwd = getBaseDir();
     const appPath = path.join(__dirname, 'app.js');
     if (isPackaged()) {
       // todo fork的cwd目录为什么要在app.asar外 ？

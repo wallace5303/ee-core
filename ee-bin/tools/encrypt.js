@@ -81,7 +81,7 @@ class Encrypt {
     console.log(chalk.blue('[ee-bin] [encrypt] ') + 'start ciphering');
     console.log(this.codefiles);
     for (const file of this.codefiles) {
-      const fullpath = path.join(this.encryptCodeDir, file);
+      const fullpath = path.join(this.encryptDir, file);
       if (!fs.statSync(fullpath).isFile()) continue;
 
       // 特殊文件处理
