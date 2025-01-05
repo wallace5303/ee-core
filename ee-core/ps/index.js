@@ -95,8 +95,8 @@ function getLogDir() {
   return dir;
 }
 
-// 获取加密文件路径
-function getEncryptDir(basePath) {
+// 获取bundle文件路径
+function getBundleDir(basePath) {
   const base = basePath || process.cwd();
   const dir = path.join(base, 'public', 'electron');
   return dir;
@@ -191,11 +191,6 @@ function isPackaged() {
   return process.env.EE_IS_PACKAGED === 'true';
 }
 
-// 是否加密
-function isEncrypted() {
-  return process.env.EE_IS_ENCRYPTED === 'true';
-}
-
 // 是否热重启
 function isHotReload() {
   return process.env.HOT_RELOAD === 'true';
@@ -277,7 +272,7 @@ module.exports = {
   appVersion,
   getDataDir,
   getLogDir,
-  getEncryptDir,
+  getBundleDir,
   getRootDir,
   getBaseDir,
   getElectronDir,
@@ -291,7 +286,6 @@ module.exports = {
   getSocketPort,
   getHttpPort,
   isPackaged,
-  isEncrypted,
   isHotReload,
   exit,
   makeMessage,

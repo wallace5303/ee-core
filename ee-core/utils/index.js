@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const { exec, execSync } = require('child_process');
 const { createHash } = require('crypto');
-const { getEncryptDir, getBaseDir } = require('../ps');
+const { getBaseDir } = require('../ps');
 const { readSync } = require('./json');
 const is = require('./is');
 
@@ -74,17 +74,6 @@ function getMAC(iface) {
 function isMAC(macAddress) {
   const macRegex = /(?:[a-z0-9]{1,2}[:-]){5}[a-z0-9]{1,2}/i;
   return macRegex.test(macAddress);
-}
-
-/**
- * is encrypt
- */
-function isEncrypt(basePath) {
-  const encryptDir = getEncryptDir(basePath);
-  if (fs.existsSync(encryptDir)) {
-    return true;
-  }
-  return false;
 }
 
 function isFileProtocol(protocol) {
@@ -169,7 +158,6 @@ module.exports = {
   getPackage,
   getMAC,
   isMAC,
-  isEncrypt,
   isFileProtocol,
   isWebProtocol,
   machineIdSync,

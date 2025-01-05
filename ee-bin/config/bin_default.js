@@ -45,6 +45,8 @@ module.exports = {
         minify: true,
         outdir: 'public/electron',
         packages: 'external',
+        sourcemap:false,
+        sourcesContent: false
       },
       typescript: {
         entryPoints: ['./electron/**/*.ts'],
@@ -55,6 +57,8 @@ module.exports = {
         minify: true,
         outdir: 'public/electron',
         packages: 'external',
+        sourcemap:false,
+        sourcesContent: false
       }
     }
   },
