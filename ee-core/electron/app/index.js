@@ -6,14 +6,14 @@ const { coreLogger } = require('../../log');
 const { is } = require('../../utils');
 const { cross } = require('../../cross');
 const { createMainWindow, setCloseAndQuit, loadServer } = require('../window');
-const { getApp, ElectronAppReady, BeforeClose, Preload } = require('../../app/application');
+const { getEventBus, ElectronAppReady, BeforeClose, Preload } = require('../../app/events');
 const { getConfig } = require('../../config');
 
 /**
  * 创建electron应用
  */
 function createElectron() {
-  const app = getApp();
+  const eventBus = getEventBus();
   const { singleLock } = getConfig();
   // 允许多个实例 
   const gotTheLock = electronApp.requestSingleInstanceLock();
@@ -23,7 +23,7 @@ function createElectron() {
 
   electronApp.whenReady().then(() => {
     createMainWindow();
-    app.callEvent(Preload);
+    eventBus.emitLifecycle(Preload);
     loadServer();
   })
 
@@ -36,11 +36,11 @@ function createElectron() {
 
   electronApp.on('before-quit', () => {
     setCloseAndQuit(true);
-    app.callEvent(BeforeClose);
+    eventBus.emitLifecycle(BeforeClose);
     cross.killAll();
   })
 
-  app.callEvent(ElectronAppReady);
+  eventBus.emitLifecycle(ElectronAppReady);
 }
 
 module.exports = {

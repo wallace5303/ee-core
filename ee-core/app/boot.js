@@ -8,7 +8,8 @@ const { getArgumentByName, getBundleDir } = require('../ps');
 const { loadConfig } = require('../config');
 const { loadLog } = require('../log');
 const { loadController } = require('../controller');
-const { loadApp, getApp, Ready } = require('./application');
+const { loadEventBus, getEventBus, Ready } = require('./events');
+const { loadApp } = require('./application');
 const { loadDir } = require('./dir');
 const { loadSocket } = require('../socket');
 const { loadElectron } = require('../electron');
@@ -17,12 +18,13 @@ class ElectronEgg {
   constructor() {
     const baseDir = electronApp.getAppPath();
     const { env } = process;
+    const entryFile = process.argv[1];
     const environmet = getArgumentByName('env') || 'prod';
 
     const options = {
       env: environmet,
       baseDir,
-      electronDir: path.join(baseDir, 'electron'),
+      electronDir: getBundleDir(baseDir),
       appName: electronApp.getName(),
       userHome: electronApp.getPath('home'),
       appData: electronApp.getPath('appData'),
@@ -37,8 +39,10 @@ class ElectronEgg {
       options.execDir = path.dirname(electronApp.getPath('exe'));
     }
 
-    // [todo] js是否使用原始代码 
-    options.electronDir = getBundleDir(baseDir);
+    // 开发环境可以指定 electron 入口文件
+    if (environmet !== 'prod' && ['.', './'].entryFile.indexOf(entryFile) !== -1) {
+      options.electronDir = path.join(baseDir, entryFile);
+    }
 
     // normalize env
     env.EE_ENV = environmet;
@@ -64,27 +68,23 @@ class ElectronEgg {
     loadConfig();
     loadDir();
     loadLog();
+    loadEventBus();
     loadApp();
   }
 
-  use() {
-    const app = getApp();
-    return app.use();
-  }
   register(eventName, handler) {
-    const app = getApp();
-    return app.register(eventName, handler);
+    const eventBus = getEventBus();
+    return eventBus.register(eventName, handler);
   }
 
   run() {
     // extended functions
-    const app = getApp();
+    const eventBus = getEventBus();
     loadController();
     loadSocket();
-    app.callEvent(Ready);
+    eventBus.emitLifecycle(Ready);
     loadElectron();
   }
-
 }
 
 module.exports = {

@@ -1,6 +1,6 @@
 'use strict';
 
-const { ElectronEgg } = require('./application');
+const { ElectronEgg } = require('./boot');
 
 module.exports = {
   ElectronEgg,

@@ -6,47 +6,9 @@ const Instance = {
   app: null,
 };
 
-
-const Ready = "ready";
-const ElectronAppReady = "electron-app-ready";
-const WindowReady = "window-ready";
-const BeforeClose = "before-close";
-const Preload = "preload";
-
 class Appliaction {
   constructor() {
-    this.lifecycleEvents = {};
-    this.eventsMap = {};
-  }
 
-  // add lifecycle event
-  register(eventName, handler) {
-    if (!this.lifecycleEvents[eventName]) {
-      this.lifecycleEvents[eventName] = handler;
-    }
-  }
-
-  // call lifecycle event
-  callEvent(eventName, ...args) {
-    const eventFn = this.lifecycleEvents[eventName];
-    if (eventFn) {
-      eventFn(...args);
-    }
-  } 
-
-  // add listener
-  on(eventName, handler) {
-    if (!this.eventsMap[eventName]) {
-      this.eventsMap[eventName] = handler;
-    }
-  }
-
-  // emit listener
-  emit(eventName, ...args) {
-    const eventFn = this.eventsMap[eventName];
-    if (eventFn) {
-      eventFn(...args);
-    }
   }
 
 }
@@ -65,9 +27,4 @@ module.exports = {
   Appliaction,
   loadApp,
   getApp,
-  Ready,
-  ElectronAppReady,
-  WindowReady,
-  Preload,
-  BeforeClose
 };

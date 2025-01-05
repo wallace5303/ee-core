@@ -22,17 +22,7 @@ function isProd() {
  * 是否为开发环境
  */
 function isDev() {
-  if ( process.env.EE_ENV === 'development' ||
-    process.env.EE_ENV === 'dev' ||
-    process.env.EE_ENV === 'local'
-  ) {
-    return true;
-  }
-  
-  if ( process.env.NODE_ENV === 'development' ||
-    process.env.NODE_ENV === 'dev' ||
-    process.env.NODE_ENV === 'local'
-  ) {
+  if (process.env.EE_ENV === 'dev' || process.env.EE_ENV === 'local') {
     return true;
   }
 
