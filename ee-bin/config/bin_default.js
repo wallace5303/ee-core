@@ -16,6 +16,7 @@ module.exports = {
       hostname: 'localhost',
       port: 8080,
       indexPath: 'index.html',
+      force: false,
     },
     electron: {
       directory: './',
@@ -60,7 +61,47 @@ module.exports = {
         sourcemap:false,
         sourcesContent: false
       }
-    }
+    },
+    win32: {
+      cmd: 'electron-builder',
+      directory: './',
+      args: ['--config=./cmd/builder.json', '-w=nsis', '--ia32'],
+    },
+    win64: {
+      cmd: 'electron-builder',
+      directory: './',
+      args: ['--config=./cmd/builder.json', '-w=nsis', '--x64'],
+    },
+    win_e: {
+      cmd: 'electron-builder',
+      directory: './',
+      args: ['--config=./cmd/builder.json', '-w=portable', '--x64'],
+    },
+    win_7z: {
+      cmd: 'electron-builder',
+      directory: './',
+      args: ['--config=./cmd/builder.json', '-w=7z', '--x64'],
+    },
+    mac: {
+      cmd: 'electron-builder',
+      directory: './',
+      args: ['--config=./cmd/builder-mac.json', '-m'],
+    },
+    mac_arm64: {
+      cmd: 'electron-builder',
+      directory: './',
+      args: ['--config=./cmd/builder-mac-arm64.json', '-m', '--arm64'],
+    },
+    linux: {
+      cmd: 'electron-builder',
+      directory: './',
+      args: ['--config=./cmd/builder-linux.json', '-l=deb', '--x64'],
+    },
+    linux_arm64: {
+      cmd: 'electron-builder',
+      directory: './',
+      args: ['--config=./cmd/builder-linux.json', '-l=deb', '--arm64'],
+    },
   },
 
   /**
