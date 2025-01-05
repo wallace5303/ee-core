@@ -9,7 +9,7 @@ const { loadConfig } = require('../config');
 const { loadLog } = require('../log');
 const { app } = require('./application');
 const { loadDir } = require('./dir');
-const { isJsProject } = require('../utils');
+// const { isJsProject } = require('../utils');
 
 class ElectronEgg {
   constructor() {

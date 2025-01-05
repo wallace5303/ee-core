@@ -16,13 +16,12 @@ class Encrypt {
   constructor(options = {}) {
     // cli args
     const { config, out } = options;
-    const outputFolder = out || './public';
-
     this.basePath = process.cwd();
-    this.encryptCodeDir = path.join(this.basePath, outputFolder);
+    
     const cfg = loadConfig(config);
     this.config = cfg.encrypt;
-    
+    const outputFolder = out || this.config.encryptDir;
+    this.encryptDir = path.join(this.basePath, outputFolder);
     this.filesExt = this.config.fileExt;
     this.type = this.config.type;
     this.bOpt = this.config.bytecodeOptions;
@@ -32,7 +31,6 @@ class Encrypt {
     this.specFiles = this.config.specificFiles;
 
     this.codefiles = this._initCodeFiles();
-    console.log(chalk.blue('[ee-bin] [encrypt] ') + 'cleanFiles:' + this.cleanFiles);
   }
 
   /**
@@ -81,6 +79,7 @@ class Encrypt {
    */
   encrypt() {
     console.log(chalk.blue('[ee-bin] [encrypt] ') + 'start ciphering');
+    console.log(this.codefiles);
     for (const file of this.codefiles) {
       const fullpath = path.join(this.encryptCodeDir, file);
       if (!fs.statSync(fullpath).isFile()) continue;

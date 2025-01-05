@@ -165,7 +165,6 @@ class ServeProcess {
     const esbuildOptions = bundleConfig[bundleConfig.language];
     if (isDev) {
       // [todo]
-      esbuildOptions.minify = false;
     }
     debug('esbuild options:%O', esbuildOptions);
     buildSync(esbuildOptions);
