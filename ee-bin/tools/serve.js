@@ -2,6 +2,7 @@
 
 const debug = require('debug')('ee-bin:serve');
 const path = require('path');
+const fsPro = require('fs-extra');
 const { loadConfig } = require('../lib/utils');
 const is = require('is-type-of');
 const chalk = require('chalk');
@@ -11,13 +12,18 @@ const { buildSync } = require('esbuild');
 class ServeProcess {
 
   constructor() {
+    process.env.NODE_ENV = 'prod'; // dev / prod
     this.execProcess = {};
+    this.electronDir = './electron';
+    this.defaultBundleDir = './public/electron';
   }
 
   /**
    * 启动前端、主进程服务
    */
   dev(options = {}) {
+    // 设置一个环境变量
+    process.env.NODE_ENV = 'dev';
     const { config, serve } = options;
     const binCfg = loadConfig(config);
     const binCmd = 'dev';
@@ -31,7 +37,7 @@ class ServeProcess {
     // build electron code 
     const cmds = this._formatCmds(command);
     if (cmds.indexOf("electron") !== -1) {
-      this.bundle(true, binCfg.build.electron);
+      this.bundle(binCfg.build.electron);
     }
 
     const opt = {
@@ -69,7 +75,8 @@ class ServeProcess {
    * 构建
    */
   build(options = {}) {
-    const { config, cmds } = options;
+    const { config, cmds, env } = options;
+    process.env.NODE_ENV = env;
     const binCfg = loadConfig(config);
     const binCmd = 'build';
     const binCmdConfig = binCfg[binCmd];
@@ -81,7 +88,7 @@ class ServeProcess {
     }
 
     if (cmds.indexOf("electron") !== -1) {
-      this.bundle(false, binCfg.build.electron);
+      this.bundle(binCmdConfig.electron);
       return;
     }
 
@@ -161,13 +168,21 @@ class ServeProcess {
   } 
   
   // esbuild
-  bundle(isDev = false, bundleConfig) {
-    const esbuildOptions = bundleConfig[bundleConfig.language];
-    if (isDev) {
-      // [todo]
+  bundle(bundleConfig) {
+    const bundleType = bundleConfig.type;
+    if (bundleType == 'copy') {
+      const srcResource = path.join(process.cwd(), this.electronDir);
+      const destResource = path.join(process.cwd(), this.defaultBundleDir);
+      fsPro.removeSync(destResource);
+      fsPro.copySync(srcResource, destResource);
+    } else {
+      const esbuildOptions = bundleConfig[bundleConfig.type];
+      if (this.isDev()) {
+        esbuildOptions.minify = false;
+      }
+      debug('esbuild options:%O', esbuildOptions);
+      buildSync(esbuildOptions);
     }
-    debug('esbuild options:%O', esbuildOptions);
-    buildSync(esbuildOptions);
   }
 
   // format commands
@@ -181,7 +196,12 @@ class ServeProcess {
     }
 
     return cmds;
-  }  
+  }
+  
+  // env
+  isDev() {
+    return process.env.NODE_ENV === 'dev';
+  }
 }
 
 module.exports = {

@@ -26,6 +26,7 @@ program
   .description('building multiple resources')
   .option('--config <folder>', 'config file')
   .option('--cmds <flag>', 'custom commands')
+  .option('--env <env>', 'environment')
   .action(function() {
     serveProcess.build(this.opts());
   });
