@@ -1,0 +1,14 @@
+export function renderer(): boolean;
+export function main(): boolean;
+export function osx(): boolean;
+export function macOS(): boolean;
+export function windows(): boolean;
+export function linux(): boolean;
+export function x86(): boolean;
+export function x64(): boolean;
+export function sandbox(): boolean;
+export function mas(): boolean;
+export function windowsStore(): boolean;
+export function all(...args: any[]): boolean;
+export function none(...args: any[]): boolean;
+export function one(...args: any[]): boolean;
