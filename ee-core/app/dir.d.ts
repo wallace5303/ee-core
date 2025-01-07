@@ -1,1 +1,1 @@
-export function loadDir(): void;
+export declare function loadDir(): void;

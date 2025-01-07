@@ -1,10 +1,13 @@
-export class ConfigLoader {
+import { Timing } from "../core/utils/timing";
+import { EEConfig } from "./default_config";
+export declare class ConfigLoader {
     timing: Timing;
     /**
      * Load config/config.xxx.js
      */
-    load(): any;
-    _AppConfig(): {};
-    _loadConfig(dirpath: any, filename: any): any;
+    load(): EEConfig;
+    _AppConfig(): EEConfig;
+    _loadConfig(dirpath: string, filename: string): EEConfig;
 }
-import { Timing } from "../core/utils/timing";
+
+

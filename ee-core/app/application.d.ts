@@ -1,5 +1,5 @@
-export class Appliaction {
-    register(eventName: any, handler: any): void;
+export declare class Appliaction {
+    register(eventName: string, handler: Function): void;
     run(): void;
 }
-export const app: Appliaction;
+export declare const app: Appliaction;

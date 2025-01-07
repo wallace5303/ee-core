@@ -1,2 +1,3 @@
-export function loadConfig(): any;
-export function getConfig(): any;
+import { EEConfig } from "./default_config";
+export declare function loadConfig(): EEConfig;
+export declare function getConfig(): EEConfig;

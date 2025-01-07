@@ -1,5 +1,5 @@
-export class ElectronEgg {
+export declare class ElectronEgg {
     init(): void;
-    register(eventName: any, handler: any): void;
+    register(eventName: string, handler: Function): void;
     run(): void;
 }
