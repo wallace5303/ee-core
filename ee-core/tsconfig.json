@@ -4,7 +4,6 @@
     "allowJs": true,
     "emitDeclarationOnly": true,
     "declaration": true,
-    "outDir": "types", 
   },
   "include": [
     "index.js", "app", "config", "const", "controller", "core", "cross", "electron", "exception",
