@@ -3,7 +3,20 @@
   "version": "4.0.0-beta.1",
   "description": "ee core",
   "main": "index.js",
-  "types": "./types/**/*.d.ts",
+  "exports": {
+    ".": {
+      "require": "./index.js",
+      "types": "./types/index.d.ts"
+    },
+    "./utils": {
+      "require": "./types/utils/index.js",
+      "types": "./utils/index.d.ts"
+    },
+    "./utils/helper": {
+      "require": "./types/utils/helper.js",
+      "types": "./utils/helper.d.ts"
+    }
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

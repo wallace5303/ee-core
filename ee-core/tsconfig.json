@@ -10,6 +10,5 @@
     "index.js", "app", "config", "const", "controller", "core", "cross", "electron", "exception",
     "html", "jobs", "loader", "log", "message", "ps", "socket", "storage", "utils",
   ]
-  //"include": ["src"]
 }
   
