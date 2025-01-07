@@ -1,1 +1,1 @@
-export function getHtmlFilepath(name: any): string;
+export declare function getHtmlFilepath(name: any): string;

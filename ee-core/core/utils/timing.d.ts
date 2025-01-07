@@ -1,4 +1,4 @@
-export class Timing {
+export declare class Timing {
     _enable: boolean;
     init(): void;
     start(name: any, start: any): {

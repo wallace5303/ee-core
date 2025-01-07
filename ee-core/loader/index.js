@@ -4,13 +4,7 @@ const path = require('path');
 const CoreUtils = require('../core/utils');
 const { getElectronDir } = require('../ps');
 
-/**
- * 加载单个文件(如果是函数，将被执行)
- *
- * @param {String} filepath - fullpath
- * @param {Array} inject - pass rest arguments into the function when invoke
- * @return {Object} exports
- */
+// 加载单个文件(如果是函数，将被执行)
 function loadFile(filepath, ...inject) {
   const isAbsolute = path.isAbsolute(filepath);
   if (!isAbsolute) {
@@ -35,13 +29,7 @@ function requireFile(filepath) {
   return CoreUtils.loadFile(filepath);
 }
 
-/**
- * 加载并运行文件
- *
- * @param {String} filepath - fullpath
- * @param {Array} inject - pass rest arguments into the function when invoke
- * @return {Any}
- */
+// 加载并运行文件
 function execFile(filepath, ...inject) {
   let ret = CoreUtils.loadFile(filepath);
   if (is.class(ret) || CoreUtils.isBytecodeClass(ret)) {
@@ -53,10 +41,7 @@ function execFile(filepath, ...inject) {
   return ret;
 }
 
-/**
- * 模块的绝对路径
- * @param {String} filepath - fullpath
- */
+// 模块的绝对路径
 function resolveModule(filepath) {
   let fullpath;
   try {
@@ -80,10 +65,7 @@ function resolveModule(filepath) {
   return fullpath;
 }
 
-/**
- * 获取electron目录下文件的绝对路径
- * @param {String} filepath - fullpath
- */
+// 获取electron目录下文件的绝对路径
 function getFullpath(filepath) {
   let fullpath;
   const isAbsolute = path.isAbsolute(filepath);

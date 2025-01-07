@@ -1,4 +1,4 @@
-export class CrossProcess {
+export declare class CrossProcess {
     emitter: EventEmitter<[never]>;
     children: {};
     childrenMap: {};

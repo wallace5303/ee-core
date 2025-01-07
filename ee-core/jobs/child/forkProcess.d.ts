@@ -1,5 +1,5 @@
 /// <reference types="node" />
-export class ForkProcess {
+declare export class ForkProcess {
     constructor(host: any, opt?: {});
     emitter: EventEmitter<[never]>;
     host: any;

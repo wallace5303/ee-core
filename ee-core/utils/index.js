@@ -24,19 +24,15 @@ const MachineGuid = {
   freebsd: 'kenv -q smbios.system.uuid || sysctl -n kern.hostuuid'
 };
 
-/**
- * 获取项目根目录package.json
- */
+// 获取项目根目录package.json
 function getPackage() {
   const json = readSync(path.join(getBaseDir(), 'package.json'));
   
   return json;
 };
 
-/**
- * Get the first proper MAC address
- * @param iface If provided, restrict MAC address fetching to this interface
- */
+// Get the first proper MAC address
+// iface: If provided, restrict MAC address fetching to this interface
 function getMAC(iface) {
   const zeroRegex = /(?:[0]{1,2}[:-]){5}[0]{1,2}/;
   const list = os.networkInterfaces();
@@ -68,9 +64,7 @@ function getMAC(iface) {
   throw new Error('failed to get the MAC address');
 }
 
-/**
- * Check if the input is a valid MAC address
- */
+// Check if the input is a valid MAC address
 function isMAC(macAddress) {
   const macRegex = /(?:[a-z0-9]{1,2}[:-]){5}[a-z0-9]{1,2}/i;
   return macRegex.test(macAddress);
@@ -93,18 +87,14 @@ function isJsProject(baseDir) {
   return false;
 }
 
-/**
- * get machine id
- */
+// get machine id
 function machineIdSync(original) {
   let id = _expose(execSync(MachineGuid[platform]).toString());
   return original ? id : _hash(id);
 }
 
-/**
- * get machine id (promise)
- * original <Boolean>, If true return original value of machine id, otherwise return hashed value (sha-256), default: false
- */
+// get machine id (promise)
+// original <Boolean>, If true return original value of machine id, otherwise return hashed value (sha-256), default: false
 function machineId(original) {
   return new Promise((resolve, reject) => {
     return exec(MachineGuid[platform], {}, (err, stdout, stderr) => {

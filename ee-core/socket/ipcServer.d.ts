@@ -1,4 +1,4 @@
-export class IpcServer {
+export declare class IpcServer {
     directory: string;
     loop(obj: any, pathname: any): void;
     register(exportObj: any, propertyChain: any): void;

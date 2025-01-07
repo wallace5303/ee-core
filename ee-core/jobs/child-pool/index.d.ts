@@ -1,4 +1,4 @@
-export class ChildPoolJob extends EventEmitter<[never]> {
+export declare class ChildPoolJob extends EventEmitter<[never]> {
     constructor(opt?: {});
     config: any;
     boundMap: Map<any, any>;

@@ -8,14 +8,6 @@ const { parseArgv } = require('./pargv');
 
 const _basePath = process.cwd();
 
-/**
- * fnDebounce
- * 
- * @param  {Function} fn - 回调函数
- * @param  {Time} delayTime - 延迟时间(ms)
- * @param  {Boolean} isImediate - 是否需要立即调用
- * @param  {type} args - 回调函数传入参数
-*/
 function fnDebounce() {
   const fnObject = {};
   let timer;
@@ -112,9 +104,7 @@ function stringify(obj, ignore = []) {
   return JSON.stringify(result);
 }
 
-/**
- * 是否有效值
- */
+// 是否有效值
 function validValue(value) {
   return (
     value !== undefined &&

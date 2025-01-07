@@ -1,6 +1,6 @@
-export function getMainWindow(): any;
-export function createMainWindow(): any;
-export function restoreMainWindow(): void;
-export function setCloseAndQuit(flag: any): void;
-export function getCloseAndQuit(): boolean;
-export function loadServer(): Promise<void>;
+export declare function getMainWindow(): any;
+export declare function createMainWindow(): any;
+export declare function restoreMainWindow(): void;
+export declare function setCloseAndQuit(flag: any): void;
+export declare function getCloseAndQuit(): boolean;
+export declare function loadServer(): Promise<void>;

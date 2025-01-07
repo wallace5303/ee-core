@@ -1,8 +1,8 @@
-export let polling: string;
-export let weights: string;
-export let random: string;
-export let specify: string;
-export let weightsPolling: string;
-export let weightsRandom: string;
-export let minimumConnection: string;
-export let weightsMinimumConnection: string;
+export declare let polling: string;
+export declare let weights: string;
+export declare let random: string;
+export declare let specify: string;
+export declare let weightsPolling: string;
+export declare let weightsRandom: string;
+export declare let minimumConnection: string;
+export declare let weightsMinimumConnection: string;

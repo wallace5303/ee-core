@@ -1,5 +1,5 @@
-export function createLog(config: any): import("egg-logger").EggLoggers;
-export function loadLog(): any;
+export declare function createLog(config: any): import("egg-logger").EggLoggers;
+export declare function loadLog(): any;
 declare namespace Instance {
     export let eelog: any;
     let logger_1: {};

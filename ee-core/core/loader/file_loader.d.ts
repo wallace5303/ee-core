@@ -1,7 +1,7 @@
 /**
  * Load files from directory to target object.
  */
-export class FileLoader {
+export declare class FileLoader {
     /**
      * @class
      * @param {Object} options - options
@@ -62,5 +62,5 @@ export class FileLoader {
      */
     parse(): any[];
 }
-export const EXPORTS: unique symbol;
-export const FULLPATH: unique symbol;
+export declare const EXPORTS: unique symbol;
+export declare const FULLPATH: unique symbol;

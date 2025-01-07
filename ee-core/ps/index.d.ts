@@ -1,43 +1,37 @@
-export function allEnv(): NodeJS.ProcessEnv;
-export function env(): string;
-export function isProd(): boolean;
-/**
- * 是否为开发环境
- */
-export function isDev(): boolean;
-export function isRenderer(): boolean;
-export function isMain(): boolean;
-export function isForkedChild(): boolean;
-export function processType(): string;
-export function appName(): string;
-export function appVersion(): string;
-export function getDataDir(): string;
-export function getLogDir(): string;
-export function getBundleDir(basePath: any): string;
-export function getRootDir(): string;
-export function getBaseDir(): string;
-export function getElectronDir(): string;
-export function getPublicDir(): string;
-export function getExtraResourcesDir(): string;
-export function getAppUserDataDir(): string;
-export function getExecDir(): string;
-export function getUserHomeDir(): string;
-export function getUserHomeAppDir(): string;
-export function getUserHomeHiddenAppDir(): string;
-export function getSocketPort(): number;
-export function getHttpPort(): number;
-/**
- * 是否打包
- */
-export function isPackaged(): boolean;
-export function isHotReload(): boolean;
-export function exit(code?: number): never;
-export function makeMessage(msg?: {}): {
+export declare function allEnv(): NodeJS.ProcessEnv;
+export declare function env(): string;
+export declare function isProd(): boolean;
+export declare function isDev(): boolean;
+export declare function isRenderer(): boolean;
+export declare function isMain(): boolean;
+export declare function isForkedChild(): boolean;
+export declare function processType(): string;
+export declare function appName(): string;
+export declare function appVersion(): string;
+export declare function getDataDir(): string;
+export declare function getLogDir(): string;
+export declare function getBundleDir(basePath: any): string;
+export declare function getRootDir(): string;
+export declare function getBaseDir(): string;
+export declare function getElectronDir(): string;
+export declare function getPublicDir(): string;
+export declare function getExtraResourcesDir(): string;
+export declare function getAppUserDataDir(): string;
+export declare function getExecDir(): string;
+export declare function getUserHomeDir(): string;
+export declare function getUserHomeAppDir(): string;
+export declare function getUserHomeHiddenAppDir(): string;
+export declare function getSocketPort(): number;
+export declare function getHttpPort(): number;
+export declare function isPackaged(): boolean;
+export declare function isHotReload(): boolean;
+export declare function exit(code?: number): never;
+export declare function makeMessage(msg?: {}): {
     channel: string;
     event: string;
     data: {};
 };
-export function exitChildJob(code?: number): void;
-export function isChildJob(): boolean;
-export function isChildPoolJob(): boolean;
-export function getArgumentByName(name: any): string;
+export declare function exitChildJob(code?: number): void;
+export declare function isChildJob(): boolean;
+export declare function isChildPoolJob(): boolean;
+export declare function getArgumentByName(name: any): string;

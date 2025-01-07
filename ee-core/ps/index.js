@@ -18,9 +18,7 @@ function isProd() {
   return (process.env.EE_ENV === 'prod');
 }
 
-/**
- * 是否为开发环境
- */
+// 是否为开发环境
 function isDev() {
   if (process.env.EE_ENV === 'dev' || process.env.EE_ENV === 'local') {
     return true;
@@ -174,9 +172,7 @@ function getHttpPort() {
   return parseInt(process.env.EE_HTTP_PORT) || 0;
 }
 
-/**
- * 是否打包
- */
+// 是否打包
 function isPackaged() {
   return process.env.EE_IS_PACKAGED === 'true';
 }

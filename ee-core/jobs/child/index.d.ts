@@ -1,4 +1,4 @@
-export class ChildJob extends EventEmitter<[never]> {
+export declare class ChildJob extends EventEmitter<[never]> {
     constructor();
     jobs: {};
     config: any;

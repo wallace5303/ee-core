@@ -1,4 +1,4 @@
-export class SpawnProcess {
+export declare class SpawnProcess {
     constructor(host: any, opt?: {});
     emitter: EventEmitter<[never]>;
     host: any;
