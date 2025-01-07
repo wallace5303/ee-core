@@ -41,9 +41,6 @@ class ForkProcess {
     this._init();
   }
 
-  /**
-   * 初始化事件监听
-   */
   _init() {
     const { messageLog } = this.host.config;
     this.child.on('message', (m) => {
@@ -78,9 +75,6 @@ class ForkProcess {
     });
   }
 
-  /**
-   * event emit
-   */
   _eventEmit(m) {
     switch (m.eventReceiver) {
       case Receiver.forkProcess:
@@ -96,9 +90,6 @@ class ForkProcess {
     }
   }
   
-  /**
-   * 分发任务
-   */
   dispatch(cmd, jobPath = '', ...params) {
     // 消息对象
     const mid = getRandomString();
@@ -114,9 +105,6 @@ class ForkProcess {
     this.child.send(msg);
   }
 
-  /**
-   * 调用job的方法
-   */
   callFunc(jobPath = '', funcName = '', ...params) {
     jobPath = getFullpath(jobPath);
 
@@ -132,9 +120,6 @@ class ForkProcess {
     this.child.send(msg);
   }
 
-  /**
-   * kill
-   */
   kill(timeout = 1000) {
     this.child.kill('SIGINT');
     setTimeout(() => {

@@ -1,1 +1,1 @@
-export declare function getPort(options: any): Promise<any>;
+export declare function getPort(options?: any): Promise<any>;

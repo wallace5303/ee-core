@@ -1,5 +1,5 @@
-export declare function strictParse(str: any): any;
-export declare function readSync(filepath: any): any;
-export declare function writeSync(filepath: any, str: any, options: any): void;
-export declare function read(filepath: any): any;
-export declare function write(filepath: any, str: any, options: any): Promise<void>;
+export declare function strictParse(str: string): {};
+export declare function readSync(filepath: string): any;
+export declare function writeSync(filepath: string, str: string, options: any): void;
+export declare function read(filepath: string): any;
+export declare function write(filepath: string, str: string, options: any): Promise<void>;

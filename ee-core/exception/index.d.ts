@@ -1,17 +1,9 @@
-/**
- * 捕获异常
- */
+// Capture exceptions
 export declare function loadException(): void;
-/**
- * 当进程上抛出异常而没有被捕获时触发该事件，并且使异常静默。
- */
+// When an exception is thrown on a process without being caught, trigger the event and silence the exception
 export declare function uncaughtExceptionHandler(): void;
-/**
- * 当promise中reject的异常在同步任务中没有使用catch捕获就会触发该事件，
- * 即便是在异步情况下使用了catch也会触发该事件
- */
+// When the reject exception in the promise is not caught using catch in the synchronization task, it will trigger the event，
+// Even if catch is used in asynchronous situations, it will trigger the event
 export declare function unhandledRejectionHandler(): void;
-/**
- * 当进程上抛出异常而没有被捕获时触发该事件。
- */
+// This event is triggered when an exception is thrown on the process without being caught.
 export declare function uncaughtExceptionMonitorHandler(): void;

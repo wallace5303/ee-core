@@ -1,2 +1,2 @@
-export function loadController(): void;
-export function getController(): any;
+export declare function loadController(): void;
+export declare function getController(): any;

@@ -5,17 +5,13 @@ const { isForkedChild, isRenderer, isDev, isMain } = require('../ps');
 const { getConfig } = require('../config');
 const { childMessage } = require('../message');
 
-/**
- * 捕获异常
- */
+// 捕获异常
 function loadException() {
   uncaughtExceptionHandler();
   unhandledRejectionHandler();
 }
 
-/**
- * 当进程上抛出异常而没有被捕获时触发该事件，并且使异常静默。
- */
+// 当进程上抛出异常而没有被捕获时触发该事件，并且使异常静默。
 function uncaughtExceptionHandler() {
   process.on('uncaughtException', function(err) {
     if (!(err instanceof Error)) {
@@ -34,9 +30,7 @@ function uncaughtExceptionHandler() {
   });
 }
 
-/**
- * 当进程上抛出异常而没有被捕获时触发该事件。
- */
+// 当进程上抛出异常而没有被捕获时触发该事件。
 function uncaughtExceptionMonitorHandler() {
   process.on('uncaughtExceptionMonitor', function(err, origin) {
     if (!(err instanceof Error)) {
@@ -46,10 +40,8 @@ function uncaughtExceptionMonitorHandler() {
   });
 }
 
-/**
- * 当promise中reject的异常在同步任务中没有使用catch捕获就会触发该事件，
- * 即便是在异步情况下使用了catch也会触发该事件
- */
+// 当promise中reject的异常在同步任务中没有使用catch捕获就会触发该事件，
+// 即便是在异步情况下使用了catch也会触发该事件
 function unhandledRejectionHandler() {
   process.on('unhandledRejection', function(err) {
     if (!(err instanceof Error)) {
@@ -71,18 +63,14 @@ function unhandledRejectionHandler() {
   });
 }
 
-/**
- * 如果是子进程，发送错误到主进程控制台
- */
+// 如果是子进程，发送错误到主进程控制台
 function _devError (err) {
   if (isForkedChild() && isDev()) {
     childMessage.sendErrorToTerminal(err);
   }
 }
 
-/**
- * 捕获异常后是否退出
- */
+// 捕获异常后是否退出
 function _exit () {
   const { mainExit, childExit, rendererExit  } = getConfig().exception;
 
@@ -97,9 +85,7 @@ function _exit () {
   }
 }
 
-/**
- * 捕获异常后是否退出
- */
+// 捕获异常后是否退出
 function _delayExit() {
   // 等待日志等异步写入完成
   setTimeout(() => {

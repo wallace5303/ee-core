@@ -1,14 +1,16 @@
+
+import { Database } from "better-sqlite3";
 export declare class SqliteStorage {
     constructor(name: any, opt?: {});
-    name: any;
+    name: string;
     mode: string;
     dbDir: string;
-    fileName: any;
-    db: any;
+    fileName: string;
+    db: Database;
     _initDB(opt?: {}): any;
-    _formatFileName(name: any): any;
+    _formatFileName(name: string): string;
     _createDatabaseDir(): string;
-    getMode(name: any): string;
+    getMode(name: string): string;
     getDbDir(): string;
     getFilePath(): string;
 }

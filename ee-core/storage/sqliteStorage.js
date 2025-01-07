@@ -3,7 +3,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
-const Database = require('better-sqlite3');
+const BSqlite = require('better-sqlite3');
 const { mkdir } = require('../utils/helper');
 const { getDataDir } = require('../ps');
 
@@ -32,7 +32,7 @@ class SqliteStorage {
       dbPath = this.getFilePath();
     }
 
-    const db = new Database(dbPath, options);
+    const db = new BSqlite(dbPath, options);
 
     // 如果是文件类型，判断文件是否创建成功
     if (this.mode != 'memory') {

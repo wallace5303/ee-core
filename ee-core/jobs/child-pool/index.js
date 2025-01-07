@@ -39,9 +39,6 @@ class ChildPoolJob extends EventEmitter {
     this._initEvents();
   }
 
-  /**
-   * 初始化监听
-   */  
   _initEvents() {
     this.on(Events.childProcessExit, (data) => {
       this._removeChild(data.pid);
@@ -50,10 +47,7 @@ class ChildPoolJob extends EventEmitter {
       this._removeChild(data.pid);
     });
   }
-
-  /**
-   * 移除对象
-   */  
+ 
   _removeChild(pid) {
     const length = Object.keys(this.children).length;
     const lbOpt = {
@@ -63,10 +57,7 @@ class ChildPoolJob extends EventEmitter {
     this.LB.del(lbOpt);
     delete this.children[pid];
   }
-
-  /**
-   * 创建一个池子
-   */  
+ 
   async create(number = 3) {
     if (number < 0 || number > this.max) {
       throw new Error(`[ee-core] [jobs/child-pool] The number is invalid !`);
@@ -96,9 +87,7 @@ class ChildPoolJob extends EventEmitter {
     return pids;
   }
 
-  /**
-   * 子进程创建后处理
-   */  
+  //  Post creation processing of child processes
   _childCreated(childProcess) {
     let pid = childProcess.pid;
     this.children[pid] = childProcess;
@@ -111,9 +100,7 @@ class ChildPoolJob extends EventEmitter {
     this.LB.add(lbTask);
   }
 
-  /**
-   * 执行一个job文件
-   */  
+  // Execute a job file 
   run(filepath, params = {}) {
     const jobPath = getFullpath(filepath);
     const childProcess = this.getChild();
@@ -122,16 +109,12 @@ class ChildPoolJob extends EventEmitter {
     return childProcess;
   }
 
-  /**
-   * 异步执行一个job文件
-   */
+  // Asynchronous execution of a job file
   async runPromise(filepath, params = {}) {
     return this.run(filepath, params);
   }  
 
-  /**
-   * 获取绑定的进程对象
-   */  
+  // Get the bound process object 
   getBoundChild(boundId) {
     let proc;
     const boundPid = this.boundMap.get(boundId);
@@ -147,17 +130,13 @@ class ChildPoolJob extends EventEmitter {
     return proc;
   }
 
-  /**
-   * 通过pid获取一个子进程对象
-   */  
+  // Retrieve a sub process object through PID 
   getChildByPid(pid) {
     let proc = this.children[pid] || null;
     return proc;
   }
 
-  /**
-   * 获取一个子进程对象
-   */  
+  // Get a sub process object 
   getChild() {
     let proc;
     const currentPids = Object.keys(this.children);
@@ -180,18 +159,14 @@ class ChildPoolJob extends EventEmitter {
     return proc;
   }
 
-  /**
-   * 获取当前pids
-   */  
+  // Get current pigs 
   getPids() {
     let pids = Object.keys(this.children);
     return pids;
   }   
 
-  /**
-   * kill all 
-   * @param type {String} - 'sequence' | 'parallel'
-   */
+  // kill all
+  // type: sequence | parallel
   killAll(type = 'parallel') {
     let i = 1;
     Object.keys(this.children).forEach(key => {

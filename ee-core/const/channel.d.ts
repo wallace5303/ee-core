@@ -1,15 +1,15 @@
-export namespace Processes {
+export declare namespace Processes {
     let showException: string;
     let sendToMain: string;
 }
-export namespace SocketIO {
+export declare namespace SocketIO {
     let partySoftware: string;
 }
-export namespace Events {
+export declare namespace Events {
     let childProcessExit: string;
     let childProcessError: string;
 }
-export namespace Receiver {
+export declare namespace Receiver {
     let childJob: string;
     let forkProcess: string;
     let all: string;

@@ -1,18 +1,19 @@
+import { EventEmitter } from 'node:events';
+import { SpawnProcess } from "./spawnProcess";
+import internal = require("stream");
 export declare class CrossProcess {
     emitter: EventEmitter<[never]>;
     children: {};
     childrenMap: {};
     create(): Promise<void>;
-    run(service: any, opt?: {}): Promise<SpawnProcess>;
+    run(service: string, opt?: {}): Promise<SpawnProcess>;
     killAll(): void;
-    kill(pid: any): void;
-    killByName(name: any): void;
-    getUrl(name: any): any;
-    getProcByName(name: any): any;
-    getProc(pid: any): any;
+    kill(pid: string|number): void;
+    killByName(name: string): void;
+    getUrl(name: string): any;
+    getProcByName(name: string): any;
+    getProc(pid: string|number): any;
     getPids(): string[];
     _initEventEmitter(): void;
 }
-import EventEmitter = require("events");
-import { SpawnProcess } from "./spawnProcess";
 export declare let cross: CrossProcess;

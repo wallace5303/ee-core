@@ -10,7 +10,7 @@ export declare function appName(): string;
 export declare function appVersion(): string;
 export declare function getDataDir(): string;
 export declare function getLogDir(): string;
-export declare function getBundleDir(basePath: any): string;
+export declare function getBundleDir(basePath: string): string;
 export declare function getRootDir(): string;
 export declare function getBaseDir(): string;
 export declare function getElectronDir(): string;
@@ -34,4 +34,4 @@ export declare function makeMessage(msg?: {}): {
 export declare function exitChildJob(code?: number): void;
 export declare function isChildJob(): boolean;
 export declare function isChildPoolJob(): boolean;
-export declare function getArgumentByName(name: any): string;
+export declare function getArgumentByName(name: string): string;

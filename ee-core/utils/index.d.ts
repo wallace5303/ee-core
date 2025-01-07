@@ -1,10 +1,10 @@
 export declare function getPackage(): any;
 export declare function getMAC(iface: any): string;
-export declare function isMAC(macAddress: any): boolean;
-export declare function isFileProtocol(protocol: any): boolean;
-export declare function isWebProtocol(protocol: any): boolean;
-export declare function isJsProject(baseDir: any): boolean;
-export declare function machineIdSync(original: any): any;
-export declare function machineId(original: any): Promise<any>;
+export declare function isMAC(macAddress: string): boolean;
+export declare function isFileProtocol(protocol: string): boolean;
+export declare function isWebProtocol(protocol: string): boolean;
+export declare function isJsProject(baseDir: string): boolean;
+export declare function machineIdSync(original: boolean): any;
+export declare function machineId(original: boolean): Promise<any>;
 import is = require("./is");
 export { is };

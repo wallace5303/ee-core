@@ -1,3 +1,4 @@
+import EventEmitter = require("events");
 export declare class SpawnProcess {
     constructor(host: any, opt?: {});
     emitter: EventEmitter<[never]>;
@@ -19,11 +20,10 @@ export declare class SpawnProcess {
     getArgsObj(): {
         _: any[];
     };
-    setPort(port: any): void;
+    setPort(port: string|number): void;
     _generateId(): string;
     /**
      * exit electron
      */
     _exitElectron(timeout?: number): void;
 }
-import EventEmitter = require("events");
