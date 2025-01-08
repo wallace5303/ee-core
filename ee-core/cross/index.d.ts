@@ -1,3 +1,2 @@
-import { CrossProcess } from "./cross";
-import { cross } from "./cross";
-export { CrossProcess, cross };
+import { Cross, cross } from "./cross";
+export { Cross, cross };

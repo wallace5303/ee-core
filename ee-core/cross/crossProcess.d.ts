@@ -1,5 +1,5 @@
 import EventEmitter = require("events");
-export declare class SpawnProcess {
+export declare class CrossProcess {
     constructor(host: any, opt?: {});
     emitter: EventEmitter<[never]>;
     host: any;

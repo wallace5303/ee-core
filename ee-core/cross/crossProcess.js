@@ -11,7 +11,7 @@ const { is } = require('../utils');
 const { parseArgv } = require('../utils/pargv');
 const { app: electronApp } = require('electron');
 
-class SpawnProcess {
+class CrossProcess {
   constructor(host, opt = {}) {
     this.emitter = new EventEmitter();
     this.host = host;
@@ -164,5 +164,5 @@ class SpawnProcess {
 }
 
 module.exports = {
-  SpawnProcess
+  CrossProcess
 };

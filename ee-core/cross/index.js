@@ -1,8 +1,8 @@
 'use strict';
 
-const { CrossProcess, cross} = require('./cross');
+const { Cross, cross} = require('./cross');
 
 module.exports = {
-  CrossProcess,
+  Cross,
   cross
 };

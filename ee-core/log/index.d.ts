@@ -1,13 +1,5 @@
-import { EggLoggers } from "egg-logger";
-import logger = Instance.logger;
-import coreLogger = Instance.coreLogger;
+import { EggLoggers, Logger } from "egg-logger";
 export declare function createLog(config: any): EggLoggers;
-export declare function loadLog(): any;
-declare namespace Instance {
-    export let eelog: any;
-    let logger_1: {};
-    export { logger_1 as logger };
-    let coreLogger_1: {};
-    export { coreLogger_1 as coreLogger };
-}
-export { logger, coreLogger };
+export declare function loadLog(): EggLoggers;
+export declare const logger: Logger;
+export declare const coreLogger: Logger;

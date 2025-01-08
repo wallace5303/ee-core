@@ -3,12 +3,12 @@
 const EventEmitter = require('events');
 const { getConfig } = require('../config');
 const { sleep, getValueFromArgv, replaceArgsValue } = require('../utils/helper');
-const { SpawnProcess } = require('./spawnProcess');
+const { CrossProcess } = require('./crossProcess');
 const { Events } = require('../const/channel');
 const { extend } = require('../utils/extend');
 const { getPort } = require('../utils/port');
 
-class CrossProcess {
+class Cross {
   constructor() {
     this.emitter = undefined;
 
@@ -62,7 +62,7 @@ class CrossProcess {
     }
 
     // 创建进程
-    const subProcess = new SpawnProcess(this, { targetConf, port: confPort });
+    const subProcess = new CrossProcess(this, { targetConf, port: confPort });
     let uniqueName = targetConf.name;
     if (this.childrenMap.hasOwnProperty(uniqueName)) {
       uniqueName = uniqueName + "-" + String(subProcess.pid);
@@ -147,6 +147,6 @@ class CrossProcess {
 }  
 
 module.exports = {
-  CrossProcess,
-  cross: new CrossProcess()
+  Cross,
+  cross: new Cross()
 };
