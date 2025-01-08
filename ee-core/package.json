@@ -36,6 +36,8 @@
     "urllib": "^2.38.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/electron": "^1.4.38",
     "@types/node": "^20.16.0",
     "typescript": "^5.7.2"
   }

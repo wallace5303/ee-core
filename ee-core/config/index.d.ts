@@ -1,3 +1,28 @@
-import defaultConfig, { EEConfig } from "./default_config";
-export declare function loadConfig(): EEConfig;
-export declare function getConfig(): EEConfig;
+import { 
+    AppConfig, 
+    WindowsConfig, 
+    LoggerConfig, 
+    SocketConfig, 
+    HttpConfig,
+    RemoteConfig,
+    MainConfig,
+    ExceptionConfig,
+    JobConfig,
+    CrossConfig 
+} from "./default_config";
+declare function loadConfig(): AppConfig;
+declare function getConfig(): AppConfig;
+export {
+    AppConfig, 
+    WindowsConfig, 
+    LoggerConfig, 
+    SocketConfig, 
+    HttpConfig,
+    RemoteConfig,
+    MainConfig,
+    ExceptionConfig,
+    JobConfig,
+    CrossConfig,
+    loadConfig,
+    getConfig
+}
