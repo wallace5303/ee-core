@@ -8,7 +8,7 @@ export declare interface AppConfig {
     socketServer?: SocketConfig;
     httpServer?: HttpConfig;
     remote?: RemoteConfig;
-    mainServer?: MainConfig;
+    mainServer: MainConfig;
     exception?: ExceptionConfig;
     job?: JobConfig;
     cross?: CrossConfig;
