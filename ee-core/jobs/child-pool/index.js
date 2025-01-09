@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
 const LoadBalancer = require('../load-balancer');
 const { getFullpath } = require('../../loader');
-const { ForkProcess } = require('../child/forkProcess');
+const { JobProcess } = require('../child/jobProcess');
 const { Events } = require('../../const/channel');
 const { validValue } = require('../../utils/helper');
 const { getConfig } = require('../../config');
@@ -78,7 +78,7 @@ class ChildPoolJob extends EventEmitter {
       }
     }, {});
     for (let i = 1; i <= number; i++) {
-      let task = new ForkProcess(this, options);
+      let task = new JobProcess(this, options);
       this._childCreated(task);
     }
   

@@ -1,5 +1,5 @@
 const EventEmitter = require('events');
-const { ForkProcess } = require('./forkProcess');
+const { JobProcess } = require('./jobProcess');
 const { getFullpath } = require('../../loader');
 const { Events } = require('../../const/channel');
 const { getConfig } = require('../../config');
@@ -53,7 +53,7 @@ class ChildJob extends EventEmitter {
         type: 'childJob'
       }
     }, opt);
-    const proc = new ForkProcess(this, options);
+    const proc = new JobProcess(this, options);
     if (!proc) {
       let errorMessage = `[ee-core] [jobs/child] Failed to obtain the child process !`
       throw new Error(errorMessage);

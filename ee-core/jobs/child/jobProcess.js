@@ -9,7 +9,7 @@ const { getRandomString } = require('../../utils/helper');
 const { getFullpath } = require('../../loader');
 const { extend } = require('../../utils/extend');
 
-class ForkProcess {
+class JobProcess {
   constructor(host, opt = {}) {
     
     let cwd = getBaseDir();
@@ -130,5 +130,5 @@ class ForkProcess {
 }
 
 module.exports = {
-  ForkProcess
+  JobProcess
 };

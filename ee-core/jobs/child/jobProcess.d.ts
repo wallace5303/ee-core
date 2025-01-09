@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { ChildProcess } from "child_process";
-declare export class ForkProcess {
+declare export class JobProcess {
     constructor(host: any, opt?: {});
     emitter: EventEmitter<[never]>;
     host: any;
