@@ -37,8 +37,9 @@ module.exports = {
       args: ['run', 'build'],
     },
     electron: {
-      type: 'copy',
+      type: 'javascript',
       bundler: 'esbuild',
+      bundleType: 'bundle', // copy | bundle
       javascript: {
         entryPoints: ['./electron/**/*.js'],
         platform: 'node',

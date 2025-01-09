@@ -169,7 +169,7 @@ class ServeProcess {
   
   // esbuild
   bundle(bundleConfig) {
-    const bundleType = bundleConfig.type;
+    const { bundleType } = bundleConfig;
     if (bundleType == 'copy') {
       const srcResource = path.join(process.cwd(), this.electronDir);
       const destResource = path.join(process.cwd(), this.defaultBundleDir);

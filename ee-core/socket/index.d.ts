@@ -1,7 +1,10 @@
 import IoServer = require("socket.io");
 import IoClient = require("socket.io-client");
+import { HttpServer } from './httpServer';
+import { IpcServer } from './ipcServer';
+import { SocketServer } from './socketServer';
 export declare function loadSocket(): void;
-export declare function getSocketServer(): any;
-export declare function getHttpServer(): any;
-export declare function getIpcServer(): any;
-export { Koa, IoServer, IoClient };
+export declare function getSocketServer(): SocketServer;
+export declare function getHttpServer(): HttpServer;
+export declare function getIpcServer(): IpcServer;
+export { IoServer, IoClient };
