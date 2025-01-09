@@ -8,6 +8,7 @@ const is = require('is-type-of');
 const chalk = require('chalk');
 const crossSpawn = require('cross-spawn');
 const { buildSync } = require('esbuild');
+const chokidar = require('chokidar');
 
 class ServeProcess {
 
@@ -33,18 +34,33 @@ class ServeProcess {
     if (!command) {
       command = Object.keys(binCmdConfig).join();
     }
-
-    // build electron code 
-    const cmds = this._formatCmds(command);
-    if (cmds.indexOf("electron") !== -1) {
-      this.bundle(binCfg.build.electron);
-    }
-
     const opt = {
       binCmd,
       binCmdConfig,
       command,
     }
+
+    // build electron code 
+    const cmds = this._formatCmds(command);
+    if (cmds.indexOf("electron") !== -1) {
+      // watche electron code
+      const watcher = chokidar.watch([this.electronDir], {
+        persistent: true
+      });
+      watcher.on('change', async (f) => {
+        console.log(chalk.blue('[ee-bin] [dev] ') + `File ${f} has been changed`);
+        const subPorcess = this.execProcess['electron'];
+        subPorcess.kill();
+        this.bundle(binCfg.build.electron);
+
+        // todo 是启动多个命令，还是只启动 electron 命令
+        this.multiExec(opt);
+      });
+
+      // When starting for the first time, build the code for the electron directory
+      this.bundle(binCfg.build.electron);
+    }
+
     this.multiExec(opt);
   }
 
