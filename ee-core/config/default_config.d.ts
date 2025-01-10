@@ -8,25 +8,11 @@ export declare interface AppConfig {
     socketServer?: SocketConfig;
     httpServer?: HttpConfig;
     remote?: RemoteConfig;
-    mainServer: MainConfig;
+    mainServer?: MainConfig;
     exception?: ExceptionConfig;
     job?: JobConfig;
     cross?: CrossConfig;
 }
-export declare interface WindowsConfig {
-    title?: string;
-    width?: number;
-    height?: number;
-    minWidth?: number;
-    minHeight?: number;
-    webPreferences?: {
-        contextIsolation?: boolean;
-        nodeIntegration?: boolean;
-    };
-    frame?: boolean;
-    show?: boolean;
-    icon?: string;
-};
 export declare interface LoggerConfig {
     type?: string;
     dir?: string;
