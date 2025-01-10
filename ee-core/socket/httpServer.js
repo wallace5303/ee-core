@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug')('ee-core:socket:httpServer');
 const assert = require('assert');
 const is = require('is-type-of');
 const Koa = require('koa');
@@ -20,7 +21,9 @@ const { getPort } = require('../utils/port');
  */
 class HttpServer {
   constructor () {
-    this.config = getConfig().httpServer;
+    const { httpServer, mainServer } = getConfig();
+    this.config = httpServer;
+    this.channelSeparator = mainServer.channelSeparator;
     this.httpApp = undefined;
     this.init();
   }
@@ -117,11 +120,13 @@ class HttpServer {
       if (uriPath.slice(0, 10) != 'controller') {
         uriPath = 'controller/' + uriPath;
       }
-      const cmd = uriPath.split('/').join('.');
+      const cmd = uriPath.split('/').join(this.channelSeparator);
+      debug('[request] uri %s', cmd);
       const args = (method == 'POST') ? body: params;
       let fn = null;
       if (is.string(cmd)) {
-        const actions = cmd.split('.');
+        const actions = cmd.split(this.channelSeparator);
+        debug('[findFn] channel %o', actions);
         let obj = { controller };
         actions.forEach(key => {
           obj = obj[key];

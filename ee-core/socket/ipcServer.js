@@ -6,11 +6,18 @@ const { ipcMain } = require('electron');
 const { coreLogger } = require('../log');
 const { getController } = require('../controller');
 const { EXPORTS } = require('../core/loader/file_loader');
+const { getConfig } = require('../config');
 
 class IpcServer {
   constructor () {
+    const { mainServer } = getConfig();
+    this.channelSeparator = mainServer.channelSeparator;
     this.directory = 'controller';
     this.init();
+  }
+  init() {
+    const controller = getController();
+    this.loop(controller, this.directory);
   }
 
   loop(obj, pathname) {
@@ -35,7 +42,10 @@ class IpcServer {
     const controller = getController();
     const keys = Object.keys(exportObj);
     for (const key of keys) {
-      const channel = `${propertyChain}.${key}`;
+      // Supports two types of routing separators
+      // channel: controller.file.function | controller/file/function
+      const tmpChannel = `${propertyChain}.${key}`;
+      const channel = tmpChannel.split('.').join(this.channelSeparator);
       debug('[register] channel %s', channel);
 
       // send/on model
@@ -71,7 +81,8 @@ class IpcServer {
       const cmd = c;
       let fn = null;
       if (is.string(cmd)) {
-        const actions = cmd.split('.');
+        const actions = cmd.split(this.channelSeparator);
+        debug('[findFn] channel %o', actions);
         let obj = { controller };
         actions.forEach(key => {
           obj = obj[key];
@@ -88,10 +99,6 @@ class IpcServer {
     return null;
   }
 
-  init() {
-    const controller = getController();
-    this.loop(controller, this.directory);
-  }
 }
 
 module.exports = {

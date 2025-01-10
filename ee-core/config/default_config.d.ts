@@ -94,6 +94,7 @@ export declare interface MainConfig {
     options?: {};
     takeover?: string;
     loadingPage?: string;
+    channelSeparator?: string;
 }
 export declare interface ExceptionConfig {
     mainExit?: boolean;

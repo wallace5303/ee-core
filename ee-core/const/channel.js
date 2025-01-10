@@ -6,7 +6,7 @@ const Processes = {
 }
 
 const SocketIO = {
-  partySoftware: 'c1',
+  partySoftware: 'socket-channel',
 }
 
 const Events = {

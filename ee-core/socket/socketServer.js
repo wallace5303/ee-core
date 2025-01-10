@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug')('ee-core:socket:socketServer');
 const is = require('is-type-of');
 const { Server } = require('socket.io');
 const { coreLogger } = require('../log');
@@ -13,9 +14,11 @@ const { getPort } = require('../utils/port');
  */
 class SocketServer {
   constructor () {
+    const { socketServer, mainServer } = getConfig();
+    this.config = socketServer;
+    this.channelSeparator = mainServer.channelSeparator;
     this.socket = undefined;
     this.io = undefined;
-    this.config = getConfig().socketServer;
     this.init();
   }
 
@@ -49,8 +52,10 @@ class SocketServer {
           const cmd = message.cmd;
           const args = message.args;
           let fn = null;
+          debug('[socket] channel %s', cmd);
           if (is.string(cmd)) {
-            const actions = cmd.split('.');
+            const actions = cmd.split(this.channelSeparator);
+            debug('[findFn] channel %o', actions);
             let obj = { controller };
             actions.forEach(key => {
               obj = obj[key];

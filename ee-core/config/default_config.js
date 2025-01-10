@@ -96,6 +96,7 @@ module.exports = () => {
       options: {},
       takeover: '',
       loadingPage: '',
+      channelSeparator: '/',
     },
     exception: {
       mainExit: false,
