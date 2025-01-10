@@ -16,6 +16,8 @@ const { getController } = require('../controller');
 const { getConfig } = require('../config');
 const { getPort } = require('../utils/port');
 
+let channelSeparator = '/';
+
 /**
  * http server
  */
@@ -23,7 +25,7 @@ class HttpServer {
   constructor () {
     const { httpServer, mainServer } = getConfig();
     this.config = httpServer;
-    this.channelSeparator = mainServer.channelSeparator;
+    channelSeparator = mainServer.channelSeparator;
     this.httpApp = undefined;
     this.init();
   }
@@ -120,12 +122,12 @@ class HttpServer {
       if (uriPath.slice(0, 10) != 'controller') {
         uriPath = 'controller/' + uriPath;
       }
-      const cmd = uriPath.split('/').join(this.channelSeparator);
+      const cmd = uriPath.split('/').join(channelSeparator);
       debug('[request] uri %s', cmd);
       const args = (method == 'POST') ? body: params;
       let fn = null;
       if (is.string(cmd)) {
-        const actions = cmd.split(this.channelSeparator);
+        const actions = cmd.split(channelSeparator);
         debug('[findFn] channel %o', actions);
         let obj = { controller };
         actions.forEach(key => {
