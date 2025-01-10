@@ -40,20 +40,27 @@ class ServeProcess {
       command,
     }
 
-    // build electron code 
+    // build electron main code 
     const cmds = this._formatCmds(command);
     if (cmds.indexOf("electron") !== -1) {
-      // watche electron code
+      // watche electron main code
       const watcher = chokidar.watch([this.electronDir], {
         persistent: true
       });
       watcher.on('change', async (f) => {
         console.log(chalk.blue('[ee-bin] [dev] ') + `File ${f} has been changed`);
-        const subPorcess = this.execProcess['electron'];
-        subPorcess.kill();
-        this.bundle(binCfg.build.electron);
+        for (let i = 0; i < cmds.length; i++) {
+          let cmd = cmds[i];
+          console.log(chalk.blue('[ee-bin] [dev] ') + `restart ${cmd}`);
+          if (cmd == 'electron') {
+            this.bundle(binCfg.build.electron);
+          }
+          let subPorcess = this.execProcess[cmd];
+          subPorcess.kill();
+          delete this.execProcess[cmd];
+        }
 
-        // todo 是启动多个命令，还是只启动 electron 命令
+        // restart multiple commands
         this.multiExec(opt);
       });
 
