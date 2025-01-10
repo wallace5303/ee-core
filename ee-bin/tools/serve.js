@@ -44,25 +44,31 @@ class ServeProcess {
     const cmds = this._formatCmds(command);
     if (cmds.indexOf("electron") !== -1) {
       // watche electron main code
-      const watcher = chokidar.watch([this.electronDir], {
-        persistent: true
-      });
-      watcher.on('change', async (f) => {
-        console.log(chalk.blue('[ee-bin] [dev] ') + `File ${f} has been changed`);
-        for (let i = 0; i < cmds.length; i++) {
-          let cmd = cmds[i];
-          console.log(chalk.blue('[ee-bin] [dev] ') + `restart ${cmd}`);
-          if (cmd == 'electron') {
-            this.bundle(binCfg.build.electron);
-          }
+      const electronConfig = binCmdConfig.electron;
+      if (electronConfig.watch) {
+        const cmd = 'electron';
+        const watcher = chokidar.watch([this.electronDir], {
+          persistent: true
+        });
+        watcher.on('change', async (f) => {
+          console.log(chalk.blue('[ee-bin] [dev] ') + `File ${f} has been changed`);
+          console.log(chalk.blue('[ee-bin] [dev] ') + `Restart ${cmd}`);
+
+          // rebuild code
+          this.bundle(binCfg.build.electron);
           let subPorcess = this.execProcess[cmd];
           subPorcess.kill();
           delete this.execProcess[cmd];
-        }
-
-        // restart multiple commands
-        this.multiExec(opt);
-      });
+  
+          // restart electron command
+          let onlyElectronOpt = {
+            binCmd,
+            binCmdConfig,
+            command: cmd,
+          }
+          this.multiExec(onlyElectronOpt);
+        });
+      }
 
       // When starting for the first time, build the code for the electron directory
       this.bundle(binCfg.build.electron);

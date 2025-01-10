@@ -23,6 +23,7 @@ module.exports = {
       cmd: 'electron',
       args: ['.', '--env=local'],
       loadingPage: '/public/html/loading.html',
+      watch: false,
     },
   },
 
