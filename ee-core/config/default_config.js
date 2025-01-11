@@ -100,7 +100,7 @@ module.exports = () => {
     },
     exception: {
       mainExit: false,
-      childExit: true,
+      childExit: false,
       rendererExit: true,
     },
     jobs: {
