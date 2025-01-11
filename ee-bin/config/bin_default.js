@@ -17,6 +17,7 @@ module.exports = {
       port: 8080,
       indexPath: 'index.html',
       force: false,
+      sync: false,
     },
     electron: {
       directory: './',
@@ -24,6 +25,7 @@ module.exports = {
       args: ['.', '--env=local'],
       loadingPage: '/public/html/loading.html',
       watch: false,
+      sync: false,
     },
   },
 
@@ -142,8 +144,10 @@ module.exports = {
     confusionOptions: {
       compact: true,      
       stringArray: true,
-      stringArrayEncoding: ['none'],
+      stringArrayEncoding: ['rc4'],
       deadCodeInjection: false,
+      stringArrayCallsTransform: true,
+      numbersToExpressions: true,
     }
   },
 
