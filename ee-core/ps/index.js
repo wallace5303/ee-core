@@ -177,11 +177,6 @@ function isPackaged() {
   return process.env.EE_IS_PACKAGED === 'true';
 }
 
-// 是否热重启
-function isHotReload() {
-  return process.env.HOT_RELOAD === 'true';
-}
-
 // 进程退出
 function exit(code = 0) {
   return process.exit(code);
@@ -272,7 +267,6 @@ module.exports = {
   getSocketPort,
   getHttpPort,
   isPackaged,
-  isHotReload,
   exit,
   makeMessage,
   exitChildJob,
