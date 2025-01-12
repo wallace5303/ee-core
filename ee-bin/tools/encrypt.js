@@ -9,17 +9,19 @@ const JavaScriptObfuscator = require('javascript-obfuscator');
 const globby = require('globby');
 const chalk = require('chalk');
 const { loadConfig } = require('../lib/utils');
+const { extend } = require('../lib/extend');
 
 const EncryptTypes = ['bytecode', 'confusion', 'strict'];
 
 class Encrypt {
   constructor(options = {}) {
     // cli args
-    const { config, out } = options;
+    const { config, out, target } = options;
     this.basePath = process.cwd();
     
-    const cfg = loadConfig(config);
-    this.config = cfg.encrypt;
+    const conf = loadConfig(config).encrypt;
+    this.config = conf[target];
+    console.log(this.config);
     const outputFolder = out || this.config.encryptDir;
     this.encryptDir = path.join(this.basePath, outputFolder);
     this.filesExt = this.config.fileExt;
@@ -44,40 +46,11 @@ class Encrypt {
   }
 
   /**
-   * 备份代码
-   */
-  backup() {
-    // clean
-    this.cleanCode();
-
-    console.log(chalk.blue('[ee-bin] [encrypt] ') + 'backup start');
-    this.codefiles.forEach((filepath) => {
-      let source = path.join(this.basePath, filepath);
-      if (fs.existsSync(source)) {
-        let target = path.join(this.encryptCodeDir, filepath);
-        fsPro.copySync(source, target);
-      }
-    })
-
-    console.log(chalk.blue('[ee-bin] [encrypt] ') + 'backup end');
-    return true;
-  }
-  
-  /**
-   * 清除加密代码
-   */
-  cleanCode() {
-    this.cleanFiles.forEach((file) => {
-      let tmpFile = path.join(this.basePath, file);
-      fsPro.removeSync(tmpFile);
-      console.log(chalk.blue('[ee-bin] [encrypt] ') + 'clean up tmp files:' + chalk.magenta(`${tmpFile}`));
-    })
-  }
-
-  /**
    * 加密代码
    */
   encrypt() {
+    if (EncryptTypes.indexOf(this.type) == -1) return;
+
     console.log(chalk.blue('[ee-bin] [encrypt] ') + 'start ciphering');
     for (const file of this.codefiles) {
       const fullpath = path.join(this.encryptDir, file);
@@ -171,10 +144,17 @@ class Encrypt {
 }
 
 function encrypt(options = {}) {
-  const enc = new Encrypt(options);
-  if (EncryptTypes.indexOf(enc.type) == -1) return;
-  //if (!enc.backup()) return;
-  enc.encrypt();
+  const electronOpt = extend(true, {
+    target: 'electron',
+  }, options);
+  const electronEpt = new Encrypt(electronOpt);
+  electronEpt.encrypt();
+
+  const frontendOpt = extend(true, {
+    target: 'frontend',
+  }, options);
+  const frontendEpt = new Encrypt(frontendOpt);
+  frontendEpt.encrypt();
 }
 
 function cleanEncrypt(options = {}) {

@@ -47,7 +47,7 @@ module.exports = {
         entryPoints: ['./electron/**/*.js'],
         platform: 'node',
         bundle: false,
-        minify: true,
+        minify: false,
         outdir: 'public/electron',
         packages: 'external',
         sourcemap:false,
@@ -59,7 +59,7 @@ module.exports = {
         platform: 'node',
         format: 'cjs',
         bundle: false,
-        minify: true,
+        minify: false,
         outdir: 'public/electron',
         packages: 'external',
         sourcemap:false,
@@ -133,21 +133,43 @@ module.exports = {
    * 加密
    */  
   encrypt: {
-    type: 'none',
-    files: [
-      './public/electron/**/*.(js|json)',
-    ],
-    fileExt: ['.js'],
-    cleanFiles: ['./public/electron'],
-    specificFiles: ['./public/electron/preload/bridge.js'],
-    encryptDir: './',
-    confusionOptions: {
-      compact: true,      
-      stringArray: true,
-      stringArrayEncoding: ['rc4'],
-      deadCodeInjection: false,
-      stringArrayCallsTransform: true,
-      numbersToExpressions: true,
+    frontend: {
+      type: 'none',
+      files: [
+        './public/dist/**/*.(js|json)',
+      ],
+      fileExt: ['.js'],
+      cleanFiles: ['./public/dist'],
+      specificFiles: [],
+      encryptDir: './',
+      confusionOptions: {
+        compact: true,      
+        stringArray: true,
+        stringArrayEncoding: ['none'],
+        deadCodeInjection: false,
+        stringArrayCallsTransform: true,
+        numbersToExpressions: true,
+        target: 'browser',
+      }
+    },
+    electron: {
+      type: 'none',
+      files: [
+        './public/electron/**/*.(js|json)',
+      ],
+      fileExt: ['.js'],
+      cleanFiles: ['./public/electron'],
+      specificFiles: ['./public/electron/preload/bridge.js'],
+      encryptDir: './',
+      confusionOptions: {
+        compact: true,      
+        stringArray: true,
+        stringArrayEncoding: ['rc4'],
+        deadCodeInjection: false,
+        stringArrayCallsTransform: true,
+        numbersToExpressions: true,
+        target: 'node',
+      }
     }
   },
 

@@ -206,9 +206,10 @@ class ServeProcess {
       fsPro.copySync(srcResource, destResource);
     } else {
       const esbuildOptions = bundleConfig[bundleConfig.type];
-      if (this.isDev()) {
-        esbuildOptions.minify = false;
-      }
+      // todo 不压缩
+      // if (this.isDev()) {
+      //   esbuildOptions.minify = false;
+      // }
       debug('esbuild options:%O', esbuildOptions);
       buildSync(esbuildOptions);
     }
