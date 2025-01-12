@@ -158,6 +158,7 @@ function encrypt(options = {}) {
 }
 
 function cleanEncrypt(options = {}) {
+  // [todo] 删除前端和主进程代码
   let files = options.dir !== undefined ? options.dir : ['./public/electron'];
   files = is.string(files) ? [files] : files;
 
