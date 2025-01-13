@@ -18,10 +18,10 @@ class Encrypt {
     // cli args
     const { config, out, target } = options;
     this.basePath = process.cwd();
+    this.target = target;
     
     const conf = loadConfig(config).encrypt;
     this.config = conf[target];
-    console.log(this.config);
     const outputFolder = out || this.config.encryptDir;
     this.encryptDir = path.join(this.basePath, outputFolder);
     this.filesExt = this.config.fileExt;
@@ -50,8 +50,9 @@ class Encrypt {
    */
   encrypt() {
     if (EncryptTypes.indexOf(this.type) == -1) return;
+    if (this.target == 'frontend' && (this.type == 'bytecode' || this.type == 'strict')) return;
 
-    console.log(chalk.blue('[ee-bin] [encrypt] ') + 'start ciphering');
+    console.log(chalk.blue('[ee-bin] [encrypt] ') + `start ciphering ${this.target}`);
     for (const file of this.codefiles) {
       const fullpath = path.join(this.encryptDir, file);
       if (!fs.statSync(fullpath).isFile()) continue;
@@ -159,6 +160,7 @@ function encrypt(options = {}) {
 
 function cleanEncrypt(options = {}) {
   // [todo] 删除前端和主进程代码
+  return;
   let files = options.dir !== undefined ? options.dir : ['./public/electron'];
   files = is.string(files) ? [files] : files;
 
