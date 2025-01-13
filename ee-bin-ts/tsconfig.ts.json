@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    /* Full strict is fine for the TypeScript files, so turn back on the checks we turned off for mixed-use. */
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "useUnknownInCatchVariables": true,
+  },
+  "include": [
+    /* All TypeScript targets from tsconfig.json include. */
+    "src/**/*.ts",
+    "src/**/*.mts",
+  ],
+}

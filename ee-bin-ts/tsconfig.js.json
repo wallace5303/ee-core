@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    /* All JavaScript targets from tsconfig.json include. */
+    // "*.js",
+    // "*.mjs",
+    // "lib/**/*.js",
+    // "tools/**/*.js",
+    "src/**/*.js",
+    "src/**/*.mjs"
+  ],
+}
