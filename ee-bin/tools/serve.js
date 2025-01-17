@@ -9,6 +9,7 @@ const chalk = require('chalk');
 const crossSpawn = require('cross-spawn');
 const { buildSync } = require('esbuild');
 const chokidar = require('chokidar');
+const kill = require('tree-kill');
 
 class ServeProcess {
 
@@ -57,16 +58,23 @@ class ServeProcess {
           // rebuild code
           this.bundle(binCfg.build.electron);
           let subPorcess = this.execProcess[cmd];
-          subPorcess.kill();
+          kill(subPorcess.pid, 'SIGKILL', (err) => {
+            if (err) {
+              console.log(chalk.red('[ee-bin] [dev] ') + `Restart failed, error: ${err}`);
+              process.exit(-1);
+            }
+          })
           delete this.execProcess[cmd];
   
           // restart electron command
-          let onlyElectronOpt = {
-            binCmd,
-            binCmdConfig,
-            command: cmd,
-          }
-          this.multiExec(onlyElectronOpt);
+          setTimeout(() => {
+            let onlyElectronOpt = {
+              binCmd,
+              binCmdConfig,
+              command: cmd,
+            }
+            this.multiExec(onlyElectronOpt);
+          }, electronConfig.delay);
         });
       }
 

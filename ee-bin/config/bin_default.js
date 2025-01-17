@@ -26,6 +26,7 @@ module.exports = {
       loadingPage: '/public/html/loading.html',
       watch: false,
       sync: false,
+      delay: 1000,
     },
   },
 
