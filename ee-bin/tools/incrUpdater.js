@@ -2,9 +2,10 @@
 
 const path = require('path');
 const fs = require('fs');
+const fsPro = require('fs-extra');
 const crypto = require('crypto')
 const chalk = require('chalk');
-const { loadConfig, rm, getPackage, writeJsonSync } = require('../lib/utils');
+const { loadConfig, getPackage, writeJsonSync } = require('../lib/utils');
 const admZip = require('adm-zip')
 
 /**
@@ -13,6 +14,16 @@ const admZip = require('adm-zip')
  */
 
 class IncrUpdater {
+
+  constructor() {
+    this.tmpAppDirs = [
+      'mac',
+      'mac-arm64',
+      'win-unpacked',
+      'win-ia32-unpacked',
+      'linux-unpacked'
+    ];
+  }
 
   /**
    * 执行
@@ -50,14 +61,6 @@ class IncrUpdater {
     let asarFilePath = "";
     if (asarFile) {
       asarFilePath = path.normalize(path.join(homeDir, asarFile));
-    } else if (Array.isArray(cfg.asarFile)) {  
-      // 检查文件列表，如果存在就跳出
-      for (const filep of cfg.asarFile) {
-        asarFilePath = path.normalize(path.join(homeDir, filep));
-        if (fs.existsSync(asarFilePath)) {
-          break;
-        }
-      }
     } else {
       asarFilePath = path.normalize(path.join(homeDir, cfg.asarFile));
     }
@@ -119,11 +122,10 @@ class IncrUpdater {
 
     // 删除缓存文件，防止生成的 zip 是旧版本
     if (cfg.cleanCache) {
-      rm(path.join(homeDir, cfg.output.directory, 'mac'));
-      rm(path.join(homeDir, cfg.output.directory, 'mac-arm64'));
-      rm(path.join(homeDir, cfg.output.directory, 'win-unpacked'));
-      rm(path.join(homeDir, cfg.output.directory, 'win-ia32-unpacked'));
-      rm(path.join(homeDir, cfg.output.directory, 'linux-unpacked'));
+      this.tmpAppDirs.forEach(dir => {
+        const dirPath = path.join(homeDir, cfg.output.directory, dir);
+        fsPro.removeSync(dirPath);
+      });
     }  
   }
   
