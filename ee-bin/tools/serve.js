@@ -47,34 +47,39 @@ class ServeProcess {
       // watche electron main code
       const electronConfig = binCmdConfig.electron;
       if (electronConfig.watch) {
+        let debounceTimer = null;
         const cmd = 'electron';
         const watcher = chokidar.watch([this.electronDir], {
           persistent: true
         });
         watcher.on('change', async (f) => {
           console.log(chalk.blue('[ee-bin] [dev] ') + `File ${f} has been changed`);
-          console.log(chalk.blue('[ee-bin] [dev] ') + `Restart ${cmd}`);
 
-          // rebuild code
-          this.bundle(binCfg.build.electron);
-          let subPorcess = this.execProcess[cmd];
-          kill(subPorcess.pid, 'SIGKILL', (err) => {
-            if (err) {
-              console.log(chalk.red('[ee-bin] [dev] ') + `Restart failed, error: ${err}`);
-              process.exit(-1);
-            }
-          })
-          delete this.execProcess[cmd];
-  
-          // restart electron command
-          setTimeout(() => {
-            let onlyElectronOpt = {
-              binCmd,
-              binCmdConfig,
-              command: cmd,
-            }
-            this.multiExec(onlyElectronOpt);
-          }, electronConfig.delay);
+          // 防抖
+          if (debounceTimer) {
+            clearTimeout(debounceTimer);
+          }
+          debounceTimer = setTimeout(async () => {
+            // rebuild code
+            console.log(chalk.blue('[ee-bin] [dev] ') + `Restart ${cmd}`);
+            this.bundle(binCfg.build.electron);
+            let subPorcess = this.execProcess[cmd];
+            kill(subPorcess.pid, 'SIGKILL', (err) => {
+              if (err) {
+                console.log(chalk.red('[ee-bin] [dev] ') + `Restart failed, error: ${err}`);
+                process.exit(-1);
+              }
+              delete this.execProcess[cmd];
+
+              // restart electron command
+              let onlyElectronOpt = {
+                binCmd,
+                binCmdConfig,
+                command: cmd,
+              }
+              this.multiExec(onlyElectronOpt);
+            })                     
+          }, electronConfig.delay);  
         });
       }
 
