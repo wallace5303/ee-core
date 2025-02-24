@@ -10,6 +10,7 @@ const { getRandomString, getValueFromArgv } = require('../utils/helper');
 const { is } = require('../utils');
 const { parseArgv } = require('../utils/pargv');
 const { app: electronApp } = require('electron');
+const tkill = require('tree-kill');
 
 class CrossProcess {
   constructor(host, opt = {}) {
@@ -116,11 +117,15 @@ class CrossProcess {
    * kill
    */
   kill(timeout = 1000) {
-    this.child.kill('SIGINT');
-    setTimeout(() => {
-      if (this.child.killed) return;
-      this.child.kill('SIGKILL');
-    }, timeout)
+    tkill(this.pid, 'SIGINT', (err) => {
+      if (err) {
+        coreLogger.error(`[ee-core] [corss/process] kill cross-process, error: ${err}, pid:${this.pid}`);
+        tkill(this.pid, 'SIGKILL');
+      }
+      setTimeout(() => {
+        this._exitElectron();
+      }, timeout)
+    })
   }
 
   getUrl() {
