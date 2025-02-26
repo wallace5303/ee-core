@@ -83,7 +83,7 @@ class IncrUpdater {
     zipName = path.basename(cfg.output.zip, '.zip') + `-${platformForFilename}-${version}.zip`;
     const asarZipPath = path.join(homeDir, cfg.output.directory, zipName);
     if (fs.existsSync(asarZipPath)) {
-      rm(asarZipPath);
+      fsPro.removeSync(asarZipPath);
     }
     const zip = new admZip();
     // 添加 asar 文件
