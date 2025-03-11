@@ -47,15 +47,20 @@ class ChildApp {
     const {jobPath, jobParams, jobFunc, jobFuncParams} = msg;
     let mod = requireFile(jobPath);
     if (is.class(mod) || isBytecodeClass(mod)) {
+      let instance;
       if (!this.jobMap.has(jobPath)) {
-        const instance = new mod(...jobParams);
-        instance.handle(...jobParams);
+        instance = new mod(...jobParams);
         this.jobMap.set(jobPath, instance);
       } else {
-        const instance = this.jobMap.get(jobPath);
-        instance[jobFunc](...jobFuncParams);
+        instance = this.jobMap.get(jobPath);
       }
 
+      // 如果指定了函数名，则调用指定的函数
+      if (jobFunc) {
+        instance[jobFunc](...jobFuncParams);
+      } else {
+        instance.handle(...jobParams);
+      }
     } else if (is.function(mod)) {
       mod(jobParams);
     }
