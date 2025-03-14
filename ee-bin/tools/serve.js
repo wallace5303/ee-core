@@ -3,7 +3,7 @@
 const debug = require('debug')('ee-bin:serve');
 const path = require('path');
 const fsPro = require('fs-extra');
-const { loadConfig } = require('../lib/utils');
+const { loadConfig, isWindows } = require('../lib/utils');
 const is = require('is-type-of');
 const chalk = require('chalk');
 const crossSpawn = require('cross-spawn');
@@ -58,7 +58,7 @@ class ServeProcess {
     await this.sleep(1000);
     currentProcess.forEach((p) => {
       kill(p.pid);
-      console.log(chalk.blue("[ee-bin] ") + `Kill ${chalk.blue(p.name)} server, pid: ${p.pid}`);
+      debug(`Kill ${chalk.blue(p.name)} server, pid: ${p.pid}`);
     });
     process.exit(0);
   }
@@ -245,6 +245,9 @@ class ServeProcess {
         this.execProcess[cmd].on('exit', () => {
           if (binCmd == 'dev') {
             console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + `The ${chalk.green(cmd)} process is exiting`);
+            if (isWindows() && cmd == 'electron') {
+              console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.green('Press "CTRL+C" to exit'));
+            }
             return
           }
           console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + `The ${chalk.green(cmd)} command has been executed and exited`);
