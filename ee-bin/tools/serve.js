@@ -10,6 +10,7 @@ const crossSpawn = require('cross-spawn');
 const { buildSync } = require('esbuild');
 const chokidar = require('chokidar');
 const kill = require('tree-kill');
+const process = require("process");
 
 class ServeProcess {
 
@@ -18,6 +19,48 @@ class ServeProcess {
     this.execProcess = {};
     this.electronDir = './electron';
     this.defaultBundleDir = './public/electron';
+    this._init();
+  }
+
+  /**
+   * init 
+   */  
+  _init() {
+    // process manager
+    // Monitor SIGINT signal（Ctrl + C）
+    process.on('SIGINT', () => {
+      console.log(chalk.blue('[ee-bin] ') + `Received SIGINT. Closing processes...`);
+      this._closeProcess();
+    });
+
+    // Monitor SIGTERM signal
+    process.on('SIGTERM', () => {
+      console.log(chalk.blue('[ee-bin] ') + `Received SIGTERM. Closing processes...`);
+      this._closeProcess();
+    });
+  }  
+
+  // Close process
+  async _closeProcess() {
+    const currentProcess = [];
+    const keys = Object.keys(this.execProcess);
+    const len = keys.length;
+    for (let i = 0; i < len; i++) {
+      const key = keys[i];
+      const p = this.execProcess[key];
+      currentProcess.push({
+        name: key,
+        pid: p.pid,
+      });
+    }
+
+    // Cleaning work before the end of the process
+    await this.sleep(1000);
+    currentProcess.forEach((p) => {
+      kill(p.pid);
+      console.log(chalk.blue("[ee-bin] ") + `Kill [${chalk.blue(p.name)}] server. pid: ${chalk.green(p.pid)}`);
+    });
+    process.exit(0);
   }
 
   /**
@@ -199,8 +242,8 @@ class ServeProcess {
 
       if(!cfg.sync) {
         this.execProcess[cmd].on('exit', () => {
-          if (cmd == 'electron') {
-            console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.green('Press "CTRL+C" to exit'));
+          if (binCmd == 'dev') {
+            console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`the ${cmd}`) + ' process is exiting');
             return
           }
           console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`[${binCmd} ${cmd}]`) + ' command has been executed and exited');
