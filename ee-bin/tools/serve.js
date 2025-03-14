@@ -58,7 +58,7 @@ class ServeProcess {
     await this.sleep(1000);
     currentProcess.forEach((p) => {
       kill(p.pid);
-      console.log(chalk.blue("[ee-bin] ") + `Kill [${chalk.blue(p.name)}] server. pid: ${chalk.green(p.pid)}`);
+      console.log(chalk.blue("[ee-bin] ") + `Kill ${chalk.blue(p.name)} server, pid: ${p.pid}`);
     });
     process.exit(0);
   }
@@ -96,7 +96,8 @@ class ServeProcess {
           persistent: true
         });
         watcher.on('change', async (f) => {
-          console.log(chalk.blue('[ee-bin] [dev] ') + `File ${f} has been changed`);
+          //console.log(chalk.blue('[ee-bin] [dev] ') + 'File ' + chalk.cyan(`[${f}]`) + 'has been changed');
+          console.log(chalk.blue('[ee-bin] [dev] ') + `File [${chalk.cyan(f)}] has been changed`);
 
           // 防抖
           if (debounceTimer) {
@@ -215,7 +216,7 @@ class ServeProcess {
       const cfg = binCmdConfig[cmd];
 
       if (!cfg) {
-        console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.red(`Error: [${binCmd} ${cmd}] config does not exist` ));
+        console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.red(`Error: [${cmd}] config does not exist` ));
         continue;
       }
 
@@ -224,8 +225,8 @@ class ServeProcess {
         continue;
       }
 
-      console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + "Run " + chalk.green(`[${binCmd} ${cmd}]` + " command"));
-      console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.green('config:'), JSON.stringify(cfg));
+      console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + `Run ${chalk.green(cmd)} command`);
+      console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.magenta('Config:'), JSON.stringify(cfg));
 
       const execDir = path.join(process.cwd(), cfg.directory);
       const execArgs = is.string(cfg.args) ? [cfg.args] : cfg.args;
@@ -238,15 +239,15 @@ class ServeProcess {
         execArgs,
         { stdio: stdio, cwd: execDir, maxBuffer: 1024 * 1024 * 1024 },
       );
-      console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`[${binCmd} ${cmd}]`) + ` command is ${cfg.sync ? 'run completed' : 'running'}`);
+      console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`${cmd}`) + ` command is ${cfg.sync ? 'run completed' : 'running'}`);
 
       if(!cfg.sync) {
         this.execProcess[cmd].on('exit', () => {
           if (binCmd == 'dev') {
-            console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`the ${cmd}`) + ' process is exiting');
+            console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + `The ${chalk.green(cmd)} process is exiting`);
             return
           }
-          console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + 'The ' + chalk.green(`[${binCmd} ${cmd}]`) + ' command has been executed and exited');
+          console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + `The ${chalk.green(cmd)} command has been executed and exited`);
         });
       }
     }
