@@ -50,6 +50,9 @@ class HttpServer {
    */
   _create () {
     const config = this.config;
+    // config.default 增加koaConfig配置项
+    const koaConfig = config.koaConfig || {};
+    const { preMiddleware = [], postMiddleware = [], errorHandler = null } = koaConfig;
     const isHttps = config?.https?.enable ?? false;
     const sslOptions = {};
 
@@ -67,10 +70,21 @@ class HttpServer {
     const corsOptions = config.cors;
 
     const koaApp = new Koa();
+
+    // 设置错误处理器，便于统一错误代码处理
+    this._setupErrorHandler(koaApp, errorHandler);
+
+    // 加载前置中间件
+    this._loadMiddlewares(koaApp, preMiddleware);
+
+    // 核心中间件
     koaApp
       .use(cors(corsOptions))
       .use(koaBody(config.body))
       .use(this._dispatch);
+
+    // 加载后置中间件
+    this._loadMiddlewares(koaApp, postMiddleware, 'post');
 
     let msg = '[ee-core] [socket/http] server is: ' + url;
     const listenOpt = {
@@ -88,7 +102,7 @@ class HttpServer {
         coreLogger.info(msg);
       });
     }
-    
+
     this.httpApp = koaApp;
   }
 
@@ -149,6 +163,34 @@ class HttpServer {
 
   getHttpApp() {
     return this.httpApp;
+  }
+
+  // 设置错误处理函数
+  _setupErrorHandler(app, errorHandler) {
+    if (is.isFunction(errorHandler)) {
+      app.on('error', errorHandler)
+    }
+  }
+
+  /**
+   * 加载前置、后置中间件
+   * @param {*} app koaApp示例
+   * @param {*} middlewares 中间件数组
+   * @param {*} type 类型，pre/post
+   */
+  _loadMiddlewares(app, middlewares = [], type = 'pre') {
+    if (is.isArray(middlewares)) {
+      middlewares.forEach((middleware) => {
+        if (is.isFunction(middleware)) {
+          // middleware是一个方法
+          // 返回值是中间件(ctx, next) => {}的异步函数
+          // 便于使用async/await进行同步编程
+          app.use(middleware());
+        } else {
+          coreLogger.warn(`[ee-core/httpServer] Invalid ${type} middleware detected, skipping.`);
+        }
+      })
+    }
   }
 }
 
