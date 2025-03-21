@@ -305,18 +305,25 @@ class ServeProcess {
     return cmds;
   }
 
+  // Modify the main attribute in package.json
   _switchPkgMain(isDebugger = false) {
+    let mainFile = 'main.js';
     const pkgPath = path.join(process.cwd(), this.pkgPath);
     const pkg = readJsonSync(pkgPath);
-    const extname = path.extname(pkg.main);
-    if (isDebugger) {
-      pkg.main = path.join(this.electronDir, 'main' + extname);
-      console.log("debugger:", pkg.main)
+    const maints = path.join(process.cwd(), this.electronDir, 'main.ts');
+    if (fsPro.existsSync(maints)) {
+      mainFile = 'main.ts'
+    }
+
+    // [todo] Currently only supports JS
+    if (isDebugger && mainFile == 'main.js') {
+      pkg.main = path.join(this.electronDir, mainFile);
+      //console.log("debugger:", pkg.main)
       writeJsonSync(pkgPath, pkg);
     } else {
       // Modify when the path is incorrect to reduce unnecessary operations
       const bundleMainPath = path.join(this.bundleDir, 'main.js');
-      console.log("build:", bundleMainPath)
+      //console.log("build:", bundleMainPath)
       if (pkg.main != bundleMainPath) {
         pkg.main = bundleMainPath;
         writeJsonSync(pkgPath, pkg);
