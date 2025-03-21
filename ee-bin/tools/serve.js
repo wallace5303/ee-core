@@ -232,7 +232,8 @@ class ServeProcess {
       const cfg = binCmdConfig[cmd];
 
       if (!cfg) {
-        console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.red(`Error: [${cmd}] config does not exist` ));
+        // Running the build electron code separately may be empty
+        //console.log(chalk.blue(`[ee-bin] [${binCmd}] `) + chalk.yellow(`Warning: [${cmd}] config does not exist` ));
         continue;
       }
 
