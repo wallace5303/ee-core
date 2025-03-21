@@ -3,7 +3,7 @@
 const debug = require('debug')('ee-bin:serve');
 const path = require('path');
 const fsPro = require('fs-extra');
-const { loadConfig, isWindows } = require('../lib/utils');
+const { loadConfig, isWindows, getArgumentByName, readJsonSync, writeJsonSync } = require('../lib/utils');
 const is = require('is-type-of');
 const chalk = require('chalk');
 const crossSpawn = require('cross-spawn');
@@ -18,7 +18,8 @@ class ServeProcess {
     process.env.NODE_ENV = 'prod'; // dev / prod
     this.execProcess = {};
     this.electronDir = './electron';
-    this.defaultBundleDir = './public/electron';
+    this.bundleDir = './public/electron';
+    this.pkgPath = './package.json';
     this._init();
   }
 
@@ -55,7 +56,7 @@ class ServeProcess {
     }
 
     // Cleaning work before the end of the process
-    await this.sleep(1000);
+    await this.sleep(500);
     currentProcess.forEach((p) => {
       kill(p.pid);
       debug(`Kill ${chalk.blue(p.name)} server, pid: ${p.pid}`);
@@ -64,10 +65,10 @@ class ServeProcess {
   }
 
   /**
-   * 启动前端、主进程服务
+   * Start frontend and main process services
    */
   dev(options = {}) {
-    // 设置一个环境变量
+    // Set an environment variable
     process.env.NODE_ENV = 'dev';
     const { config, serve } = options;
     const binCfg = loadConfig(config);
@@ -87,8 +88,13 @@ class ServeProcess {
     // build electron main code 
     const cmds = this._formatCmds(command);
     if (cmds.indexOf("electron") !== -1) {
-      // watche electron main code
       const electronConfig = binCmdConfig.electron;
+
+      // Debugging source code
+      const debugging = getArgumentByName(electronConfig.args, 'debuger') == 'true'? true : false;
+      this._switchPkgMain(debugging);
+
+      // watche electron main code
       if (electronConfig.watch) {
         let debounceTimer = null;
         const cmd = 'electron';
@@ -135,7 +141,7 @@ class ServeProcess {
   }
 
   /**
-   * 启动主进程服务
+   * Start the main process service
    */
   start(options = {}) {
     const { config } = options;
@@ -158,10 +164,11 @@ class ServeProcess {
   }
 
   /**
-   * 构建
+   * build
    */
   build(options = {}) {
-    const { config, cmds, env } = options;
+    const { config, env } = options;
+    let { cmds } = options;
     process.env.NODE_ENV = env;
     const binCfg = loadConfig(config);
     const binCmd = 'build';
@@ -173,9 +180,18 @@ class ServeProcess {
       return
     }
 
-    if (cmds.indexOf("electron") !== -1) {
+    // [todo] If there is 'electron' , then execute 'electron' first and recycle other commands
+    // should it be placed in multiExec() and maintain the execution order
+    const commands = this._formatCmds(cmds);
+    if (commands.indexOf("electron") !== -1) {
       this.bundle(binCmdConfig.electron);
-      return;
+      // Remove electron cmd and execute others 
+      const index = commands.indexOf("electron");
+      commands.splice(index, 1);
+      cmds = commands.join(); 
+
+      // switch pkg.main
+      this._switchPkgMain(false)
     }
 
     const opt = {
@@ -187,7 +203,7 @@ class ServeProcess {
   }
 
   /**
-   * 执行自定义命令
+   * Execute custom commands
    */
   exec(options = {}) {
     const { config, cmds } = options;
@@ -204,15 +220,15 @@ class ServeProcess {
   }
 
   /**
-   * 支持多个命令
+   * Support multiple commands
    */
   multiExec(opt = {}) {
     //console.log('multiExec opt:', opt)
     const { binCmd, binCmdConfig, command } = opt;
-    const cmds = this._formatCmds(command);
+    const commands = this._formatCmds(command);
 
-    for (let i = 0; i < cmds.length; i++) {
-      let cmd = cmds[i];
+    for (let i = 0; i < commands.length; i++) {
+      let cmd = commands[i];
       const cfg = binCmdConfig[cmd];
 
       if (!cfg) {
@@ -261,7 +277,7 @@ class ServeProcess {
     const { bundleType } = bundleConfig;
     if (bundleType == 'copy') {
       const srcResource = path.join(process.cwd(), this.electronDir);
-      const destResource = path.join(process.cwd(), this.defaultBundleDir);
+      const destResource = path.join(process.cwd(), this.bundleDir);
       fsPro.removeSync(destResource);
       fsPro.copySync(srcResource, destResource);
     } else {
@@ -286,6 +302,25 @@ class ServeProcess {
     }
 
     return cmds;
+  }
+
+  _switchPkgMain(isDebugger = false) {
+    const pkgPath = path.join(process.cwd(), this.pkgPath);
+    const pkg = readJsonSync(pkgPath);
+    const extname = path.extname(pkg.main);
+    if (isDebugger) {
+      pkg.main = path.join(this.electronDir, 'main' + extname);
+      console.log("debugger:", pkg.main)
+      writeJsonSync(pkgPath, pkg);
+    } else {
+      // Modify when the path is incorrect to reduce unnecessary operations
+      const bundleMainPath = path.join(this.bundleDir, 'main.js');
+      console.log("build:", bundleMainPath)
+      if (pkg.main != bundleMainPath) {
+        pkg.main = bundleMainPath;
+        writeJsonSync(pkgPath, pkg);
+      }
+    }
   }
   
   // env

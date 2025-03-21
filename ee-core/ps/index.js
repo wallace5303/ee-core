@@ -90,10 +90,18 @@ function getBundleDir(basePath) {
   return dir;
 }
 
-// 获取root目录  (dev-项目根目录，pro-app user data目录)
-function getRootDir() {
-  const appDir = isDev() ? getBaseDir() : getAppUserDataDir();
-  return appDir;
+// 获取electron 源码文件路径
+function getElectronCodeDir(basePath) {
+  const base = basePath || process.cwd();
+  const dir = path.join(base, 'electron');
+  return dir;
+}
+
+// 获取frontend 源码文件路径
+function getFrontendCodeDir(basePath) {
+  const base = basePath || process.cwd();
+  const dir = path.join(base, 'frontend');
+  return dir;
 }
 
 // 获取base目录
@@ -131,6 +139,12 @@ function getExtraResourcesDir() {
     dir = path.join(execDir, "build", "extraResources");
   }
   return dir;
+}
+
+// 获取root目录  (dev-项目根目录，pro-app user data目录)
+function getRootDir() {
+  const appDir = isDev() ? getBaseDir() : getAppUserDataDir();
+  return appDir;
 }
 
 // 获取 appUserData目录
@@ -254,6 +268,8 @@ module.exports = {
   getDataDir,
   getLogDir,
   getBundleDir,
+  getElectronCodeDir,
+  getFrontendCodeDir,
   getRootDir,
   getBaseDir,
   getElectronDir,

@@ -4,7 +4,7 @@ const debug = require('debug')('ee-core:app:boot');
 const path = require('path');
 const { loadException } = require('../exception');
 const { electronApp } = require('../electron/app');
-const { getArgumentByName, getBundleDir } = require('../ps');
+const { getArgumentByName, getBundleDir, getElectronCodeDir } = require('../ps');
 const { loadConfig } = require('../config');
 const { loadLog } = require('../log');
 const { app } = require('./application');
@@ -15,11 +15,18 @@ class ElectronEgg {
     const baseDir = electronApp.getAppPath();
     const { env } = process;
     const environmet = getArgumentByName('env') || 'prod';
+    const debugging = getArgumentByName('debuger') == 'true'? true : false;
+    
+    // Debugging source code
+    let electronDir = getBundleDir(baseDir);
+    if (debugging) {
+      electronDir = getElectronCodeDir(baseDir);
+    }
 
     const options = {
       env: environmet,
       baseDir,
-      electronDir: getBundleDir(baseDir),
+      electronDir,
       appName: electronApp.getName(),
       userHome: electronApp.getPath('home'),
       appData: electronApp.getPath('appData'),

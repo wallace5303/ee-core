@@ -22,7 +22,7 @@ module.exports = {
     electron: {
       directory: './',
       cmd: 'electron',
-      args: ['.', '--env=local'],
+      args: ['.', '--env=local', '--debugger=false'],
       loadingPage: '/public/html/loading.html',
       watch: false,
       sync: false,

@@ -11,6 +11,8 @@ export declare function appVersion(): string;
 export declare function getDataDir(): string;
 export declare function getLogDir(): string;
 export declare function getBundleDir(basePath: string): string;
+export declare function getElectronCodeDir(basePath: string): string;
+export declare function getFrontendCodeDir(basePath: string): string;
 export declare function getRootDir(): string;
 export declare function getBaseDir(): string;
 export declare function getElectronDir(): string;

@@ -144,11 +144,11 @@ function getPackage () {
   return content;
 }
 
-function readJsonSync (filepath) {
+function readJsonSync (filepath, encoding = 'utf8') {
   if (!fs.existsSync(filepath)) {
     throw new Error(filepath + ' is not found');
   }
-  return JSON.parse(fs.readFileSync(filepath));
+  return JSON.parse(fs.readFileSync(filepath, { encoding }));
 }
 
 function writeJsonSync (filepath, str, options) {
@@ -191,6 +191,20 @@ function getPlatform(delimiter = "_", isDiffArch = false) {
   return os;
 }
 
+// Get cmd parameter by name
+function getArgumentByName(args, name) {
+  if (!args) {
+    args = process.argv;
+  }
+  for (let i = 0; i < args.length; i++) {
+    const item = args[i];
+    const prefixKey = `--${name}=`;
+    if (item.indexOf(prefixKey) !== -1) {
+      return item.substring(prefixKey.length);
+    }
+  }
+}
+
 module.exports = {
   loadConfig,
   getElectronProgram,
@@ -205,5 +219,6 @@ module.exports = {
   rm,
   getPackage,
   readJsonSync,
-  writeJsonSync
+  writeJsonSync,
+  getArgumentByName
 }
