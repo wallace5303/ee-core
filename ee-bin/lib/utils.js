@@ -192,7 +192,7 @@ function getPlatform(delimiter = "_", isDiffArch = false) {
 }
 
 // Get cmd parameter by name
-function getArgumentByName(args, name) {
+function getArgumentByName(name, args) {
   if (!args) {
     args = process.argv;
   }

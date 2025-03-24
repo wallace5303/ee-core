@@ -244,9 +244,12 @@ function isChildPoolJob() {
 }
 
 // Get cmd parameter by name
-function getArgumentByName(name) {
-  for (let i = 0; i < process.argv.length; i++) {
-    const item = process.argv[i]
+function getArgumentByName(name, args) {
+  if (!args) {
+    args = process.argv;
+  }
+  for (let i = 0; i < args.length; i++) {
+    const item = args[i];
     const prefixKey = `--${name}=`;
     if (item.indexOf(prefixKey) !== -1) {
       return item.substring(prefixKey.length);

@@ -91,7 +91,7 @@ class ServeProcess {
       const electronConfig = binCmdConfig.electron;
 
       // Debugging source code
-      const debugging = getArgumentByName(electronConfig.args, 'debuger') == 'true'? true : false;
+      const debugging = getArgumentByName('debuger', electronConfig.args) == 'true'? true : false;
       this._switchPkgMain(debugging);
 
       // watche electron main code

@@ -36,4 +36,4 @@ export declare function makeMessage(msg?: {}): {
 export declare function exitChildJob(code?: number): void;
 export declare function isChildJob(): boolean;
 export declare function isChildPoolJob(): boolean;
-export declare function getArgumentByName(name: string): string;
+export declare function getArgumentByName(name: string, args?: any): string;
