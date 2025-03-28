@@ -97,6 +97,9 @@ program
   .description('Generate logo')
   .option('-i, --input <file>', 'image file default /public/images/logo.png')
   .option('-o, --output <folder>', 'output directory default /build/icons/')
+  .option('-s, --size <flag>', 'generate size default 16,32,64,256,512')
+  .option('-c, --clear', 'clear output directory first')
+  .option('-img, --images <flag>', 'Win window icon/tray image generation path default /public/images/')
   .action(function() {
     const iconGen = require('./tools/iconGen');
     iconGen.run();
