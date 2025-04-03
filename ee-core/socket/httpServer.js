@@ -167,7 +167,7 @@ class HttpServer {
 
   // 设置错误处理函数
   _setupErrorHandler(app, errorHandler) {
-    if (is.isFunction(errorHandler)) {
+    if (is.function(errorHandler)) {
       app.on('error', errorHandler)
     }
   }
@@ -179,9 +179,9 @@ class HttpServer {
    * @param {*} type 类型，pre/post
    */
   _loadMiddlewares(app, middlewares = [], type = 'pre') {
-    if (is.isArray(middlewares)) {
+    if (is.array(middlewares)) {
       middlewares.forEach((middleware) => {
-        if (is.isFunction(middleware)) {
+        if (is.function(middleware)) {
           // middleware是一个方法
           // 返回值是中间件(ctx, next) => {}的异步函数
           // 便于使用async/await进行同步编程
