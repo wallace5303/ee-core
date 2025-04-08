@@ -1,6 +1,5 @@
 'use strict';
 
-const debug = require('debug')('ee-core:electron:app');
 const { app: electronApp } = require('electron');
 const { coreLogger } = require('../../log');
 const { is } = require('../../utils');
@@ -18,6 +17,7 @@ function createElectron() {
   const gotTheLock = electronApp.requestSingleInstanceLock();
   if (singleLock && !gotTheLock) {
     electronApp.quit();
+    return;
   }
 
   electronApp.whenReady().then(() => {
