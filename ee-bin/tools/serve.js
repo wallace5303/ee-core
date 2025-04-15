@@ -322,8 +322,9 @@ class ServeProcess {
       pkg.main =this.electronDir + '/' + mainFile;
       writeJsonSync(pkgPath, pkg);
     } else {
+      // only load main.js file
       // const bundleMainPath = path.join(this.bundleDir, 'main.js');
-      const bundleMainPath = this.bundleDir + '/' + mainFile;
+      const bundleMainPath = this.bundleDir + '/' + 'main.js';
 
       // Modify when the path is incorrect to reduce unnecessary operations
       if (pkg.main != bundleMainPath) {
