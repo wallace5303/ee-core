@@ -316,14 +316,14 @@ class ServeProcess {
     }
 
     // [todo] Currently only supports JS
+    // [todo] Do not use path. join() to ensure consistent performance between Windows and macOS
     if (isDebugger && mainFile == 'main.js') {
-      pkg.main = path.join(this.electronDir, mainFile);
-      //console.log("debugger:", pkg.main)
+      //pkg.main = path.join(this.electronDir, mainFile);
+      pkg.main =this.electronDir + '/' + mainFile;
       writeJsonSync(pkgPath, pkg);
     } else {
-      // [todo] Do not use path. join() to ensure consistent performance between Windows and macOS
-      // const bundleMainPath = path.join(this.bundleDir, '/main.js');
-      const bundleMainPath = this.bundleDir + '/main.js';
+      // const bundleMainPath = path.join(this.bundleDir, 'main.js');
+      const bundleMainPath = this.bundleDir + '/' + mainFile;
 
       // Modify when the path is incorrect to reduce unnecessary operations
       if (pkg.main != bundleMainPath) {
