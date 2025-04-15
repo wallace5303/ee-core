@@ -321,9 +321,11 @@ class ServeProcess {
       //console.log("debugger:", pkg.main)
       writeJsonSync(pkgPath, pkg);
     } else {
+      // [todo] Do not use path. join() to ensure consistent performance between Windows and macOS
+      // const bundleMainPath = path.join(this.bundleDir, '/main.js');
+      const bundleMainPath = this.bundleDir + '/main.js';
+
       // Modify when the path is incorrect to reduce unnecessary operations
-      const bundleMainPath = path.join(this.bundleDir, 'main.js');
-      //console.log("build:", bundleMainPath)
       if (pkg.main != bundleMainPath) {
         pkg.main = bundleMainPath;
         writeJsonSync(pkgPath, pkg);
