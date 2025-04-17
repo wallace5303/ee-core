@@ -69,6 +69,19 @@ export declare interface HttpConfig {
         uris?: string[];
         returnData?: string;
     };
+    koaConfig?: {
+        autoCamelCase?: boolean;
+        preMiddleware?: Array<Middleware | (() => Middleware) | string>;
+        postMiddleware?: Array<Middleware | (() => Middleware) | string>;
+        errorHandler?: (err: Error, ctx: Koa.Context) => void;
+        router?: RouteConfig[];
+    };
+}
+declare interface RouteConfig {
+    api: string;
+    method?: 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'options';
+    controller: string;
+    middlewares?: string[];
 }
 export declare interface RemoteConfig {
     enable: boolean;
