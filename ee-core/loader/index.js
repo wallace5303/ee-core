@@ -6,18 +6,19 @@ const { getElectronDir } = require('../ps');
 
 // 加载单个文件(如果是函数，将被执行)
 function loadFile(filepath, ...inject) {
-  const isAbsolute = path.isAbsolute(filepath);
+  let fullpath = filepath;
+  const isAbsolute = path.isAbsolute(fullpath);
   if (!isAbsolute) {
-    filepath = path.join(getElectronDir(), filepath);
+    fullpath = path.join(getElectronDir(), fullpath);
   }
 
-  filepath = filepath && resolveModule(filepath);
-  if (!fs.existsSync(filepath)) {
+  fullpath = fullpath && resolveModule(fullpath);
+  if (!fs.existsSync(fullpath)) {
     let errorMsg = `[ee-core] [loader/index] loadFile ${filepath} does not exist`;
     throw new Error(errorMsg);
   }
 
-  let ret = CoreUtils.loadFile(filepath);
+  let ret = CoreUtils.loadFile(fullpath);
   if (is.function(ret) && !is.class(ret) && !CoreUtils.isBytecodeClass(ret)) {
     ret = ret(...inject);
   }
