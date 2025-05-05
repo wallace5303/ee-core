@@ -4,6 +4,7 @@ const debug = require('debug')('ee-core:socket:httpServer');
 const assert = require('assert');
 const is = require('is-type-of');
 const Koa = require('koa');
+const Router = require('koa-router');
 const cors = require('koa2-cors');
 const koaBody = require('koa-body');
 const https = require('https');
@@ -18,11 +19,8 @@ const { getPort } = require('../utils/port');
 
 let channelSeparator = '/';
 
-/**
- * http server
- */
 class HttpServer {
-  constructor () {
+  constructor() {
     const { httpServer, mainServer } = getConfig();
     this.config = httpServer;
     channelSeparator = mainServer.channelSeparator;
@@ -31,11 +29,11 @@ class HttpServer {
   }
 
   async init() {
-    if (this.config.enable == false) {
+    if (this.config.enable === false) {
       return;
     }
 
-    const port = await getPort({port: parseInt(this.config.port)});
+    const port = await getPort({ port: parseInt(this.config.port) });
     if (!port) {
       throw new Error('[ee-core] [socket/HttpServer] http port required, and must be a number !');
     }
@@ -48,11 +46,15 @@ class HttpServer {
   /**
    * 创建服务
    */
-  _create () {
+  _create() {
     const config = this.config;
-    // config.default 增加koaConfig配置项
     const koaConfig = config.koaConfig || {};
-    const { preMiddleware = [], postMiddleware = [], errorHandler = null } = koaConfig;
+    const { 
+      preMiddleware = [], 
+      postMiddleware = [], 
+      errorHandler = null, 
+      router = [] 
+    } = koaConfig;
     const isHttps = config?.https?.enable ?? false;
     const sslOptions = {};
 
@@ -66,22 +68,29 @@ class HttpServer {
       sslOptions.key = fs.readFileSync(keyFile);
       sslOptions.cert = fs.readFileSync(certFile);
     }
+
     const url = config.protocol + config.host + ':' + config.port;
     const corsOptions = config.cors;
 
     const koaApp = new Koa();
+    const routerInstance = new Router();
 
-    // 设置错误处理器，便于统一错误代码处理
+    // 设置错误处理器
     this._setupErrorHandler(koaApp, errorHandler);
 
     // 加载前置中间件
     this._loadMiddlewares(koaApp, preMiddleware);
 
+    // 注册路由
+    this._registerRoutes(routerInstance, router);
+
     // 核心中间件
     koaApp
       .use(cors(corsOptions))
       .use(koaBody(config.body))
-      .use(this._dispatch);
+      .use(routerInstance.routes())
+      .use(routerInstance.allowedMethods())
+      .use(this._dispatch.bind(this));
 
     // 加载后置中间件
     this._loadMiddlewares(koaApp, postMiddleware, 'post');
@@ -90,7 +99,8 @@ class HttpServer {
     const listenOpt = {
       host: config.host,
       port: config.port
-    }
+    };
+
     if (isHttps) {
       https.createServer(sslOptions, koaApp.callback()).listen(listenOpt, (err) => {
         msg = err ? err : msg;
@@ -107,41 +117,141 @@ class HttpServer {
   }
 
   /**
-   * 路由分发
+   * 通用函数查找器
+   * @param {String} uriPath 函数路径
+   * @param {String} type 类型（用于日志）
+   * @returns {Function|null}
    */
-  async _dispatch (ctx, next) {
+  _findFunction(uriPath, type = 'controller') {
+    if (!uriPath) return null;
+    if (uriPath.indexOf('/') === 0) {
+      uriPath = uriPath.substring(1);
+    }
+    if (!uriPath.startsWith('controller/httpServer')) {
+      uriPath = 'controller/httpServer/' + uriPath;
+    }
+
+    try {
+      const controller = getController();
+      const actions = uriPath.split(channelSeparator);
+      let fn = null;
+      if (is.string(uriPath)) {
+        let obj = { controller };
+        actions.forEach(key => {
+          obj = obj[key];
+          if (!obj) throw new Error(`class or function '${key}' not exists`);
+        });
+        fn = obj;
+      }
+
+      return is.function(fn) ? fn : null;
+    } catch (err) {
+      coreLogger.error(`[ee-core/httpServer] Error finding ${type}: ${uriPath}`, err);
+      return null;
+    }
+  }
+
+  /**
+   * 注册路由
+   * @param {Router} router koa-router实例
+   * @param {Array} routes 路由配置
+   */
+  _registerRoutes(router, routes) {
+    if (!is.array(routes)) return;
+
+    routes.forEach(route => {
+      const { api, method = 'get', controller, middlewares = [] } = route;
+      
+      if (!api || !controller) {
+        coreLogger.warn('[ee-core/httpServer] Invalid route config, api and controller are required');
+        return;
+      }
+
+      const httpMethod = method.toLowerCase();
+      if (!['get', 'post', 'put', 'delete', 'patch', 'head', 'options'].includes(httpMethod)) {
+        coreLogger.warn(`[ee-core/httpServer] Invalid HTTP method: ${method} for route: ${api}`);
+        return;
+      }
+
+      const routeMiddlewares = middlewares
+        .map(name => this._findFunction(name, 'middleware'))
+        .filter(Boolean);
+
+      routeMiddlewares.push(async (ctx, next) => {
+        try {
+          const controllerFn = this._findFunction(controller);
+          if (!controllerFn) {
+            ctx.status = 404;
+            ctx.body = { error: 'Controller not found' };
+            return;
+          }
+
+          const args = httpMethod === 'get' ? ctx.request.query : ctx.request.body;
+          const result = await controllerFn.call(null, args, ctx);
+          ctx.body = result;
+        } catch (err) {
+          coreLogger.error('[ee-core/httpServer] route handler error:', err);
+          ctx.status = 500;
+          ctx.body = { error: 'Internal server error' };
+        }
+        await next();
+      });
+
+      router[httpMethod](api, ...routeMiddlewares);
+      coreLogger.info(`[ee-core/httpServer] Registered route: [${httpMethod.toUpperCase()}] ${api} -> ${controller}`);
+    });
+  }
+
+  /**
+   * 路由分发（兼容旧版）
+   */
+  async _dispatch(ctx, next) {
+    if (ctx.body !== undefined || ctx.status !== 404) {
+      return await next();
+    }
+
     const controller = getController();
-    const { filterRequest } = getConfig().httpServer;
+    const { filterRequest } = this.config;
     let uriPath = ctx.request.path;
     const method = ctx.request.method;
     let params = ctx.request.query;
     params = is.object(params) ? JSON.parse(JSON.stringify(params)) : {};
     const body = ctx.request.body;
 
-    // 默认
     ctx.response.status = 200;
 
     try {
-      // 找函数
-      // 去除开头的 '/'
-      if (uriPath.indexOf('/') == 0) {
+      if (uriPath.indexOf('/') === 0) {
         uriPath = uriPath.substring(1);
       }
-      // 过滤
-      if (_.includes(filterRequest.uris, uriPath)) {
+
+      if (_.includes(filterRequest?.uris || [], uriPath)) {
         ctx.response.body = filterRequest.returnData;
         await next();
-        return
+        return;
       }
-      if (uriPath.slice(0, 10) != 'controller') {
-        uriPath = 'controller/' + uriPath;
+
+      if (!uriPath.startsWith('controller/httpServer')) {
+        uriPath = 'controller/httpServer/' + uriPath;
       }
+
       const cmd = uriPath.split('/').join(channelSeparator);
       debug('[request] uri %s', cmd);
-      const args = (method == 'POST') ? body: params;
+      const args = (method === 'POST') ? body : params;
+      
+      const actions = cmd.split(channelSeparator);
+      debug('[findFn] channel %o', actions);
+      
       let fn = null;
       if (is.string(cmd)) {
-        const actions = cmd.split(channelSeparator);
+        let realCmd = cmd;
+        if (this.config.koaConfig?.autoCamelCase){
+          const toCamelCase = (str) => {
+            return str.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+          };
+          realCmd = toCamelCase(cmd);
+        }
+        const actions = realCmd.split(channelSeparator);
         debug('[findFn] channel %o', actions);
         let obj = { controller };
         actions.forEach(key => {
@@ -151,11 +261,12 @@ class HttpServer {
         fn = obj;
       }
       if (!fn) throw new Error('function not exists');
-
       const result = await fn.call(controller, args, ctx);
       ctx.response.body = result;
     } catch (err) {
       coreLogger.error('[ee-core/httpServer] throw error:', err);
+      ctx.status = 500;
+      ctx.body = { error: err.message };
     }
 
     await next();
@@ -165,31 +276,21 @@ class HttpServer {
     return this.httpApp;
   }
 
-  // 设置错误处理函数
   _setupErrorHandler(app, errorHandler) {
     if (is.function(errorHandler)) {
-      app.on('error', errorHandler)
+      app.on('error', errorHandler);
     }
   }
 
-  /**
-   * 加载前置、后置中间件
-   * @param {*} app koaApp示例
-   * @param {*} middlewares 中间件数组
-   * @param {*} type 类型，pre/post
-   */
   _loadMiddlewares(app, middlewares = [], type = 'pre') {
     if (is.array(middlewares)) {
       middlewares.forEach((middleware) => {
         if (is.function(middleware)) {
-          // middleware是一个方法
-          // 返回值是中间件(ctx, next) => {}的异步函数
-          // 便于使用async/await进行同步编程
           app.use(middleware());
         } else {
           coreLogger.warn(`[ee-core/httpServer] Invalid ${type} middleware detected, skipping.`);
         }
-      })
+      });
     }
   }
 }

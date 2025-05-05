@@ -84,7 +84,17 @@ module.exports = () => {
           'favicon.ico'
         ],
         returnData: ''
-      }
+      },
+      koaConfig: {
+        autoCamelcase: true,
+        router: [
+          {
+            api: '/api/do-http-request',
+            method: 'get',
+            controller: 'framework/doHttpRequest',
+          }
+        ]
+      },
     },
     remote: {
       enable: false,
