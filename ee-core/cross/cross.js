@@ -106,6 +106,7 @@ class Cross {
 
   // 获取 proc
   getProcByName(name) {
+    // [todo] 如果有名字一样的服务，需要加 pid
     const pid = this.childrenMap[name];
     if (!pid) {
       throw new Error(`[ee-core] [cross] The process named [${name}] does not exit`);
