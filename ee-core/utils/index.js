@@ -109,6 +109,36 @@ function machineId(original) {
   });
 }
 
+// get platform 
+// values:  windows | windows_32 | windows_64 | macos_intel | macos_apple | linux
+function getPlatform(delimiter = "_", isDiffArch = false) {
+  let osName = "";
+  if (is.windows()) {
+    osName = "windows";
+    if (isDiffArch) {
+      const arch = is.x64() ? "64" : "32";
+      osName += delimiter + arch;
+    }
+  } else if (is.macOS()) {
+    let isAppleSilicon = false;
+    const cpus = os.cpus();
+    for (let cpu of cpus) {
+      if (cpu.model.includes('Apple')) {
+        isAppleSilicon = true;
+        break;
+      }
+    }
+    const core = isAppleSilicon? "apple" : "intel";
+    osName = "macos" + delimiter + core;
+  } else if (is.linux()) {
+    osName = "linux";
+  }
+
+  return osName;
+}
+
+
+
 function _isWindowsProcessMixedOrNativeArchitecture() {
   // detect if the node binary is the same arch as the Windows OS.
   // or if this is 32 bit node on 64 bit windows.
@@ -162,6 +192,7 @@ module.exports = {
   isJsProject,
   machineIdSync,
   machineId,
+  getPlatform,
   is
 }
 

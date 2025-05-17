@@ -6,5 +6,6 @@ export declare function isWebProtocol(protocol: string): boolean;
 export declare function isJsProject(baseDir: string): boolean;
 export declare function machineIdSync(original: boolean): any;
 export declare function machineId(original: boolean): Promise<any>;
+export declare function getPlatform(delimiter?: string, isDiffArch?: boolean): string;
 import is = require("./is");
 export { is };
