@@ -205,6 +205,35 @@ function getArgumentByName(name, args) {
   }
 }
 
+function getExtraResourcesDir() {
+  const dir = path.join(_basePath, "build", "extraResources")
+  return dir;
+}
+
+function getModuleNameFromPath(modulePath) {
+  // 分割路径段（处理不同系统的分隔符）
+  const segments = path.normalize(modulePath).split(path.sep);
+  
+  // 从后往前查找 node_modules
+  for (let i = segments.length - 1; i >= 0; i--) {
+    if (segments[i] === 'node_modules') {
+      // 普通模块：node_modules/dayjs
+      if (i + 1 < segments.length) {
+        return segments[i + 1];
+      }
+      
+      // 作用域模块：node_modules/@scope/module
+      if (i + 2 < segments.length && segments[i + 1].startsWith('@')) {
+        return `${segments[i + 1]}/${segments[i + 2]}`;
+      }
+      
+      break; // 找到 node_modules 但后面没有模块名
+    }
+  }
+  
+  return null;
+}
+
 module.exports = {
   loadConfig,
   getElectronProgram,
@@ -220,5 +249,7 @@ module.exports = {
   getPackage,
   readJsonSync,
   writeJsonSync,
-  getArgumentByName
+  getArgumentByName,
+  getExtraResourcesDir,
+  getModuleNameFromPath
 }

@@ -25,6 +25,8 @@ class IncrUpdater {
       'win-ia32-unpacked',
       'linux-unpacked'
     ];
+    this.nodeModulesString = 'node_modules';
+    this.asarUnpackedString = 'app.asar.unpacked';
   }
 
   /**
@@ -101,7 +103,24 @@ class IncrUpdater {
         const extraResDir = path.dirname(extraResPath);
         const index = extraResDir.indexOf('extraResources');
         const zipFileDir = extraResDir.substring(index);
+        // 资源路径 extraResPath: D:\www\gofile\src\ee\ee-demo\build\extraResources\hello\c.txt
+        // 文件在zip中的路径 zipFileDir: extraResources/hello
         zip.addLocalFile(extraResPath, zipFileDir);
+      }
+    }
+    // 添加 asarUnpacked
+    if (cfg.asarUnpacked && cfg.asarUnpacked.length > 0) {
+      const modules = cfg.asarUnpacked;
+      for (const moduleItem of modules) {
+        const modulePath = path.normalize(path.join(homeDir, moduleItem));
+        if (!fs.existsSync(modulePath)) {
+          throw new Error(`${modulePath} is not exists!`);
+        }
+      
+        const zipDir = path.join(this.asarUnpackedString, moduleItem);
+        // console.log('modulePath', modulePath);
+        // console.log('zipDir', zipDir);
+        zip.addLocalFolder(modulePath, zipDir);
       }
     }
 
