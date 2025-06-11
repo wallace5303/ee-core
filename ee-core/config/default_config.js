@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('path');
-const { env, getBaseDir, getLogDir } = require('../ps');
+const { env, getBaseDir, getLogDir, getExtraResourcesDir } = require('../ps');
 const { SocketIO } = require('../const/channel');
 
 /**
@@ -79,6 +79,13 @@ module.exports = () => {
           keepExtensions: true
         }
       },
+      static: {
+        enable: true,
+        prefix: '/public',
+        path: path.join(getExtraResourcesDir(), 'public'),
+        options: {}
+      },
+      filter: null,
       filterRequest: {
         uris:  [
           'favicon.ico'
