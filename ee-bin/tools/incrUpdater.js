@@ -131,9 +131,9 @@ class IncrUpdater {
     });
 
     // 生成 latest.json
-    const sha1 = this.generateSha1(asarFilePath);
+    const sha1 = this.generateSha1(asarZipPath);
     const date = this._getFormattedDate();
-    const fileStat = fs.statSync(asarFilePath);
+    const fileStat = fs.statSync(asarZipPath);
     const item = {
       version: version,
       file: zipName,
