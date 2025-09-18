@@ -5,13 +5,14 @@ const fs = require('fs');
 const fsPro = require('fs-extra');
 const crypto = require('crypto');
 const chalk = require('chalk');
-const { loadConfig, getPackage, writeJsonSync } = require('../lib/utils');
 const admZip = require('adm-zip');
 const globby = require('globby');
-
+const yaml = require('js-yaml');
+const { loadConfig, writeJsonSync } = require('../lib/utils');
+const { extend } = require('../lib/extend');
 
 /**
- * 增量升级
+ * Updater
  * @class
  */
 
@@ -30,7 +31,7 @@ class IncrUpdater {
   }
 
   /**
-   * 执行
+   * run
    */  
   run(options = {}) {
     console.log('[ee-bin] [updater] Start');
@@ -49,18 +50,28 @@ class IncrUpdater {
   }
 
   /**
-   * 生成增量升级文件
+   * generate json file
    */ 
   generateFile(config, asarFile, platform) {
-    const cfg = config[platform];
+    let cfg = config[platform];
     if (!cfg) {
       console.log(chalk.blue('[ee-bin] [updater] ') + chalk.red(`Error: ${platform} config does not exist`));
       return;
     }
+    cfg = extend(true, {
+      metadata: './out/latest.yml',
+    }, cfg);
 
     let latestVersionInfo = {}
     const homeDir = process.cwd();
     console.log(chalk.blue('[ee-bin] [updater] ') + chalk.green(`${platform} config:`), cfg);
+
+    const metadataPath = path.join(homeDir, cfg.metadata);
+    if (!fs.existsSync(metadataPath)) {
+      console.log(chalk.blue('[ee-bin] [updater] ') + chalk.red(`Error: ${metadataPath} does not exist!`));
+      return;
+    }    
+    const metadataObj = yaml.load(fs.readFileSync(metadataPath, 'utf8')); 
 
     let asarFilePath = "";
     if (asarFile) {
@@ -74,15 +85,14 @@ class IncrUpdater {
       return;
     }
 
-    const packageJson = getPackage();
-    const version = packageJson.version;
+    const version = metadataObj.version;
     let platformForFilename = platform;
     if (platform.indexOf("_") !== -1) {
       const platformArr = platform.split("_");
       platformForFilename = platformArr.join("-");
     }
     
-    // 生成 zip
+    // zip
     let zipName = "";
     zipName = path.basename(cfg.output.zip, '.zip') + `-${platformForFilename}-${version}.zip`;
     const asarZipPath = path.join(homeDir, cfg.output.directory, zipName);
@@ -90,9 +100,9 @@ class IncrUpdater {
       fsPro.removeSync(asarZipPath);
     }
     const zip = new admZip();
-    // 添加 asar 文件
+    // add asar
     zip.addLocalFile(asarFilePath); 
-    // 添加 extraResources
+    // add extraResources
     if (cfg.extraResources && cfg.extraResources.length > 0) {
       const files = globby.sync(cfg.extraResources, { cwd: homeDir });
       for (const extraRes of files) {
@@ -108,7 +118,7 @@ class IncrUpdater {
         zip.addLocalFile(extraResPath, zipFileDir);
       }
     }
-    // 添加 asarUnpacked
+    // add asarUnpacked
     if (cfg.asarUnpacked && cfg.asarUnpacked.length > 0) {
       const modules = cfg.asarUnpacked;
       for (const moduleItem of modules) {
@@ -130,23 +140,40 @@ class IncrUpdater {
       }
     });
 
-    // 生成 latest.json
-    const sha1 = this.generateSha1(asarZipPath);
-    const date = this._getFormattedDate();
+    // generate latest.json
+    // incr file
+    const zipSha1 = this.generateHash(asarZipPath, 'sha1', 'hex');
     const fileStat = fs.statSync(asarZipPath);
+    // full file
+    const fullFileInfo = metadataObj.files[0];
+    const fullFileName = fullFileInfo.url;
+    const fullFilePath = path.normalize(path.join(homeDir, cfg.output.directory, fullFileName));
+    const generateSha512 = this.generateHash(fullFilePath, 'sha512');
+    if (fullFileInfo.sha512 != generateSha512) {
+      console.log(chalk.blue('[ee-bin] [updater] ') + chalk.red(`Error: metadata sha512 is not equal to generateSha512 !
+      at metadata sha512: ${fullFileInfo.sha512}
+      at generate Sha512: ${generateSha512}`));
+      return;
+    }
     const item = {
       version: version,
       file: zipName,
       size: fileStat.size,
-      sha1: sha1,
-      releaseDate: date,
+      sha1: zipSha1,
+      fullFile: {
+        fileName: fullFileName,
+        size: fullFileInfo.size,
+        sha512: generateSha512,
+      },
+      releaseDate: metadataObj.releaseDate,
     };
-    const jsonName = path.basename(cfg.output.file, '.json') + `-${platformForFilename}.json`;
+    const extJson = '.json';
+    const jsonName = path.basename(cfg.output.file, extJson) + `-${platformForFilename}${extJson}`;
     latestVersionInfo = item;
     const updaterJsonFilePath = path.join(homeDir, cfg.output.directory, jsonName);
     writeJsonSync(updaterJsonFilePath, latestVersionInfo);
 
-    // 删除缓存文件，防止生成的 zip 是旧版本
+    // Delete cache files to prevent generated zip files from being outdated versions
     if (cfg.cleanCache) {
       this.tmpAppDirs.forEach(dir => {
         const dirPath = path.join(homeDir, cfg.output.directory, dir);
@@ -155,36 +182,35 @@ class IncrUpdater {
     }  
   }
   
-  generateSha1(filepath = "") {
-    let sha1 = '';
+  generateHash(filepath = "", algorithm = "sha512", encoding = "base64") {
+    let data = '';
     if (filepath.length == 0) {
-      return sha1;
+      return data;
     }
 
     if (!fs.existsSync(filepath)) {
-      return sha1;
+      return data;
     }
 
-    console.log(chalk.blue('[ee-bin] [updater] ') + `generate sha1 for filepath:${filepath}`);
+    console.log(chalk.blue('[ee-bin] [updater] ') + `generate ${algorithm} for filepath:${filepath}`);
     try {
       const buffer = fs.readFileSync(filepath);
-      const fsHash = crypto.createHash('sha1');
+      const fsHash = crypto.createHash(algorithm);
       fsHash.update(buffer);
-      sha1 = fsHash.digest('hex');
-      return sha1;
-
+      data = fsHash.digest(encoding);
+      return data;
     } catch (error) {
-      console.log(chalk.blue('[ee-bin] [updater] ') + chalk.red(`Error: generate sha1 error!`));
+      console.log(chalk.blue('[ee-bin] [updater] ') + chalk.red(`Error: generate ${algorithm} error!`));
       console.log(chalk.blue('[ee-bin] [updater] ') + chalk.red(`Error: ${error}`));
     }
-    return sha1;
+    return data;
   }
 
   _getFormattedDate() {
-    const date = new Date(); // 获取当前日期
-    const year = date.getFullYear(); // 获取年份
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 获取月份，月份从0开始计数
-    const day = date.getDate().toString().padStart(2, '0'); // 获取日
+    const date = new Date(); 
+    const year = date.getFullYear(); 
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
+    const day = date.getDate().toString().padStart(2, '0');
   
     return `${year}-${month}-${day}`; 
   }  
