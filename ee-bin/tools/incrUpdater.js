@@ -53,14 +53,11 @@ class IncrUpdater {
    * generate json file
    */ 
   generateFile(config, asarFile, platform) {
-    let cfg = config[platform];
+    const cfg = config[platform];
     if (!cfg) {
       console.log(chalk.blue('[ee-bin] [updater] ') + chalk.red(`Error: ${platform} config does not exist`));
       return;
     }
-    cfg = extend(true, {
-      metadata: './out/latest.yml',
-    }, cfg);
 
     let latestVersionInfo = {}
     const homeDir = process.cwd();
