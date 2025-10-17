@@ -114,6 +114,7 @@ program
   .option('--config <folder>', 'config file')
   .option('--asar-file <file>', 'asar file path')
   .option('--platform <flag>', 'platform')
+  .option('--force <flag>', 'force update full')
   .action(function() {
     incrUpdater.run(this.opts());
   });

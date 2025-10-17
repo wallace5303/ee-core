@@ -9,7 +9,6 @@ const admZip = require('adm-zip');
 const globby = require('globby');
 const yaml = require('js-yaml');
 const { loadConfig, writeJsonSync } = require('../lib/utils');
-const { extend } = require('../lib/extend');
 
 /**
  * Updater
@@ -26,6 +25,11 @@ class IncrUpdater {
       'win-ia32-unpacked',
       'linux-unpacked'
     ];
+    this.windows32Platform = 'windows_32';
+    this.windows64Platform = 'windows_64';
+    this.macosIntelPlatform = 'macos_intel';
+    this.macosApplePlatform = 'macos_apple';
+    this.linuxPlatform = 'linux';
     this.nodeModulesString = 'node_modules';
     this.asarUnpackedString = 'app.asar.unpacked';
   }
@@ -35,16 +39,17 @@ class IncrUpdater {
    */  
   run(options = {}) {
     console.log('[ee-bin] [updater] Start');
-    const { config, asarFile, platform } = options;
+    const { config, asarFile, platform, force } = options;
     const binCfg = loadConfig(config);
     const cfg = binCfg.updater;
+    const forceUpdate = force == 'true' ? true : false;
 
     if (!cfg) {
       console.log(chalk.blue('[ee-bin] [updater] ') + chalk.red(`Error: ${cfg} config does not exist`));
       return;
     }
 
-    this.generateFile(cfg, asarFile, platform);
+    this.generateFile(cfg, asarFile, platform, forceUpdate);
 
     console.log('[ee-bin] [updater] End');
   }
@@ -52,12 +57,13 @@ class IncrUpdater {
   /**
    * generate json file
    */ 
-  generateFile(config, asarFile, platform) {
+  generateFile(config, asarFile, platform, force = false) {
     const cfg = config[platform];
     if (!cfg) {
       console.log(chalk.blue('[ee-bin] [updater] ') + chalk.red(`Error: ${platform} config does not exist`));
       return;
     }
+
 
     let latestVersionInfo = {}
     const homeDir = process.cwd();
@@ -86,12 +92,14 @@ class IncrUpdater {
     let platformForFilename = platform;
     if (platform.indexOf("_") !== -1) {
       const platformArr = platform.split("_");
+      // windows_32 -> windows-32
       platformForFilename = platformArr.join("-");
     }
     
     // zip
     let zipName = "";
-    zipName = path.basename(cfg.output.zip, '.zip') + `-${platformForFilename}-${version}.zip`;
+    const extZip = '.zip';
+    zipName = path.basename(cfg.output.zip, extZip) + `-${platformForFilename}-${version}${extZip}`;
     const asarZipPath = path.join(homeDir, cfg.output.directory, zipName);
     if (fs.existsSync(asarZipPath)) {
       fsPro.removeSync(asarZipPath);
@@ -142,7 +150,13 @@ class IncrUpdater {
     const zipSha1 = this.generateHash(asarZipPath, 'sha1', 'hex');
     const fileStat = fs.statSync(asarZipPath);
     // full file
-    const fullFileInfo = metadataObj.files[0];
+    let fullFileInfo;
+    for (const item of metadataObj.files) {
+      if (item.url.indexOf('.zip') !== -1) {
+        continue;
+      }
+      fullFileInfo = item;
+    }
     const fullFileName = fullFileInfo.url;
     const fullFilePath = path.normalize(path.join(homeDir, cfg.output.directory, fullFileName));
     const generateSha512 = this.generateHash(fullFilePath, 'sha512');
@@ -152,16 +166,18 @@ class IncrUpdater {
       at generate Sha512: ${generateSha512}`));
       return;
     }
+    
     const item = {
       version: version,
       file: zipName,
       size: fileStat.size,
       sha1: zipSha1,
       fullFile: {
-        fileName: fullFileName,
+        fileName: fullFileInfo.url,
         size: fullFileInfo.size,
         sha512: generateSha512,
       },
+      force,
       releaseDate: metadataObj.releaseDate,
     };
     const extJson = '.json';
@@ -201,15 +217,6 @@ class IncrUpdater {
       console.log(chalk.blue('[ee-bin] [updater] ') + chalk.red(`Error: ${error}`));
     }
     return data;
-  }
-
-  _getFormattedDate() {
-    const date = new Date(); 
-    const year = date.getFullYear(); 
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); 
-    const day = date.getDate().toString().padStart(2, '0');
-  
-    return `${year}-${month}-${day}`; 
   }  
 }
 
