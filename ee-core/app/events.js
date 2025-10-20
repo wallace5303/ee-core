@@ -20,6 +20,7 @@ class EventBus {
   }
 
   // call lifecycle event
+  // [todo] 如果是一个 async 函数，且函数的运行时间比较长，如何正确执行
   emitLifecycle(eventName, ...args) {
     const eventFn = this.lifecycleEvents[eventName];
     if (eventFn) {
