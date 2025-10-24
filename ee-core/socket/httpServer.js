@@ -6,12 +6,14 @@ const is = require('is-type-of');
 const Koa = require('koa');
 const cors = require('koa2-cors');
 const koaBody = require('koa-body');
+const koaMount = require('koa-mount');
+const koaStatic = require('koa-static');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 const { coreLogger } = require('../log');
-const { getBaseDir } = require('../ps');
+const { getBaseDir, getExtraResourcesDir } = require('../ps');
 const { getController } = require('../controller');
 const { getConfig } = require('../config');
 const { getPort } = require('../utils/port');
@@ -77,6 +79,14 @@ class HttpServer {
     // 加载前置中间件
     this._loadMiddlewares(koaApp, preMiddleware);
 
+    // 静态服务
+    const staticPrefix = config.static?.prefix || '/public';
+    const staticPath = config.static?.path || path.join(getExtraResourcesDir(), 'public');
+    const staticOptions = config.static?.options || {};
+    if(config.static?.enable) {
+      koaApp.use(koaMount(staticPrefix, koaStatic(staticPath, staticOptions)));
+    }
+
     // 核心中间件
     koaApp
       .use(cors(corsOptions))
@@ -111,7 +121,7 @@ class HttpServer {
    */
   async _dispatch (ctx, next) {
     const controller = getController();
-    const { filterRequest } = getConfig().httpServer;
+    const { filter, filterRequest } = getConfig().httpServer;
     let uriPath = ctx.request.path;
     const method = ctx.request.method;
     let params = ctx.request.query;
@@ -122,6 +132,11 @@ class HttpServer {
     ctx.response.status = 200;
 
     try {
+      // 自定义 filter 过滤 http 请求
+      if (filter && filter(uriPath, ctx)) {
+        await next();
+        return;
+      }
       // 找函数
       // 去除开头的 '/'
       if (uriPath.indexOf('/') == 0) {

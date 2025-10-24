@@ -65,6 +65,13 @@ export declare interface HttpConfig {
             keepExtensions?: boolean;
         };
     };
+    static?: {
+        enable?: boolean,
+        prefix?: string,
+        path?: string,
+        options?: object
+    },
+    filter: (uriPath: string, ctx: any) => boolean;
     filterRequest?: {
         uris?: string[];
         returnData?: string;
