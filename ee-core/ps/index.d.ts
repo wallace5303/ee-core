@@ -23,6 +23,7 @@ export declare function getExecDir(): string;
 export declare function getUserHomeDir(): string;
 export declare function getUserHomeAppDir(): string;
 export declare function getUserHomeHiddenAppDir(): string;
+export declare function getCustomAppDir(): string;
 export declare function getSocketPort(): number;
 export declare function getHttpPort(): number;
 export declare function isPackaged(): boolean;

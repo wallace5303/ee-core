@@ -30,6 +30,11 @@ function linux() {
   return process.platform === 'linux'
 }
 
+// Checks if we are under openharmony OS
+function openharmony() {
+  return process.platform === 'openharmony'
+}
+
 // Checks if we are the processor's arch is x86
 function x86() {
   return process.arch === 'ia32'
@@ -101,6 +106,7 @@ module.exports = {
   macOS,
   windows,
   linux,
+  openharmony,
   x86,
   x64,
   sandbox,

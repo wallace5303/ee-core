@@ -71,14 +71,28 @@ function appVersion() {
 
 // 获取数据存储路径
 function getDataDir() {
-  const base = isDev() ? getBaseDir() : getUserHomeHiddenAppDir();
+  let base = getBaseDir();
+  if (isProd()) {
+    base = getUserHomeHiddenAppDir();
+    // 权限问题，openharmony 环境下，自定义应用目录
+    if (is.openharmony()) {
+      base = getCustomAppDir();
+    }
+  } 
   const dataDir = path.join(base, 'data');
   return dataDir;
 }
 
 // 获取日志存储路径 
 function getLogDir() {
-  const base = isDev() ? getBaseDir() : getUserHomeHiddenAppDir();
+  let base = getBaseDir();
+  if (isProd()) {
+    base = getUserHomeHiddenAppDir();
+    // 权限问题，openharmony 环境下，自定义应用目录
+    if (is.openharmony()) {
+      base = getCustomAppDir();
+    }
+  } 
   const dir = path.join(base, 'logs');
   return dir;
 }
@@ -133,6 +147,9 @@ function getExtraResourcesDir() {
     dir = path.join(execDir, "resources", "extraResources");
     if (is.macOS()) {
       dir = path.join(execDir, "..", "Resources", "extraResources");
+    } else if (is.openharmony()) {
+      // todo
+      dir = path.join(execDir, "..", "Resources", "extraResources");
     }
   } else {
     // 打包前
@@ -158,7 +175,11 @@ function getExecDir() {
 }
 
 // 获取操作系统用户目录
+// 权限原因：openharmony 下返回 appUserData 目录
 function getUserHomeDir() {
+  if (is.openharmony()) {
+    return getAppUserDataDir();
+  }
   return process.env.EE_USER_HOME;
 }
 
@@ -173,6 +194,13 @@ function getUserHomeHiddenAppDir() {
 function getUserHomeAppDir() {
   const appnameDir = appName();
   const dir = path.join(getUserHomeDir(), appnameDir);
+  return dir;
+}
+
+// 获取自定义应用目录
+function getCustomAppDir() {
+  const appnameDir = appName();
+  const dir = path.join(getAppUserDataDir(), appnameDir);
   return dir;
 }
 
@@ -283,6 +311,7 @@ module.exports = {
   getUserHomeDir,
   getUserHomeAppDir,
   getUserHomeHiddenAppDir,
+  getCustomAppDir,
   getSocketPort,
   getHttpPort,
   isPackaged,

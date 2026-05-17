@@ -4,6 +4,7 @@ export declare function osx(): boolean;
 export declare function macOS(): boolean;
 export declare function windows(): boolean;
 export declare function linux(): boolean;
+export declare function openharmony(): boolean;
 export declare function x86(): boolean;
 export declare function x64(): boolean;
 export declare function sandbox(): boolean;
